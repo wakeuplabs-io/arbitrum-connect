@@ -2,7 +2,7 @@ import EthereumIconCheck from "@/assets/ethereum-icon-check.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 import HomeButton from "@/components/layout/home-button";
 import { TransactionStatus } from "@/components/transaction/status";
-import { ClaimStatus } from "@/hooks/useArbitrumBridge";
+import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { transactionsStorageService } from "@/lib/transactions";
 import { createFileRoute } from "@tanstack/react-router";
 import { formatEther } from "ethers/lib/utils";

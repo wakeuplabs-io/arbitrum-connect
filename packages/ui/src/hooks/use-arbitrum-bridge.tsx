@@ -13,7 +13,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
-import { useEthersSigner } from "./useEthersSigner";
+import { useEthersSigner } from "./use-ethers-signer";
 
 export enum ClaimStatus {
   PENDING = "PENDING",
@@ -49,8 +49,8 @@ export default function useArbitrumBridge() {
   async function isForceIncludePossible(parentSigner: ethers.providers.JsonRpcSigner) {
     await ensureChainId(parentChainId);
     const inboxSdk = new InboxTools(parentSigner, l2Network);
-
-    return !!(await inboxSdk.getForceIncludableEvent());
+    const canForceInclude = await inboxSdk.getForceIncludableEvent();
+    return !!(canForceInclude);
   }
 
   async function forceInclude(parentSigner: ethers.providers.JsonRpcSigner) {
@@ -106,17 +106,17 @@ export default function useArbitrumBridge() {
   async function getL2toL1Msg(l2TxnHash: string, childProvider: ethers.providers.JsonRpcProvider, parentSigner: ethers.providers.JsonRpcSigner) {
     if (!l2TxnHash.startsWith("0x") || l2TxnHash.trim().length != 66)
       throw new Error(`Hmm, ${l2TxnHash} doesn't look like a txn hash...`);
-
+  
     // First, let's find the Arbitrum txn from the txn hash provided
     const receipt = await childProvider.getTransactionReceipt(l2TxnHash);
     if (receipt === null)
-      return undefined
+      return receipt
 
     const l2Receipt = new ChildTransactionReceipt(receipt);
     // In principle, a single transaction could trigger any number of outgoing messages; the common case will be there's only one.
     // We assume there's only one / just grad the first one.
     const messages = await l2Receipt.getChildToParentMessages(parentSigner);
-
+   
     return messages[0];
   }
 

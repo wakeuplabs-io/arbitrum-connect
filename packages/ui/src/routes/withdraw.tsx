@@ -3,7 +3,7 @@ import { LEARN_MORE_URI } from "@/constants";
 import { useAlertContext } from "@/contexts/alert/alert-context";
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import { useEthPrice } from "@/hooks/use-eth-price";
-import useArbitrumBridge, { ClaimStatus } from "@/hooks/useArbitrumBridge";
+import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import {
   getMockedL1ClaimTxGasLimit,
   getMockedL2WithdrawPrice,

@@ -26,6 +26,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Generate .env file
+        working-directory: ./packages/ui
+        env:
+          NETWORK: ${{ github.ref == 'refs/heads/main' && 'mainnet' || github.ref == 'refs/heads/develop' && 'sepolia'}}
+        run: |
+          echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
+          echo "VITE_HTTPS_ETH_RPC_URL=https://eth-${{ env.NETWORK }}.g.alchemy.com/v2/${{ secrets.ALCHEMY_API_KEY }}" >> .env
+          echo "VITE_HTTPS_ARB_RPC_URL=https://arb-${{ env.NETWORK }}.g.alchemy.com/v2/${{ secrets.ALCHEMY_API_KEY }}" >> .env
+          echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
+
       - name: Build
         working-directory: ./packages/ui
         run: pnpm build

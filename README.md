@@ -24,40 +24,9 @@ the SDK to force the inclusion of the transaction.
 
 The implementation is fully open source with MIT license.
 
-## How to run
-
-### Local Setup Guide
-
-TL;DR
-
-#### Required Prerequisites
-
-- Node version: 18.18.2
-- npm version: 9.8.1
-
-Also, Node 18.18.2 comes with npm 9.8.1, so the project should work properly with it. In any case, npm workspaces were added in npm 7.0.0, so you should have at least that version (9.8.1 strongly recommended).
-
-#### Steps to Run Locally
-
-1.  Clone the repository:
-
-    ```bash
-     git clone https://github.com/wakeuplabs-io/arbitrum-connect.git
-    ```
-
-2.  Install dependencies:
-
-    ```bash
-     npm install
-    ```
-
-3.  Start the local server:
-
-    ```bash
-     npm run dev
-    ```
-
 ## Arbitrum Connect User Guide
+
+You can read our technical research [here](https://drive.google.com/file/d/1mBZLs-64t7PxTXpgJsqTmKRwsR5w5opG/view).
 
 ### Our Solution
 
@@ -109,9 +78,42 @@ Try it out here: https://staging-transaction-enforcer.wakeuplabs.link/
 
 ![Demo](/assets/app-preview-1.png)
 
+## How to run
+
+### Local Setup Guide
+
+TL;DR
+
+#### Required Prerequisites
+
+- Node version: 18.18.2
+- npm version: 9.8.1
+
+Also, Node 18.18.2 comes with npm 9.8.1, so the project should work properly with it. In any case, npm workspaces were added in npm 7.0.0, so you should have at least that version (9.8.1 strongly recommended).
+
+#### Steps to Run Locally
+
+1.  Clone the repository:
+
+    ```bash
+     git clone https://github.com/wakeuplabs-io/arbitrum-connect.git
+    ```
+
+2.  Install dependencies:
+
+    ```bash
+     npm install
+    ```
+
+3.  Start the local server:
+
+    ```bash
+     npm run dev
+    ```
+
 ---
 
-<div style='text-align: center;'>
+<div align="center">
   <a href='https://www.wakeuplabs.io/' target='_blank' rel='noreferrer'>
     Made with love ❤️ by WakeUp Labs
   </a>

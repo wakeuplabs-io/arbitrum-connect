@@ -1,4 +1,4 @@
-import { ClaimStatus } from "@/hooks/useArbitrumBridge";
+import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { Address } from "viem";
 
 export interface Transaction {
