@@ -15,6 +15,9 @@ Parameters:
   CertificateId:
     Description: The ID of the existing certificate related to the domain name
     Type: String
+  UrlPrefix:
+    Description: The URL prefix to attach to the domain name
+    Type: String
 
 Resources:
   SecurityHeadersPolicy:
@@ -42,10 +45,17 @@ Resources:
             ModeBlock: true
             Override: true
 
+  Conditions:
+    HasUrlPrefix: !Not [!Equals [!Ref UrlPrefix, ""]]
+    
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${StackName}.${DomainName}"
+      BucketName: 
+        !If
+          - HasUrlPrefix
+          - !Sub "${UrlPrefix}.${DomainName}"
+          - !Ref DomainName
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html

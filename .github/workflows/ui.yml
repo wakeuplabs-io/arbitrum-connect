@@ -50,4 +50,8 @@ jobs:
       - name: Deploy UI to s3
         working-directory: ./packages/ui
         run: |
-          aws s3 sync dist s3://${{ vars.STACK_NAME }}.${{vars.UI_DOMAIN}}/ --delete
+          if [ -n "${{ vars.URL_PREFIX }}" ]; then
+            aws s3 sync dist s3://${{ vars.URL_PREFIX }}.${{ vars.UI_DOMAIN }}/ --delete
+          else
+            aws s3 sync dist s3://${{ vars.UI_DOMAIN }}/ --delete
+          fi
