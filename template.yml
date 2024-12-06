@@ -16,6 +16,10 @@ Parameters:
   CertificateId:
     Description: The ID of the existing certificate related to the domain name
     Type: String
+  UrlPrefix:
+    Description: The URL prefix to attach to the domain name
+    Type: String
+    Default: ""
 
 Resources:
   UI:
@@ -27,6 +31,7 @@ Resources:
         DomainName: !Ref DomainName
         HostedZoneId: !Ref HostedZoneId
         CertificateId: !Ref CertificateId
+        UrlPrefix: !Ref UrlPrefix
 
 Outputs:
   UIUrl:
