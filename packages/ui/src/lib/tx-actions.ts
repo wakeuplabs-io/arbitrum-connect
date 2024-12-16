@@ -10,7 +10,7 @@ export async function getTimestampFromTxHash(
       client
         .getBlock({ blockNumber: tx.blockNumber })
         .then((x) => Number(x.timestamp) * 1000)
-    );
+    ); // use await always
 
   return blockTimestamp;
 }

@@ -74,23 +74,29 @@ function WithdrawScreen() {
     initialData: BigNumber.from(0),
   });
 
-  function onContinue(address: Address) {
+  async function onContinue() {
+    if (!signer || !address) return;
+
     setLoading(true);
-    signer &&
-      initiateWithdraw(amountInWei, signer)
-        .then((l2Txhash) => {
-          const tx: Transaction = {
-            bridgeHash: l2Txhash,
-            amount: amountInWei,
-            claimStatus: ClaimStatus.PENDING,
-          };
-          transactionsStorageService.create(tx, address);
-          navigate({ to: `/activity/${tx.bridgeHash}` });
-        })
-        .catch((e) => {
-          setError(e);
-        })
-        .finally(() => setLoading(false));
+
+    try {
+      const l2Txhash =await initiateWithdraw(amountInWei, signer)
+
+      const tx: Transaction = {
+        bridgeHash: l2Txhash,
+        amount: amountInWei,
+        claimStatus: ClaimStatus.PENDING,
+      };
+      transactionsStorageService.create(tx, address);
+
+      await navigate({ to: `/activity/${tx.bridgeHash}` })
+    } catch (error: Error | any) { // TODO: revisar los tipos
+      setError(error.message);
+    }
+    finally{
+      setLoading(false)
+    }
+    
   }
 
   const canContinue = useMemo(() => {
@@ -279,9 +285,10 @@ function WithdrawScreen() {
         type="button"
         className={cn("btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200")}
         disabled={!canContinue || loading || !address}
-        onClick={() => address && onContinue(address)}
+        onClick={onContinue}
       >
-        {loading ? "Loading..." : "Confirm Withdrawal"}
+        {loading && "Loading..."}
+        {!loading && "Confirm Withdrawal"}
       </button>
     </div>
   );

@@ -56,6 +56,8 @@ export function TransactionStatus(props: {
         onError: setError,
     });
 
+    // TODO: refactor this code: make it more readable and clean
+
     const { data: l2ToL1Msg, isFetching: fetchingL2ToL1Msg } = useQuery({
         queryKey: ["l2ToL1Msg", transaction.bridgeHash],
         queryFn: () =>

@@ -33,7 +33,7 @@ function ActivityScreen() {
               key={`collapsable-${i}`}
             >
               <input type="radio" name="accordion" />
-              <div className="collapse-title flex justify-center items-center justify-between text-lg h-10 pl-6 p-0 mt-5 mb-2.5 pr-12">
+              <div className="collapse-title flex items-center justify-between text-lg h-10 pl-6 p-0 mt-5 mb-2.5 pr-12">
                 <div className="flex gap-3 items-center">
                   {x.claimStatus === ClaimStatus.CLAIMED ?
                     <img src={EthereumIconCheck} /> :

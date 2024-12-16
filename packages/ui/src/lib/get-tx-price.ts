@@ -9,6 +9,7 @@ export interface ITxReq extends ethers.providers.TransactionRequest {
 }
 
 //todo: to should be depend on mainnet/sepolia
+// TODO: do not mix tests with production code
 export const MockL1SendL2MessageTx: ITxReq = {
   to: "0xaAe29B0366299461418F5324a79Afc425BE5ae21",
   data: "0xb75436bb0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002104c36d4653231062d414b13589c398617e80548a539073feb0d0cb3ec7bb39b35500000000000000000000000000000000000000000000000000000000000000",
@@ -53,7 +54,7 @@ export async function getChildTxPrice(
 ) {
   const gasPrice = await childProvider
     .getGasPrice()
-    .then((x) => BigNumber.from(x));
+    .then((x) => BigNumber.from(x)); // TODO: no mezclar await y promise, preferir await
   const estimated = await childProvider.estimateGas(tx);
   const L2TxPrice = BigNumber.from(estimated).mul(gasPrice);
 
