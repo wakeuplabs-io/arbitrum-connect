@@ -155,18 +155,16 @@ function HomeScreen() {
             if (!address && openConnectModal) {
               openConnectModal();
             } else handleSubmit();
-          }}
+          }} // TODO: necesitamos un form? que otras alternativas hay para resolver esto?.
           type="submit"
           className={cn(
             "btn btn-primary font-normal rounded-3xl text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200", { "animate-shake": error }
           )}
           disabled={!address || !arbBalance}
         >
-          {address
-            ? arbBalance
-              ? "Continue"
-              : "Loading balance..."
-            : "Connect your wallet to withdraw"}
+          {address && arbBalance && "Continue"}
+          {address && !arbBalance && "Loading balance..."}
+          {!address && "Connect your wallet to withdraw"}
         </button>
       </div>
     </form >
