@@ -9,6 +9,9 @@ Parameters:
   DomainName: 
     Description: The domain name of the existing Route 53 hosted zone
     Type: String
+  Subdomain:
+    Description: The subdomain name of the existing Route 53 hosted zone
+    Type: String
   HostedZoneId:
     Description: The ID of the existing Route 53 hosted zone
     Type: String
@@ -45,7 +48,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${StackName}.${DomainName}"
+      BucketName: !Sub "${Subdomain}.${DomainName}"
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
