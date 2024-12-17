@@ -1,12 +1,6 @@
 name: infra
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-    paths:
-      - "**/template.yml"
+on: workflow_dispatch
 
 jobs:
   Deploy:
