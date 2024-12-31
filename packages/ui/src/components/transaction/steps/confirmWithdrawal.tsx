@@ -50,7 +50,7 @@ export default function ConfirmWithdrawal({
       return Status.PENDING;
     }
 
-    return Status.COMPLETED;
+    return Status.COMPLETED; //CONFIRMED
   }, []);
 
   const isRunning =

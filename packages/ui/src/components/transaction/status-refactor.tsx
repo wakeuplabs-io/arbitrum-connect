@@ -12,11 +12,10 @@ import InitiateWithdrawal from "./steps/initiateWithdrawal";
 import ConfirmWithdrawal from "./steps/confirmWithdrawal";
 import ClaimStep from "./steps/claim";
 import ForceStep from "./steps/force";
+import { useTransactionStatus } from "@/hooks/use-transaction-status";
 
-export function TransactionStatus(props: {
-  tx: Transaction;
-  isActive: boolean;
-}) {
+export function TransactionStatus({ tx }: { tx: Transaction }) {
+
   const [triggered, setTriggered] = useState(false);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -31,52 +30,49 @@ export function TransactionStatus(props: {
     fetchingClaimStatus,
     fetchingL2ToL1Msg,
     l2ToL1Msg
-  } = useTransaction({ tx: props.tx, enabled: triggered });
+  } = useTransaction({ tx: tx, enabled: triggered });
 
+  const transactionState = useTransactionStatus(transaction);
   useEffect(() => {
     if (!triggered && isVisible) setTriggered(true);
   }, [isVisible]);
 
-  return (
-    <div className="flex flex-col text-start justify-between bg-gray-100 border border-neutral-200 rounded-2xl pt-4  overflow-hidden">
-      <div
-        ref={ref}
-        className="flex flex-col grow justify-between text-primary-700 px-4 md:px-6"
-      >
-        <InitiateWithdrawal transaction={transaction} />
-        <ConfirmWithdrawal
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          fetchingInboxTxTimestamp={fetchingInboxTxTimestamp}
-          updateTx={updateTx}
-        />
-        <ForceStep
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          triggered={triggered}
-          fetchingClaimStatus={fetchingClaimStatus}
-          fetchingL2ToL1Msg={fetchingL2ToL1Msg}
-        />
-        <ClaimStep
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          fetchingClaimStatus={fetchingClaimStatus}
-          fetchingQueries={fetchingClaimStatus || fetchingL2ToL1Msg}
-          forceStepActive={!!transaction.delayedInboxHash}
-          canClaim={!!transaction.delayedInboxHash}
-          l2ToL1Msg={l2ToL1Msg!}
-          updateTx={updateTx}
-        />
-      </div>
+  // Calcular estados del step
+  const steps = [
+    {
+      component: InitiateWithdrawal,
+      state:
+        transactionState
+    },
+    {
+      component: ConfirmWithdrawal,
+      state:
+        transactionState
+    },
+    {
+      component: ForceStep,
+      state:
+        transactionState
+    },
+    {
+      component: ClaimStep,
+      state:
+        transactionState
+    },
+  ];
 
-      <div className="bg-gray-200 mt-4 px-4 py-3 text-center">
-        <div className="text-sm">
-          Have questions about this process?
-          <a className="link" href={LEARN_MORE_URI} target="_blank">
-            Learn More
-          </a>
-        </div>
-      </div>
+  return (
+    <div>
+      {steps.map((step, index) => {
+        const StepComponent = step.component;
+        return (
+          <StepComponent
+            key={index}
+            transaction={transaction}
+            state={step.state}
+          />
+        );
+      })}
     </div>
   );
 }
