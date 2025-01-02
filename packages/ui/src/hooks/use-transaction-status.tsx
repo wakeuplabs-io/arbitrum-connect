@@ -5,8 +5,13 @@ import { ClaimStatus } from "./use-arbitrum-bridge";
 export function useTransactionStatus(
   transaction: Transaction,
 ): TransactionState {
-  if (!!transaction.delayedInboxHash && !!transaction.delayedInboxTimestamp) {
-    return TransactionState.CONFIRMED;
+  const withdrawCompleted = transaction.claimStatus === ClaimStatus.CLAIMED;
+    !transaction.delayedInboxHash && !transaction.delayedInboxTimestamp;
+  if (transaction.claimStatus === ClaimStatus.CLAIMABLE && !withdrawCompleted)
+    return TransactionState.CLAIMABLE;
+
+  if (withdrawCompleted) {
+    return TransactionState.COMPLETED;
   }
 
   if (
@@ -15,13 +20,9 @@ export function useTransactionStatus(
   ) {
     return TransactionState.FORCEABLE;
   }
-  const withdrawCompleted =
-    !transaction.delayedInboxHash || !transaction.delayedInboxTimestamp;
-  if (transaction.claimStatus !== ClaimStatus.CLAIMED && !withdrawCompleted)
-    return TransactionState.CLAIMABLE;
 
-  if (withdrawCompleted) {
-    return TransactionState.COMPLETED;
+  if (!!transaction.delayedInboxHash && !!transaction.delayedInboxTimestamp) {
+    return TransactionState.CONFIRMED;
   }
 
   return TransactionState.INITIATED;
