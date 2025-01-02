@@ -8,7 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import useArbitrumBridge from "@/hooks/use-arbitrum-bridge";
 
 // Constants
-import { l1Scan } from "@/constants";
+import { l1Scan, TransactionState } from "@/constants";
 
 // Libs
 import { Transaction } from "@/lib/transactions";
@@ -27,11 +27,13 @@ export default function ConfirmWithdrawal({
   onError,
   fetchingInboxTxTimestamp: isLoading,
   updateTx,
+  state
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
   fetchingInboxTxTimestamp: boolean;
   updateTx: (tx: Transaction) => void;
+  state: TransactionState;
 }) {
   const { signer, pushChildTxToParent } = useArbitrumBridge();
 

@@ -42,22 +42,45 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
     {
       component: InitiateWithdrawal,
       state:
-        transactionState
+        transactionState,
+        
     },
     {
       component: ConfirmWithdrawal,
       state:
-        transactionState
+        transactionState,
+        props: {
+          transaction,
+          fetchingInboxTxTimestamp,
+          updateTx,
+          onError: setError
+        }
     },
     {
       component: ForceStep,
       state:
-        transactionState
+        transactionState,
+        props: {
+          fetchingInboxTxTimestamp,
+          fetchingClaimStatus,
+          fetchingL2ToL1Msg,
+          l2ToL1Msg,
+          updateTx,
+          onError: setError
+        }
     },
     {
       component: ClaimStep,
       state:
-        transactionState
+        transactionState,
+        props: {
+          fetchingInboxTxTimestamp,
+          fetchingClaimStatus,
+          fetchingL2ToL1Msg,
+          l2ToL1Msg,
+          updateTx,
+          onError: setError
+        }
     },
   ];
 
@@ -70,6 +93,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
             key={index}
             transaction={transaction}
             state={step.state}
+            {...step.props}
           />
         );
       })}
