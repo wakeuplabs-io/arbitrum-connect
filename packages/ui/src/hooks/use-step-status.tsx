@@ -31,6 +31,5 @@ export const useStepStatus = (
   transactionState: TransactionState,
 ) => {
   const stepStatuses = stepStatus(transactionState)[step];
-  console.log( {step, transactionState, stepStatuses });
   return stepStatuses;
 };
