@@ -1,6 +1,6 @@
 # Research Plan: Force-Inclusion Mechanism for Orbit Chains
 
-[Mission Link](https://forum.arbitrum.foundation/t/tally-front-end-interface-to-force-transaction-inclusion-during-sequencer-downtime/21247)
+[Original Proposal Link](https://forum.arbitrum.foundation/t/tally-front-end-interface-to-force-transaction-inclusion-during-sequencer-downtime/21247)
 
 ## **Objective**
 To design and implement a robust open-source front-end interface enabling transaction force-inclusion during sequencer downtime for Orbit Chains. This includes researching delayed inbox mechanisms and integrating the solution into the broader Orbit ecosystem.
@@ -32,7 +32,7 @@ The project builds on the foundational work of Arbitrum's Delayed Inbox and Outb
 
 The [previous initiative](https://forum.arbitrum.foundation/t/tally-front-end-interface-to-force-transaction-inclusion-during-sequencer-downtime/21247) focused on bypassing the sequencer to enable transaction submission from Arbitrum to Ethereum.
 
-The current mission aims to extend this capability to Orbit Chains, broadening the scope of decentralized and resilient transaction handling across the Arbitrum ecosystem. To achieve this, it is crucial to thoroughly analyze the architecture and operational mechanics of Orbit Chains, identify potential limitations, and address any challenges that may arise during implementation.
+The current project aims to extend this capability to Orbit Chains, broadening the scope of decentralized and resilient transaction handling across the Arbitrum ecosystem. To achieve this, it is crucial to thoroughly analyze the architecture and operational mechanics of Orbit Chains, identify potential limitations, and address any challenges that may arise during implementation.
 
 ## From Arbitrum to L1 solution
 

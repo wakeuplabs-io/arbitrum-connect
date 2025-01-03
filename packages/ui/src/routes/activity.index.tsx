@@ -1,7 +1,7 @@
 import EthereumIconCheck from "@/assets/ethereum-icon-check.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 import HomeButton from "@/components/layout/home-button";
-import { TransactionStatus } from "@/components/transaction/status";
+import { TransactionStatus } from "@/components/transaction/status-refactor";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { transactionsStorageService } from "@/lib/transactions";
 import { createFileRoute } from "@tanstack/react-router";
@@ -43,7 +43,7 @@ function ActivityScreen() {
                 <div>{formatEther(BigInt(x.amount)).slice(0, 8)} ETH</div>
               </div>
               <div className="collapse-content">
-                <TransactionStatus tx={x} isActive={false} />
+                <TransactionStatus tx={x} /* isActive={false} */ />
               </div>
             </div>
           ))}

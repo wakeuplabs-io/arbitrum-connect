@@ -81,7 +81,7 @@ Resources:
           CloudFrontDefaultCertificate: true
         DefaultCacheBehavior:
           TargetOriginId: !Sub "${StackName}S3Origin"
-          ViewerProtocolPolicy: redirect-to-https # Check what happens if there's no certificate, switch for allow-all
+          ViewerProtocolPolicy: redirect-to-https
           AllowedMethods:
             - HEAD
             - GET

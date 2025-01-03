@@ -1,39 +1,37 @@
 import classNames from "classnames";
 import { useMutation } from "@tanstack/react-query";
 import { ChildToParentMessageWriter } from "@arbitrum/sdk";
-
-// Hooks
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
-
-// Libs
 import { Transaction } from "@/lib/transactions";
-
-// Steps
 import { StatusStep } from "../status-step";
 import { Countdown } from "../countdown";
+import { useStepStatus } from "@/hooks/use-step-status";
+import { Step, TransactionState } from "@/constants";
 
 export default function ClaimStep({
   transaction,
   onError,
   // Revise this
   fetchingQueries,
-  forceStepActive,
-  canClaim,
   l2ToL1Msg,
   updateTx,
+  state,
+  canClaim
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
   fetchingClaimStatus: boolean;
   fetchingQueries: boolean;
-  forceStepActive: boolean;
-  canClaim: boolean;
   l2ToL1Msg: ChildToParentMessageWriter;
   updateTx: (tx: Transaction) => void;
+  state: TransactionState;
+  fetchingL2ToL1Msg: boolean;
+  canClaim: boolean;
 }) {
   const { signer, claimFunds } = useArbitrumBridge();
   const { childProvider } = useWeb3ClientContext();
+  const { ACTIVE, DONE } = useStepStatus(Step.CLAIM, state);
 
   const claimFundsTx = useMutation({
     mutationFn: claimFunds,
@@ -42,19 +40,10 @@ export default function ClaimStep({
 
   const claimTimeRemainingActive =
     transaction.claimStatus === ClaimStatus.PENDING &&
-    !canClaim &&
+    state !== TransactionState.CLAIMABLE &&
     !fetchingQueries;
 
-  const withdrawCompleted =
-    !transaction.delayedInboxHash || !transaction.delayedInboxTimestamp;
-
-  const claimStepActive =
-    transaction.claimStatus !== ClaimStatus.CLAIMED &&
-    !forceStepActive &&
-    !withdrawCompleted;
-
-    console.log({ transaction, forceStepActive, withdrawCompleted })
-
+  
   function onClaim() {
     if (!signer) return;
 
@@ -71,14 +60,14 @@ export default function ClaimStep({
             claimStatus: ClaimStatus.CLAIMED,
           });
         },
-      }
+      },
     );
   }
 
   return (
     <StatusStep
-      done={transaction.claimStatus === ClaimStatus.CLAIMED}
-      active={claimStepActive}
+      done={DONE}
+      active={ACTIVE}
       running={claimFundsTx.isPending || fetchingQueries}
       number={4}
       className="flex flex-col items-start pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 md:flex-row md:items-center"

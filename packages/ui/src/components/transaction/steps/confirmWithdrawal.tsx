@@ -1,60 +1,36 @@
-import React from "react";
 import { Address } from "viem";
 import classNames from "classnames";
 import { ArrowUpRight } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-
-// Hooks
 import useArbitrumBridge from "@/hooks/use-arbitrum-bridge";
-
-// Constants
-import { l1Scan } from "@/constants";
-
-// Libs
+import { l1Scan, Step, TransactionState } from "@/constants";
 import { Transaction } from "@/lib/transactions";
-
-// Steps
 import { StatusStep } from "../status-step";
-
-enum Status {
-  ACTIVE = 0,
-  PENDING = 1,
-  COMPLETED = 2,
-}
+import { useStepStatus } from "@/hooks/use-step-status";
 
 export default function ConfirmWithdrawal({
   transaction,
   onError,
   fetchingInboxTxTimestamp: isLoading,
   updateTx,
+  state
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
   fetchingInboxTxTimestamp: boolean;
   updateTx: (tx: Transaction) => void;
+  state: TransactionState;
 }) {
   const { signer, pushChildTxToParent } = useArbitrumBridge();
-
+  const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
   const l1TxUrl = `${l1Scan}/tx/${transaction.delayedInboxHash}`;
   const confirmTx = useMutation({
     mutationFn: pushChildTxToParent,
     onError,
   });
 
-  const status = React.useMemo(() => {
-    if (!transaction.delayedInboxHash) {
-      return Status.ACTIVE;
-    }
-
-    if (transaction.delayedInboxHash && !transaction.delayedInboxTimestamp) {
-      return Status.PENDING;
-    }
-
-    return Status.COMPLETED;
-  }, []);
-
   const isRunning =
-    confirmTx.isPending || isLoading || status === Status.PENDING;
+    confirmTx.isPending || isLoading || (transaction.delayedInboxHash && !transaction.delayedInboxTimestamp);
 
   function onConfirm() {
     if (!signer) return;
@@ -84,15 +60,15 @@ export default function ConfirmWithdrawal({
 
   return (
     <StatusStep
-      done={!!transaction.delayedInboxTimestamp}
-      active={status === Status.ACTIVE}
+      done={DONE}
+      active={ACTIVE}
       running={isRunning}
       number={2}
       title="Confirm Withdraw"
       description="Send the Arbitrum withdraw transaction through the delayed inbox"
       className="pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 flex items-start flex-col md:flex-row md:items-center"
     >
-      {[Status.ACTIVE, Status.PENDING].includes(status) && !isLoading && (
+      {ACTIVE && !isLoading && (
         <button
           onClick={onConfirm}
           className={classNames("btn btn-primary btn-sm", {
@@ -104,7 +80,7 @@ export default function ConfirmWithdrawal({
         </button>
       )}
 
-      {status === Status.COMPLETED && (
+      {DONE && (
         <a
           href={l1TxUrl}
           target="_blank"
