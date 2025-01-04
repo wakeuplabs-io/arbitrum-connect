@@ -9,7 +9,8 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:react/jsx-runtime"
+    "plugin:react/jsx-runtime",
+    "prettier"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -18,14 +19,11 @@
   },
   "plugins": ["@typescript-eslint", "react", "react-refresh"],
   "rules": {
-    "indent": ["error", 2],
-    "linebreak-style": ["error", 0],
-    "quotes": ["error", "double"],
-    "semi": ["error", "always"],
     "react-refresh/only-export-components": [
       "warn",
       { "allowConstantExport": true }
-    ]
+    ],
+    "@typescript-eslint/no-explicit-any": "warn"
   },
   "settings": {
     "react": {
