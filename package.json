@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "lint": "pnpm -r --if-present type-check  && eslint .",
+    "lint": "pnpm -r --if-present type-check && eslint .",
     "dev": "pnpm -r --stream dev",
     "build": "pnpm -r build",
     "format": "prettier --write ."
