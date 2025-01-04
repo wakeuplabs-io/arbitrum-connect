@@ -6,7 +6,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "pnpm -r --if-present type-check  && eslint .",
     "dev": "pnpm -r --stream dev",
     "build": "pnpm -r build",
     "format": "prettier --write ."
