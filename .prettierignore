@@ -11,3 +11,8 @@ coverage/
 
 .husky
 .vscode
+
+**/template.yml
+.github/
+pnpm-lock.yaml
+*.d.ts

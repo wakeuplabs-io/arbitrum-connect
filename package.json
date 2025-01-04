@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "dev": "pnpm -r --stream dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "7.6.0",
