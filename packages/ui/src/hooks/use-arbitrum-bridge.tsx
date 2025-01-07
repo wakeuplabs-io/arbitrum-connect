@@ -1,12 +1,11 @@
 import { ITxReq } from "@/lib/get-tx-price";
-import { l2Chain, l3Chain } from "@/lib/wagmi-config";
 import {
   ChildToParentMessageStatus,
   ChildToParentMessageWriter,
   ChildTransactionReceipt,
   getArbitrumNetwork,
   InboxTools,
-  registerCustomArbitrumNetwork
+  registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import { ArbSys__factory } from "@arbitrum/sdk/dist/lib/abi/factories/ArbSys__factory";
 import { ARB_SYS_ADDRESS } from "@arbitrum/sdk/dist/lib/dataEntities/constants";
@@ -15,7 +14,12 @@ import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
-import { EthBridge } from "@arbitrum/sdk/dist/lib/dataEntities/networks";
+import {
+  ArbitrumNetwork,
+  EthBridge,
+} from "@arbitrum/sdk/dist/lib/dataEntities/networks";
+import { useState } from "react";
+import { CustomChain } from "@/types";
 
 export enum ClaimStatus {
   PENDING = "PENDING",
@@ -24,32 +28,30 @@ export enum ClaimStatus {
 }
 
 export default function useArbitrumBridge() {
-  const parentChainId = l2Chain.id;
-  const childNetworkId = l3Chain.id;
-
-  registerCustomArbitrumNetwork(
-    {
-      chainId: l3Chain.id,
-      retryableLifetimeSeconds: 60 * 60 * 24,
-      name: "Arbitrum Sep",
-      parentChainId: l2Chain.id,
-      ethBridge: {
-        bridge: "0x9079816621B094389C940acb382331d5A3b6424F",
-        inbox: "0x5f8FA47BdB016916AE9134B155A86442410645c6",
-        sequencerInbox: "0x1fd74A0204724AEbF2507c37e156619B7cC95687",
-        outbox: "0x044b686C13966729B20B558710ee8f99EFF93e60",
-        rollup: "0x7A08988fF97D55Cde8AFF6964A21eF29886777A1",
-      } as EthBridge,
-      confirmPeriodBlocks: 5,
-      isCustom: true,
-    },
-    { throwIfAlreadyRegistered: false },
+  const [selectedChain, setSelectedChain] = useState<ArbitrumNetwork | null>(
+    null,
   );
+  const parentChainId = selectedChain?.parentChainId;
+  const networkId = selectedChain?.chainId;
+
+  const selectNetwork = (network: CustomChain) => {
+    const arbNetwork = {
+      ...network,
+      isCustom: true,
+    };
+
+    registerCustomArbitrumNetwork(arbNetwork, {
+      throwIfAlreadyRegistered: false,
+    });
+
+    setSelectedChain(arbNetwork);
+  };
+
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
   //const l2Network = getArbitrumNetwork(childNetworkId);
-  const l3Network = getArbitrumNetwork(l3Chain.id);
+  const arbNetwork = selectedChain && getArbitrumNetwork(selectedChain?.chainId);
 
   async function ensureChainId(chainId: number) {
     return switchChainAsync({ chainId });
@@ -59,8 +61,11 @@ export default function useArbitrumBridge() {
     tx: ITxReq,
     childSigner: ethers.providers.JsonRpcSigner,
   ) {
-    await ensureChainId(childNetworkId);
-    const inboxSdk = new InboxTools(signer!, l3Network);
+    if(!networkId || !arbNetwork) {
+      throw new Error("No child network available");
+    }
+    await ensureChainId(networkId);
+    const inboxSdk = new InboxTools(signer!, arbNetwork);
 
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
     const l2Txhash = (await inboxSdk.signChildTx(tx, childSigner)) as Address;
@@ -71,15 +76,21 @@ export default function useArbitrumBridge() {
   async function isForceIncludePossible(
     parentSigner: ethers.providers.JsonRpcSigner,
   ) {
+    if (!arbNetwork || !parentChainId) {
+      throw new Error("No child network available");
+    }
     await ensureChainId(parentChainId);
-    const inboxSdk = new InboxTools(parentSigner, l3Network);
+    const inboxSdk = new InboxTools(parentSigner, arbNetwork);
     const canForceInclude = await inboxSdk.getForceIncludableEvent();
     return !!canForceInclude;
   }
 
   async function forceInclude(parentSigner: ethers.providers.JsonRpcSigner) {
+    if (!arbNetwork || !parentChainId) {
+      throw new Error("No child network available");
+    }
     await ensureChainId(parentChainId);
-    const inboxTools = new InboxTools(parentSigner, l3Network);
+    const inboxTools = new InboxTools(parentSigner, arbNetwork);
 
     if (!(await inboxTools.getForceIncludableEvent())) {
       throw new Error("Force inclusion is not possible");
@@ -127,8 +138,11 @@ export default function useArbitrumBridge() {
     l2SignedTx: Address;
     parentSigner: ethers.providers.JsonRpcSigner;
   }) {
+    if (!parentChainId || !networkId) {
+      throw new Error("No child network available");
+    }
     await ensureChainId(parentChainId);
-    const l3Network = getArbitrumNetwork(childNetworkId);
+    const l3Network = getArbitrumNetwork(networkId);
     const inboxSdk = new InboxTools(props.parentSigner, l3Network);
 
     // send tx to l1 delayed inbox
@@ -192,6 +206,9 @@ export default function useArbitrumBridge() {
     parentSigner: ethers.providers.JsonRpcSigner;
     childProvider: ethers.providers.JsonRpcProvider;
   }) {
+    if (!parentChainId) {
+      throw new Error("No parent network available");
+    }
     await ensureChainId(parentChainId);
     if (!props.l2ToL1Msg) {
       throw new Error(
@@ -223,5 +240,6 @@ export default function useArbitrumBridge() {
     claimFunds,
     getL2toL1Msg,
     signer,
+    selectNetwork
   };
 }
