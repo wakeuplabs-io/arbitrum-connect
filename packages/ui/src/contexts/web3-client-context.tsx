@@ -1,5 +1,5 @@
 import envParsed from "@/envParsed";
-import { l1Chain, l2Chain } from "@/lib/wagmi-config";
+import { l2Chain, l3Chain } from "@/lib/wagmi-config";
 import { ethers } from "ethers";
 import React, { createContext, useContext } from "react";
 import { createPublicClient, http, PublicClient } from "viem";
@@ -19,11 +19,11 @@ interface Web3ClientProviderProps {
 
 export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({ children }) => {
 	const publicParentClient = createPublicClient({
-		chain: l1Chain,
+		chain: l2Chain,
 		transport: http(envParsed().HTTPS_ETH_RPC_URL),
 	});
 	const publicChildClient = createPublicClient({
-		chain: l2Chain,
+		chain: l3Chain,
 		transport: http(envParsed().HTTPS_ARB_RPC_URL),
 	});
 	const parentProvider = new ethers.providers.JsonRpcProvider(
