@@ -1,17 +1,22 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { createConfig, WagmiProvider } from "wagmi";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
-import useCustomChain from "@/hooks/use-custom-chain";
 import { defineChain, http } from "viem";
 import envParsed from "@/envParsed";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
+import { CustomChain } from "@/types";
+import { useCustomChainContext } from "@/hooks/use-custom-chain";
 
-function WagmiSetup(props: any) {
-  const { chains: customChains, loading } = useCustomChain();
+function WagmiSetup({ children }: { children: React.ReactNode }) {
+  const { getAllChains, chains: customChains, loading } = useCustomChainContext();
+
+  useEffect(() => {
+    getAllChains();
+  }, []);
 
   const definedChains = useMemo(() => {
-    return customChains.map((chain) => {
+    return customChains.map((chain: CustomChain) => {
       return defineChain({
         ...chain,
         id: chain.chainId,
@@ -63,7 +68,7 @@ function WagmiSetup(props: any) {
   return loading ? (
     <div>loading....</div>
   ) : (
-    <WagmiProvider config={config}>{props.children}</WagmiProvider>
+    <WagmiProvider config={config}>{children}</WagmiProvider>
   );
 }
 

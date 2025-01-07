@@ -16,6 +16,7 @@ type NetworkConfig = {
  nativeCurrency: NativeCurrency;
  rpcUrls: RpcUrls;
  logoUrl?: string;
+ user?: string;
 };
 
 export type CustomChain = ArbitrumNetwork & NetworkConfig

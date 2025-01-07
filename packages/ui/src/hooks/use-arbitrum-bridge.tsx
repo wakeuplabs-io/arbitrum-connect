@@ -43,7 +43,7 @@ export default function useArbitrumBridge() {
       confirmPeriodBlocks: 5,
       isCustom: true,
     },
-    { throwIfAlreadyRegistered: true },
+    { throwIfAlreadyRegistered: false },
   );
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
