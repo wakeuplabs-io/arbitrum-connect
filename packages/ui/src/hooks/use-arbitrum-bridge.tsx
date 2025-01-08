@@ -14,12 +14,8 @@ import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
-import {
-  ArbitrumNetwork,
-  EthBridge,
-} from "@arbitrum/sdk/dist/lib/dataEntities/networks";
-import { useState } from "react";
-import { CustomChain } from "@/types";
+import { useEffect } from "react";
+import { useCustomChainContext } from "./use-custom-chain";
 
 export enum ClaimStatus {
   PENDING = "PENDING",
@@ -28,30 +24,29 @@ export enum ClaimStatus {
 }
 
 export default function useArbitrumBridge() {
-  const [selectedChain, setSelectedChain] = useState<ArbitrumNetwork | null>(
-    null,
-  );
+  const { selectedChain } = useCustomChainContext();
   const parentChainId = selectedChain?.parentChainId;
   const networkId = selectedChain?.chainId;
 
-  const selectNetwork = (network: CustomChain) => {
-    const arbNetwork = {
-      ...network,
-      isCustom: true,
-    };
+  useEffect(() => {
+    if (selectedChain) {
+      const arbNetwork = {
+        ...selectedChain,
+        isCustom: true,
+      };
 
-    registerCustomArbitrumNetwork(arbNetwork, {
-      throwIfAlreadyRegistered: false,
-    });
-
-    setSelectedChain(arbNetwork);
-  };
+      registerCustomArbitrumNetwork(arbNetwork, {
+        throwIfAlreadyRegistered: false,
+      });
+    }
+  }, [selectedChain]);
 
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
   //const l2Network = getArbitrumNetwork(childNetworkId);
-  const arbNetwork = selectedChain && getArbitrumNetwork(selectedChain?.chainId);
+  const arbNetwork =
+    selectedChain && getArbitrumNetwork(selectedChain?.chainId);
 
   async function ensureChainId(chainId: number) {
     return switchChainAsync({ chainId });
@@ -61,7 +56,7 @@ export default function useArbitrumBridge() {
     tx: ITxReq,
     childSigner: ethers.providers.JsonRpcSigner,
   ) {
-    if(!networkId || !arbNetwork) {
+    if (!networkId || !arbNetwork) {
       throw new Error("No child network available");
     }
     await ensureChainId(networkId);
@@ -240,6 +235,5 @@ export default function useArbitrumBridge() {
     claimFunds,
     getL2toL1Msg,
     signer,
-    selectNetwork
   };
 }

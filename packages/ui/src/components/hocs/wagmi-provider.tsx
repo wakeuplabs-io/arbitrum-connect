@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { createConfig, WagmiProvider } from "wagmi";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 import { defineChain, http } from "viem";
@@ -9,12 +9,14 @@ import { CustomChain } from "@/types";
 import { useCustomChainContext } from "@/hooks/use-custom-chain";
 
 function WagmiSetup({ children }: { children: React.ReactNode }) {
-  const { getAllChains, chains: customChains, loading } = useCustomChainContext();
+  const {
+    chains: customChains,
+  } = useCustomChainContext();
 
-  useEffect(() => {
+  /* useEffect(() => {
     getAllChains();
   }, []);
-
+ */
   const definedChains = useMemo(() => {
     return customChains.map((chain: CustomChain) => {
       return defineChain({
@@ -65,11 +67,7 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
         ssr: false,
       });
 
-  return loading ? (
-    <div>loading....</div>
-  ) : (
-    <WagmiProvider config={config}>{children}</WagmiProvider>
-  );
+  return <WagmiProvider config={config}>{children}</WagmiProvider>;
 }
 
 export default WagmiSetup;

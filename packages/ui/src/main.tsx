@@ -5,11 +5,9 @@ import ReactDOM from "react-dom/client";
 // Import the generated route tree
 import { lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { WagmiProvider } from "wagmi";
 import ErrorAlert from "./components/error-alert";
 import { AlertProvider } from "./contexts/alert/alert-provider";
 import { Web3ClientProvider } from "./contexts/web3-client-context";
-import config from "./lib/wagmi-config";
 import "./main.css";
 import { routeTree } from "./routeTree.gen";
 import WagmiSetup from "./components/hocs/wagmi-provider";
