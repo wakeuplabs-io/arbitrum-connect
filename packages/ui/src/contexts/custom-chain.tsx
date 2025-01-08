@@ -79,7 +79,7 @@ export function CustomChainProvider({ children }: { children: ReactNode }) {
       ? JSON.parse(storedChains)
       : [];
     setChains(
-      parsedChains.filter((chain: CustomChain) => chain.user === userAddress),
+      parsedChains.filter((chain: CustomChain) => chain.user === userAddress || chain.user === zeroAddress),
     );
     setLoading(false);
   };
