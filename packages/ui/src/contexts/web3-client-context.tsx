@@ -23,14 +23,6 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
 }) => {
 	const { selectedChain, selectedParentChain } = useCustomChainContext();
 
-	// Verificar si las chains están disponibles
-	//const isChainsAvailable = selectedChain && selectedParentChain;
-
-	/* // Si no hay chains, devolver un contexto vacío o un fallback
-	if (!isChainsAvailable) {
-			return <>loading w3</>;
-	} */
-
 	const pChain = defineChain({
 			...selectedParentChain,
 			id: selectedParentChain.chainId,

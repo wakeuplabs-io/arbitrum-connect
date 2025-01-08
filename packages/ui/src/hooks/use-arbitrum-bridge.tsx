@@ -44,7 +44,7 @@ export default function useArbitrumBridge() {
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
-  //const l2Network = getArbitrumNetwork(childNetworkId);
+  
   const arbNetwork =
     selectedChain && getArbitrumNetwork(selectedChain?.chainId);
 

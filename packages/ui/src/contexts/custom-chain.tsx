@@ -30,7 +30,6 @@ export function CustomChainProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
       const initDefaultChains = async () => {
-       console.log('initDefaultChains');
        const chainExists = await getChainById(defaultCustomChain.chainId);
        if (!chainExists){
          await createChain(zeroAddress, defaultCustomChain);

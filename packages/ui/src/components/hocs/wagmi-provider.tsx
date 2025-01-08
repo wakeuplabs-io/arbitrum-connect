@@ -13,10 +13,6 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
     chains: customChains,
   } = useCustomChainContext();
 
-  /* useEffect(() => {
-    getAllChains();
-  }, []);
- */
   const definedChains = useMemo(() => {
     return customChains.map((chain: CustomChain) => {
       return defineChain({
