@@ -13,6 +13,8 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
     chains: customChains,
   } = useCustomChainContext();
 
+  
+
   const definedChains = useMemo(() => {
     return customChains.map((chain: CustomChain) => {
       return defineChain({
@@ -22,19 +24,21 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
     });
   }, [customChains]);
 
-  const testChains = [arbitrumSepolia, sepolia, ...definedChains] as const;
-  const transports: any = {
-    [arbitrumSepolia.id]: http(),
-    [sepolia.id]: http(),
-    [arbitrum.id]: http(),
-    [mainnet.id]: http(),
-  };
-
+  const allChains = envParsed().IS_TESTNET
+    ? [arbitrumSepolia, sepolia, ...definedChains] as const
+    : [arbitrum, mainnet, ...definedChains] as const;
+    
+  const transports = useMemo(() => {
+    const transportMap: Record<number, ReturnType<typeof http>> = {};
+    allChains.forEach((chain) => {
+      transportMap[chain.id] = http();
+    });
+    return transportMap;
+  }, [allChains]);
+  
   definedChains.forEach((chain) => {
     transports[chain.id] = http();
   });
-
-  const chains = [arbitrum, mainnet, ...definedChains] as const;
 
   const connectors = connectorsForWallets(
     [
@@ -49,19 +53,12 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
     },
   );
 
-  const config = envParsed().IS_TESTNET
-    ? createConfig({
-        chains: testChains,
-        transports: transports,
-        connectors,
-        ssr: false,
-      })
-    : createConfig({
-        chains,
-        transports,
-        connectors,
-        ssr: false,
-      });
+  const config = createConfig({
+    chains: allChains,
+    transports,
+    connectors,
+    ssr: false,
+  });
 
   return <WagmiProvider config={config}>{children}</WagmiProvider>;
 }

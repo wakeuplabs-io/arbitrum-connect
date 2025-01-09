@@ -7,7 +7,6 @@ import { defineChain } from "viem";
 import { createConfig, http } from "wagmi";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 
-//export const l1Chain = envParsed().IS_TESTNET ? sepolia : mainnet;
 export const l2Chain = envParsed().IS_TESTNET ? arbitrumSepolia : arbitrum;
 export const l1Chain = envParsed().IS_TESTNET ? sepolia : mainnet;
 

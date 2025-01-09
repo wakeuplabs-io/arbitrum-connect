@@ -23,29 +23,29 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
 }) => {
 	const { selectedChain, selectedParentChain } = useCustomChainContext();
 
-	const pChain = defineChain({
+	const parentChainSelected = defineChain({
 			...selectedParentChain,
 			id: selectedParentChain.chainId,
 	});
 
-	const chain = defineChain({
+	const childChainSelected = defineChain({
 			...selectedChain,
 			id: selectedChain.chainId,
 	});
 
 	const publicParentClient = createPublicClient({
-			chain: pChain,
-			transport: http(pChain.rpcUrls.default.http[0]),
+			chain: parentChainSelected,
+			transport: http(parentChainSelected.rpcUrls.default.http[0]),
 	});
 	const publicChildClient = createPublicClient({
-			chain: chain,
-			transport: http(chain.rpcUrls.default.http[0]),
+			chain: childChainSelected,
+			transport: http(childChainSelected.rpcUrls.default.http[0]),
 	});
 	const parentProvider = new ethers.providers.JsonRpcProvider(
-			pChain.rpcUrls.default.http[0],
+			parentChainSelected.rpcUrls.default.http[0],
 	);
 	const childProvider = new ethers.providers.JsonRpcProvider(
-			chain.rpcUrls.default.http[0],
+		childChainSelected.rpcUrls.default.http[0],
 	);
 
 	const values = {
