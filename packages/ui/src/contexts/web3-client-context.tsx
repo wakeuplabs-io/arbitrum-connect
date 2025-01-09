@@ -1,51 +1,74 @@
-import envParsed from "@/envParsed";
-import { l1Chain, l2Chain } from "@/lib/wagmi-config";
+import { useCustomChainContext } from "@/hooks/use-custom-chain";
 import { ethers } from "ethers";
 import React, { createContext, useContext } from "react";
-import { createPublicClient, http, PublicClient } from "viem";
+import { createPublicClient, defineChain, http, PublicClient } from "viem";
 
 type Web3ClientContextValue = {
-	publicParentClient: PublicClient,
-	publicChildClient: PublicClient,
-	parentProvider: ethers.providers.JsonRpcProvider,
-	childProvider: ethers.providers.JsonRpcProvider
-}
+  publicParentClient: PublicClient;
+  publicChildClient: PublicClient;
+  parentProvider: ethers.providers.JsonRpcProvider;
+  childProvider: ethers.providers.JsonRpcProvider;
+};
 
-const Web3ClientContext = createContext<Web3ClientContextValue | undefined>(undefined);
+const Web3ClientContext = createContext<Web3ClientContextValue | undefined>(
+  undefined,
+);
 
 interface Web3ClientProviderProps {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }
 
-export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({ children }) => {
+export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
+	children,
+}) => {
+	const { selectedChain, selectedParentChain } = useCustomChainContext();
+
+	const pChain = defineChain({
+			...selectedParentChain,
+			id: selectedParentChain.chainId,
+	});
+
+	const chain = defineChain({
+			...selectedChain,
+			id: selectedChain.chainId,
+	});
+
 	const publicParentClient = createPublicClient({
-		chain: l1Chain,
-		transport: http(envParsed().HTTPS_ETH_RPC_URL),
+			chain: pChain,
+			transport: http(pChain.rpcUrls.default.http[0]),
 	});
 	const publicChildClient = createPublicClient({
-		chain: l2Chain,
-		transport: http(envParsed().HTTPS_ARB_RPC_URL),
+			chain: chain,
+			transport: http(chain.rpcUrls.default.http[0]),
 	});
 	const parentProvider = new ethers.providers.JsonRpcProvider(
-		envParsed().HTTPS_ETH_RPC_URL
+			pChain.rpcUrls.default.http[0],
 	);
 	const childProvider = new ethers.providers.JsonRpcProvider(
-		envParsed().HTTPS_ARB_RPC_URL
+			chain.rpcUrls.default.http[0],
 	);
 
 	const values = {
-		publicParentClient, publicChildClient, parentProvider, childProvider
-	}
+			publicParentClient,
+			publicChildClient,
+			parentProvider,
+			childProvider,
+	};
 
-	return <Web3ClientContext.Provider value={values}>{children}</Web3ClientContext.Provider>;
+	return (
+			<Web3ClientContext.Provider value={values}>
+					{children}
+			</Web3ClientContext.Provider>
+	);
 };
 
+
 export const useWeb3ClientContext = (): Web3ClientContextValue => {
-	const context = useContext(Web3ClientContext);
+  const context = useContext(Web3ClientContext);
 
-	if (!context) {
-		throw new Error("Web3ClientContext failed to initialize");
-	}
+  if (!context) {
+    throw new Error("Web3ClientContext failed to initialize");
+  }
 
-	return context;
+  return context;
 };
