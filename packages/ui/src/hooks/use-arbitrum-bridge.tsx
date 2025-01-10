@@ -15,7 +15,7 @@ import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
 import { useEffect } from "react";
-import { useCustomChainContext } from "./use-custom-chain";
+import { useSelectedChain } from "./use-selected-chain";
 
 export enum ClaimStatus {
   PENDING = "PENDING",
@@ -24,7 +24,7 @@ export enum ClaimStatus {
 }
 
 export default function useArbitrumBridge() {
-  const { selectedChain } = useCustomChainContext();
+  const { selectedChain } = useSelectedChain();
   const parentChainId = selectedChain?.parentChainId;
   const networkId = selectedChain?.chainId;
 

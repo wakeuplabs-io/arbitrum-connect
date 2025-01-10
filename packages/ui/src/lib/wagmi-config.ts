@@ -40,9 +40,9 @@ export const defaultCustomChain : CustomChain = {
 
 export const l3Chain = defineChain({
   id: 24802239149,
-  name: 'Arbitrum Sep',
+  name: 'L3 Juanchi Sep',
   nativeCurrency: {
-    name: 'Arbitrum Sep Ether',
+    name: 'Arbitrum Juanchi Ether',
     symbol: 'ETH',
     decimals: 18,
   },

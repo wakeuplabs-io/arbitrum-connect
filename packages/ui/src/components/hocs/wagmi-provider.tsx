@@ -6,14 +6,15 @@ import envParsed from "@/envParsed";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { CustomChain } from "@/types";
-import { useCustomChainContext } from "@/hooks/use-custom-chain";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 function WagmiSetup({ children }: { children: React.ReactNode }) {
   const {
-    chains: customChains,
-  } = useCustomChainContext();
+    selectedChain,
+    selectedParentChain,
+  } = useSelectedChain();
 
-  
+  const customChains = [selectedChain, selectedParentChain];
 
   const definedChains = useMemo(() => {
     return customChains.map((chain: CustomChain) => {

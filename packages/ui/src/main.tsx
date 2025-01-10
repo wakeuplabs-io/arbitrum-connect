@@ -11,7 +11,7 @@ import { Web3ClientProvider } from "./contexts/web3-client-context";
 import "./main.css";
 import { routeTree } from "./routeTree.gen";
 import WagmiSetup from "./components/hocs/wagmi-provider";
-import { CustomChainProvider } from "./contexts/custom-chain";
+import { SelectedChainProvider } from "./contexts/selected-chain";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -27,7 +27,7 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <CustomChainProvider>
+    <SelectedChainProvider>
       <WagmiSetup>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
@@ -44,6 +44,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiSetup>
-    </CustomChainProvider>
+    </SelectedChainProvider>
   </React.StrictMode>,
 );
