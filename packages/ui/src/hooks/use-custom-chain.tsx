@@ -1,81 +1,49 @@
-import { useState,  useEffect } from "react";
-import { CustomChain } from "@/types";
-import { Address, zeroAddress } from "viem";
-import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
+import { useState } from "react";
+import { CreateChainPayload, CustomChain } from "@/types";
+import { Address } from "viem";
 import { FILTERS } from "@/constants";
+import CustomChainService from "@/services/custom-chain-service";
 
 export function useCustomChain() {
   const [chains, setChains] = useState<CustomChain[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const initDefaultChains = async () => {
-      const chainExists = await getChainById(defaultCustomChain.chainId);
-      if (!chainExists) {
-        await createChain(zeroAddress, defaultCustomChain);
-        await createChain(zeroAddress, defaultCustomMainnet);
-      }
-    };
-    initDefaultChains();
-  }, []);
+  
 
-
-  const createChain = (userAddress: Address, chain: CustomChain) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId && c.user === userAddress,
-    );
-    if (!chainExists) parsedChains.push({ ...chain, user: userAddress });
-    localStorage.setItem(`chains`, JSON.stringify(parsedChains));
-    setChains(parsedChains);
+  const createChain = async (chain: CreateChainPayload) => {
+    setLoading(true);
+    const newChain = await CustomChainService.createChain(chain);
+    setChains((currentChains) => {
+      return [...currentChains, newChain];
+    });
+    setLoading(false);
   };
 
-  const deleteChain = (userAddress: Address, chainId: number) => {
-    const storedChains = localStorage.getItem(`chains`);
-    if (!storedChains) return;
-    const parsedChains: CustomChain[] = JSON.parse(storedChains).filter(
-      (chain: CustomChain) =>
-        chain.chainId !== chainId && chain.user === userAddress,
-    );
-    localStorage.setItem(`chains`, JSON.stringify(parsedChains));
-    setChains(parsedChains);
+  const deleteChain = async (userAddress: Address, chainId: number) => {
+    setLoading(true);
+    const chains = await CustomChainService.deleteChain(userAddress, chainId);
+    setChains(chains || []);
   };
 
-  const getUserChains = (
+  const getUserChains = async (
     userAddress: Address,
     search: string = "",
     filter: FILTERS,
   ) => {
     setLoading(true);
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    const filteredChains = parsedChains.filter((chain: CustomChain) => {
-      const matchesUser =
-        chain.user === userAddress ||
-        (chain.user === zeroAddress && !!chain.parentChainId);
-      const matchesSearch = search
-        ? chain.name.toLowerCase().includes(search.toLowerCase())
-        : true;
-      return matchesUser && matchesSearch;
-    });
+    const filteredChains = await CustomChainService.getUserChains(
+      userAddress,
+      search,
+      filter,
+    );
     setChains(filteredChains);
     setLoading(false);
   };
 
-  const getAllChains = () => {
+  const getAllChains = async () => {
     setLoading(true);
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-    setChains(parsedChains);
+    const chains = await CustomChainService.getAllChains();
+    setChains(chains);
     setLoading(false);
   };
 

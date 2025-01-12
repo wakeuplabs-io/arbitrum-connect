@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import { SearchInput } from "../sarch-input";
 import { CustomChain } from "@/types";
 import { useAccount } from "wagmi";
-import { FILTERS } from "@/constants";
+import { FILTERS as CHAIN_FILTERS } from "@/constants";
 import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
-import { AssetFilters } from "./Filters";
 import { ListItem } from "./list-item";
-import { redirect } from '@tanstack/react-router'
 import { useNavigate } from '@tanstack/react-router';
+import { AssetFilters } from "./filters";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
   const { chains, getUserChains } = useCustomChain();
   const { selectedChain, setSelectedChain } = useSelectedChain();
-  const [filter, setFilter] = useState<FILTERS>(FILTERS.ALL);
+  const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const handleFiltersChange = (filter: FILTERS) => {
+  const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
   };
 

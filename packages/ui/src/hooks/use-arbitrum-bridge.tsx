@@ -28,19 +28,6 @@ export default function useArbitrumBridge() {
   const parentChainId = selectedChain?.parentChainId;
   const networkId = selectedChain?.chainId;
 
-  useEffect(() => {
-    if (selectedChain) {
-      const arbNetwork = {
-        ...selectedChain,
-        isCustom: true,
-      };
-
-      registerCustomArbitrumNetwork(arbNetwork, {
-        throwIfAlreadyRegistered: false,
-      });
-    }
-  }, [selectedChain]);
-
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });

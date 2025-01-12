@@ -13,6 +13,7 @@ import { CircleArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
+import ChainItem from "@/components/chain-item";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
@@ -56,18 +57,7 @@ function HomeScreen() {
     <form className="max-w-xl mx-auto" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-6">
         <div className="flex text-left justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-          <div className="flex flex-row gap-3 items-start">
-            <img src={ArbitrumIcon} alt="arbitrum icon" />
-            <div>
-              <div className="md:text-sm text-xs text-neutral-500">From</div>
-              <div className="font-semibold text-2xl text-primary-700 hidden md:block">
-                {selectedChain?.name}
-              </div>
-              {/* <div className="font-semibold text-xl text-primary-700 md:hidden">
-                ARB
-              </div> */}
-            </div>
-          </div>
+          <ChainItem chain={selectedChain} selectable={true} />
           <CircleArrowRight strokeWidth={1.5} size={29} color="#363853" />
           <div className="flex flex-row gap-3 items-start">
             <img src={EthereumIcon} alt="ethereum icon" />

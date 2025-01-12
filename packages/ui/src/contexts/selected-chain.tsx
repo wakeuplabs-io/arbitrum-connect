@@ -1,8 +1,9 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
-import { Address, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
-import { FILTERS } from "@/constants";
+import CustomChainService from "@/services/custom-chain-service";
+import { registerCustomArbitrumNetwork } from "@arbitrum/sdk";
 
 type SelectedChainContextType = {
   loading: boolean;
@@ -44,7 +45,31 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     getParent();
   }, [selectedChain?.parentChainId]);
 
- 
+  useEffect(() => {
+      if (selectedChain) {
+        const arbNetwork = {
+          ...selectedChain,
+          isCustom: true,
+        };
+  
+        registerCustomArbitrumNetwork(arbNetwork, {
+          throwIfAlreadyRegistered: false,
+        });
+      }
+    }, [selectedChain?.chainId]);
+
+  useEffect(() => {
+     const initDefaultChains = async () => {
+       const chainExists = await CustomChainService.getChainById(
+         defaultCustomChain.chainId,
+       );
+       if (!chainExists) {
+          await CustomChainService.addChain({...defaultCustomChain, user: zeroAddress});
+          await CustomChainService.addChain({...defaultCustomMainnet, user: zeroAddress});
+       }
+     };
+     initDefaultChains();
+   }, []); 
 
   return (
     <SelectedChainContext.Provider

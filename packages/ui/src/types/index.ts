@@ -1,4 +1,5 @@
 import { ArbitrumNetwork } from "@arbitrum/sdk";
+import { Address } from "viem";
 
 type NativeCurrency = {
  name: string;
@@ -26,3 +27,20 @@ export enum ChainType {
   L2 = 'L2',
   L3 = 'L3',
 }
+
+export type CreateChainPayload = {
+  chainId: number;
+  name: string;
+  parentChainId: number;
+  bridge: string;
+  inbox: string;
+  sequencerInbox: string;
+  outbox: string;
+  rollup: string;
+  nativeCurrencyName: string;
+  nativeCurrencySymbol: string;
+  nativeCurrencyDecimals: number;
+  publicRpcUrl: string;
+  logoURI: string;
+  user: Address;
+};
