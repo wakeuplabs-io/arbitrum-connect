@@ -6,7 +6,7 @@ import { FILTERS as CHAIN_FILTERS } from "@/constants";
 import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { ListItem } from "./list-item";
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate } from "@tanstack/react-router";
 import { AssetFilters } from "./filters";
 
 export const ChainSelector = ({}: {}) => {
@@ -49,8 +49,12 @@ export const ChainSelector = ({}: {}) => {
                 key={`listItem_chain_${chain.chainId}`}
                 chain={chain}
                 onSelect={handleSelectChain}
-                onDeleteClick={(c) => {}}
-                onFeaturedClick={(c) => {}}
+                onDeleteClick={(c) => {
+                  console.log(c);
+                }} //TODO: implement
+                onFeaturedClick={(c) => {
+                  console.log(c);
+                }} //TODO: implement
               />
             );
           })}

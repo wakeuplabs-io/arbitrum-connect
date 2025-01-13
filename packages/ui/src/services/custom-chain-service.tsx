@@ -77,6 +77,16 @@ export default class CustomChainService {
     return parsedChains;
   };
 
+  static filterChain(chain: CustomChain, filter: FILTERS, user: Address) {
+    switch (filter) {
+      case FILTERS.ALL:
+        return true;
+      case FILTERS.FEATURED:
+        return !!chain.featured;
+      case FILTERS.OWN:
+        return chain.user === user;
+    }
+  }
   static getUserChains = (
     userAddress: Address,
     search: string = "",
@@ -94,7 +104,12 @@ export default class CustomChainService {
       const matchesSearch = search
         ? chain.name.toLowerCase().includes(search.toLowerCase())
         : true;
-      return matchesUser && matchesSearch;
+      const matchFilter = CustomChainService.filterChain(
+        chain,
+        filter,
+        userAddress,
+      );
+      return matchesUser && matchesSearch && matchFilter;
     });
     return filteredChains;
   };

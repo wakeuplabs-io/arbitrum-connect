@@ -1,6 +1,6 @@
 import { CustomChain } from "@/types";
 import { StarIcon, Trash2Icon } from "lucide-react";
-import Avatar from "../Avatar";
+import ChainAvatar from "../chain-avatar";
 interface IListItemProps {
   chain: CustomChain;
   onSelect: (chain: CustomChain) => void;
@@ -20,7 +20,7 @@ export const ListItem = ({
       className="group w-full text-black rounded-md p-1 cursor-pointer flex items-center justify-between gap-2 pr-3"
     >
       <li className="flex items-center gap-4 text-lg text-black">
-        <Avatar src={chain.logoURI} size={34} />
+        <ChainAvatar src={chain.logoURI} size={34} />
         {chain.name}
       </li>
       <div className="flex gap-4 items-center">

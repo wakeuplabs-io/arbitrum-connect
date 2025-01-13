@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Input } from "../input";
 import { requiredAddress } from "@/lib/validations";
-import { ChainType, CreateChainPayload, CustomChain } from "@/types";
+import { ChainType, CreateChainPayload } from "@/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCustomChain } from "@/hooks/use-custom-chain";

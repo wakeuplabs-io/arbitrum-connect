@@ -1,4 +1,3 @@
-import ArbitrumIcon from "@/assets/arbitrum-icon.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 import WalletIcon from "@/assets/wallet.svg";
 import CustomConnectButton from "@/components/connect-wallet";
