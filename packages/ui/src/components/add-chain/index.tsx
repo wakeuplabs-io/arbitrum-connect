@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useAccount } from "wagmi";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { useNavigate } from "@tanstack/react-router";
 
 const schema = z.object({
   chainId: z.preprocess((val) => Number(val), z.number().min(1)),
@@ -35,6 +37,9 @@ const schema = z.object({
 export const AddChain = () => {
   const { address } = useAccount();
   const { createChain } = useCustomChain();
+  const { setSelectedChain } = useSelectedChain();
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -53,20 +58,24 @@ export const AddChain = () => {
       nativeCurrencyName: "Arbitrum Juanchi Ether",
       nativeCurrencySymbol: "ETH",
       nativeCurrencyDecimals: 18,
-      publicRpcUrl: 'https://6318-181-209-117-220.ngrok-free.app',
-      localRpcUrl: 'https://6318-181-209-117-220.ngrok-free.app',
+      publicRpcUrl: "https://6318-181-209-117-220.ngrok-free.app",
+      localRpcUrl: "https://6318-181-209-117-220.ngrok-free.app",
       logoURI: "",
       chainType: ChainType.L3, // Assuming ChainType is an enum with L1, L2, etc.
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log(data);
-    const payload : CreateChainPayload = {
+    const payload: CreateChainPayload = {
       ...data,
       user: address,
+    };
+    if (address) {
+      const newChain = await createChain(payload);
+      setSelectedChain(newChain);
+      navigate({ to: "/" });
     }
-    if (address) createChain(payload);
   };
   console.log(errors);
   return (

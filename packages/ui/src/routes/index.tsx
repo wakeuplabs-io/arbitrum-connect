@@ -57,20 +57,9 @@ function HomeScreen() {
     <form className="max-w-xl mx-auto" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-6">
         <div className="flex text-left justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-          <ChainItem chain={selectedChain} selectable={true} />
+          <ChainItem chain={selectedChain} selectable={true} header="From" />
           <CircleArrowRight strokeWidth={1.5} size={29} color="#363853" />
-          <div className="flex flex-row gap-3 items-start">
-            <img src={EthereumIcon} alt="ethereum icon" />
-            <div>
-              <div className="text-xs md:text-sm text-neutral-500">To</div>
-              <div className="font-semibold text-2xl text-primary-700 hidden md:block ">
-                {selectedParentChain?.name}
-              </div>
-              <div className="font-semibold text-xl text-primary-700 md:hidden">
-                ETH
-              </div>
-            </div>
-          </div>
+          <ChainItem chain={selectedParentChain} selectable={false} header="To" />
         </div>
         <div className="flex flex-col grow justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-4 pt-0 h-[21rem]">
           <div className="flex flex-col grow items-center">

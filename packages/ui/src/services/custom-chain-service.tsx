@@ -80,7 +80,7 @@ export default class CustomChainService {
   static getUserChains = (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS,
+    filter: FILTERS, //TODO: implement
   ) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains

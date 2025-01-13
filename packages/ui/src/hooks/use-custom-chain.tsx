@@ -17,6 +17,7 @@ export function useCustomChain() {
       return [...currentChains, newChain];
     });
     setLoading(false);
+    return newChain;
   };
 
   const deleteChain = async (userAddress: Address, chainId: number) => {

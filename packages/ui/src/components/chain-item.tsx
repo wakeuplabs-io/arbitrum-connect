@@ -6,9 +6,11 @@ import { ChevronDown } from "lucide-react";
 export default function ChainItem({
   chain,
   selectable = true,
+  header
 }: {
   chain: CustomChain;
   selectable?: boolean;
+  header: string
 }) {
   const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ export default function ChainItem({
       <img src={chain.logoURI || ArbitrumIcon} alt="arbitrum icon" />
       <div className="flex items-end gap-3">
         <div>
-          <div className="md:text-sm text-xs text-neutral-500">From</div>
+          <div className="md:text-sm text-xs text-neutral-500">{header}</div>
           <div className="font-semibold text-2xl text-primary-700 hidden md:block">
             {chain?.name}
           </div>
