@@ -13,25 +13,24 @@ import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
-import { useSelectedChain } from "./use-selected-chain";
-
 export enum ClaimStatus {
   PENDING = "PENDING",
   CLAIMABLE = "CLAIMABLE",
   CLAIMED = "CLAIMED",
 }
 
-export default function useArbitrumBridge() {
-  const { selectedChain } = useSelectedChain();
-  const parentChainId = selectedChain?.parentChainId;
-  const networkId = selectedChain?.chainId;
+export default function useArbitrumBridge(props: {
+  parentChainId: number;
+  childChainId: number;
+}) {
+  const parentChainId = props.parentChainId;
+  const childChainId = props.childChainId;
 
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
-  
-  const arbNetwork =
-    selectedChain && getArbitrumNetwork(selectedChain?.chainId);
+
+  const arbNetwork = getArbitrumNetwork(childChainId);
 
   async function ensureChainId(chainId: number) {
     return switchChainAsync({ chainId });
@@ -41,10 +40,10 @@ export default function useArbitrumBridge() {
     tx: ITxReq,
     childSigner: ethers.providers.JsonRpcSigner,
   ) {
-    if (!networkId || !arbNetwork) {
+    if (!childChainId || !arbNetwork) {
       throw new Error("No child network available");
     }
-    await ensureChainId(networkId);
+    await ensureChainId(childChainId);
     const inboxSdk = new InboxTools(signer!, arbNetwork);
 
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
@@ -118,11 +117,11 @@ export default function useArbitrumBridge() {
     l2SignedTx: Address;
     parentSigner: ethers.providers.JsonRpcSigner;
   }) {
-    if (!parentChainId || !networkId) {
+    if (!parentChainId || !childChainId) {
       throw new Error("No child network available");
     }
-    await ensureChainId(parentChainId);
-    const l3Network = getArbitrumNetwork(networkId);
+    await ensureChainId(childChainId);
+    const l3Network = getArbitrumNetwork(childChainId);
     const inboxSdk = new InboxTools(props.parentSigner, l3Network);
 
     // send tx to l1 delayed inbox
@@ -165,6 +164,7 @@ export default function useArbitrumBridge() {
 
     if (!l2ToL1Msg) return ClaimStatus.PENDING;
 
+    console.log("awaitingL2 to L1");
     // Check if already executed
     if (
       (await l2ToL1Msg.status(childProvider)) ==

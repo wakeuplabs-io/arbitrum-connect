@@ -1,5 +1,6 @@
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { Transaction, transactionsStorageService } from "@/lib/transactions";
 import { getTimestampFromTxHash } from "@/lib/tx-actions";
 import { useQuery } from "@tanstack/react-query";
@@ -15,8 +16,11 @@ export const useTransaction = ({
 }) => {
   const [transaction, setTransaction] = useState<Transaction>(tx);
   const { publicParentClient, childProvider } = useWeb3ClientContext();
-  const { signer, getClaimStatus, getL2toL1Msg } = useArbitrumBridge();
-
+  const { selectedParentChain, selectedChain } = useSelectedChain();
+  const { signer, getClaimStatus, getL2toL1Msg } = useArbitrumBridge({
+    parentChainId: selectedParentChain.chainId,
+    childChainId: selectedChain.chainId,
+  });
   const {
     data: delayedInboxTxTimestamp,
     isFetching: fetchingInboxTxTimestamp,
@@ -71,7 +75,7 @@ export const useTransaction = ({
     transaction.claimStatus === ClaimStatus.CLAIMABLE &&
     !fetchingClaimStatus &&
     !fetchingL2ToL1Msg;
-  
+
   return {
     transaction,
     updateTx,

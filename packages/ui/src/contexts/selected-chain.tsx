@@ -13,7 +13,7 @@ type SelectedChainContextType = {
 };
 
 export const SelectedChainContext = createContext<
-SelectedChainContextType | undefined
+  SelectedChainContextType | undefined
 >(undefined);
 
 export function SelectedChainProvider({ children }: { children: ReactNode }) {
@@ -23,18 +23,18 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   const [selectedParentChain, setSelectedParentChain] =
     useState<CustomChain>(defaultCustomMainnet);
 
-    const getChainById = (chainId: number) => {
-      setLoading(true);
-      const storedChains = localStorage.getItem(`chains`);
-      const parsedChains: CustomChain[] = storedChains
-        ? JSON.parse(storedChains)
-        : [];
-      const chain = parsedChains.find(
-        (chain: CustomChain) => chain.chainId === chainId,
-      );
-      return chain || null;
-    };
-    
+  const getChainById = (chainId: number) => {
+    setLoading(true);
+    const storedChains = localStorage.getItem(`chains`);
+    const parsedChains: CustomChain[] = storedChains
+      ? JSON.parse(storedChains)
+      : [];
+    const chain = parsedChains.find(
+      (chain: CustomChain) => chain.chainId === chainId,
+    );
+    return chain || null;
+  };
+
   useEffect(() => {
     const getParent = async () => {
       if (selectedChain?.parentChainId) {
@@ -46,30 +46,36 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   }, [selectedChain?.parentChainId]);
 
   useEffect(() => {
-      if (selectedChain) {
-        const arbNetwork = {
-          ...selectedChain,
-          isCustom: true,
-        };
-  
-        registerCustomArbitrumNetwork(arbNetwork, {
-          throwIfAlreadyRegistered: false,
-        });
-      }
-    }, [selectedChain?.chainId]);
+    if (selectedChain) {
+      const arbNetwork = {
+        ...selectedChain,
+        isCustom: true,
+      };
+
+      registerCustomArbitrumNetwork(arbNetwork, {
+        throwIfAlreadyRegistered: false,
+      });
+    }
+  }, [selectedChain?.chainId]);
 
   useEffect(() => {
-     const initDefaultChains = async () => {
-       const chainExists = await CustomChainService.getChainById(
-         defaultCustomChain.chainId,
-       );
-       if (!chainExists) {
-          await CustomChainService.addChain({...defaultCustomChain, user: zeroAddress});
-          await CustomChainService.addChain({...defaultCustomMainnet, user: zeroAddress});
-       }
-     };
-     initDefaultChains();
-   }, []); 
+    const initDefaultChains = async () => {
+      const chainExists = await CustomChainService.getChainById(
+        defaultCustomChain.chainId,
+      );
+      if (!chainExists) {
+        await CustomChainService.addChain({
+          ...defaultCustomChain,
+          user: zeroAddress,
+        });
+        await CustomChainService.addChain({
+          ...defaultCustomMainnet,
+          user: zeroAddress,
+        });
+      }
+    };
+    initDefaultChains();
+  }, []);
 
   return (
     <SelectedChainContext.Provider

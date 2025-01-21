@@ -57,7 +57,7 @@ export default class CustomChainService {
       : [];
 
     const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId && c.user === chain.user,
+      (c) => c.chainId === chain.chainId,
     );
     if (chainExists) throw new Error("Chain already exists");
 

@@ -13,7 +13,7 @@ export default function ConfirmWithdrawal({
   onError,
   fetchingInboxTxTimestamp: isLoading,
   updateTx,
-  state
+  state,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
@@ -21,7 +21,10 @@ export default function ConfirmWithdrawal({
   updateTx: (tx: Transaction) => void;
   state: TransactionState;
 }) {
-  const { signer, pushChildTxToParent } = useArbitrumBridge();
+  const { signer, pushChildTxToParent } = useArbitrumBridge({
+    parentChainId: transaction.parentChainId,
+    childChainId: transaction.childChainId,
+  });
   const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
   const l1TxUrl = `${l1Scan}/tx/${transaction.delayedInboxHash}`;
   const confirmTx = useMutation({
@@ -30,7 +33,9 @@ export default function ConfirmWithdrawal({
   });
 
   const isRunning =
-    confirmTx.isPending || isLoading || (transaction.delayedInboxHash && !transaction.delayedInboxTimestamp);
+    confirmTx.isPending ||
+    isLoading ||
+    (transaction.delayedInboxHash && !transaction.delayedInboxTimestamp);
 
   function onConfirm() {
     if (!signer) return;
@@ -52,9 +57,9 @@ export default function ConfirmWithdrawal({
           updateTx({
             ...updatedTx,
             delayedInboxTimestamp: Date.now(),
-          })
+          });
         },
-      }
+      },
     );
   }
 
