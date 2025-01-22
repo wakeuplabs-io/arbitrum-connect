@@ -5,6 +5,7 @@ import { Address, zeroAddress } from "viem";
 export default class CustomChainService {
   static formatChainPayload(data: CreateChainPayload): CustomChain {
     return {
+      isTestnet: data.isTestnet,
       user: data.user,
       chainId: data.chainId,
       name: data.name,

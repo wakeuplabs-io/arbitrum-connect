@@ -29,6 +29,7 @@ export enum ChainType {
 }
 
 export type CreateChainPayload = {
+  isTestnet: boolean;
   chainId: number;
   name: string;
   parentChainId: number;

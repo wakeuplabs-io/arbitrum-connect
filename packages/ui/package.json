@@ -14,7 +14,7 @@
     "e2e:open": "synpress open --configFile synpress.config.js"
   },
   "dependencies": {
-    "@arbitrum/sdk": "4.0.0",
+    "@arbitrum/sdk": "4.0.1",
     "@ethersproject/bignumber": "5.7.0",
     "@hookform/resolvers": "^3.10.0",
     "@metamask/rpc-errors": "6.3.1",

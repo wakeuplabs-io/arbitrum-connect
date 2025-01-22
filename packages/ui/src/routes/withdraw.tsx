@@ -83,9 +83,11 @@ function WithdrawScreen() {
 
   function onContinue(address: Address) {
     setLoading(true);
+    console.log("signerinsitu: ", signer);
     signer &&
       initiateWithdraw(amountInWei, signer)
         .then((l2Txhash) => {
+          console.log("then!");
           const tx: Transaction = {
             bridgeHash: l2Txhash,
             amount: amountInWei,
@@ -291,10 +293,10 @@ function WithdrawScreen() {
         className={cn(
           "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
         )}
-        disabled={!canContinue || loading || !address}
+        disabled={!canContinue || loading || !address || !signer}
         onClick={() => address && onContinue(address)}
       >
-        {loading ? "Loading..." : "Confirm Withdrawal"}
+        {loading || signer === undefined ? "Loading..." : "Confirm Withdrawal"}
       </button>
     </div>
   );
