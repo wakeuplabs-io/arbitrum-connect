@@ -1,7 +1,10 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
 import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
-import { registerCustomArbitrumNetwork } from "@arbitrum/sdk";
+import {
+  getArbitrumNetworks,
+  registerCustomArbitrumNetwork,
+} from "@arbitrum/sdk";
 import CustomChainService from "@/services/custom-chain-service";
 import { zeroAddress } from "viem";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
@@ -37,9 +40,9 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    const getParent = async () => {
+    const getParent = () => {
       if (selectedChain?.parentChainId) {
-        const parentChain = await getChainById(selectedChain?.parentChainId);
+        const parentChain = getChainById(selectedChain?.parentChainId);
         if (parentChain) setSelectedParentChain(parentChain);
       }
     };
@@ -50,7 +53,8 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     if (
       selectedChain &&
       selectedChain.chainId !== arbitrumSepolia.id &&
-      selectedChain.chainId !== arbitrum.id
+      selectedChain.chainId !== arbitrum.id &&
+      !getArbitrumNetworks().some((x) => x.chainId === selectedChain.chainId)
     ) {
       const arbNetwork = {
         ...selectedChain,

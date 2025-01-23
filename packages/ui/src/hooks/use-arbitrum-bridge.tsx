@@ -46,11 +46,8 @@ export default function useArbitrumBridge(props: {
     await ensureChainId(childChainId);
     const inboxSdk = new InboxTools(signer!, arbNetwork);
 
-    console.log("signing");
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
     const l2Txhash = (await inboxSdk.sendChildTx(tx, childSigner)) as Address;
-
-    console.log("finished");
     
     return l2Txhash;
   }
@@ -167,7 +164,6 @@ export default function useArbitrumBridge(props: {
 
     if (!l2ToL1Msg) return ClaimStatus.PENDING;
 
-    console.log("awaitingL2 to L1");
     // Check if already executed
     if (
       (await l2ToL1Msg.status(childProvider)) ==

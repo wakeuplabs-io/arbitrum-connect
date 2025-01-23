@@ -68,10 +68,6 @@ export default function ForceStep({
     onError,
   });
 
-  console.log("forceIncludeTx: ", forceIncludeTx);
-  console.log("fetchingClaimStatus: ", fetchingClaimStatus);
-  console.log("fetchingL2ToL1Msg: ", fetchingL2ToL1Msg);
-
   const isLoading =
     forceIncludeTx.isPending || fetchingClaimStatus || fetchingL2ToL1Msg;
   const isWating24 = !!remainingHours && remainingHours > 0;

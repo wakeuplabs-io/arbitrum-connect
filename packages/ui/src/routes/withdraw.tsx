@@ -86,7 +86,6 @@ function WithdrawScreen() {
     signer &&
       initiateWithdraw(amountInWei, signer)
         .then((l2Txhash) => {
-          console.log("then!");
           const tx: Transaction = {
             bridgeHash: l2Txhash,
             amount: amountInWei,
