@@ -9,7 +9,7 @@ import {
 import { ArbSys__factory } from "@arbitrum/sdk/dist/lib/abi/factories/ArbSys__factory";
 import { ARB_SYS_ADDRESS } from "@arbitrum/sdk/dist/lib/dataEntities/constants";
 import "@rainbow-me/rainbowkit/styles.css";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
@@ -45,12 +45,10 @@ export default function useArbitrumBridge(props: {
     }
     await ensureChainId(childChainId);
     const inboxSdk = new InboxTools(signer!, arbNetwork);
-    tx.nonce = 0;
-    tx.maxFeePerGas = BigNumber.from(10000000)
 
     console.log("signing");
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
-    const l2Txhash = (await inboxSdk.signChildTx(tx, childSigner)) as Address;
+    const l2Txhash = (await inboxSdk.sendChildTx(tx, childSigner)) as Address;
 
     console.log("finished");
     

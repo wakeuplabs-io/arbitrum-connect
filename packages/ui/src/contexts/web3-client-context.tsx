@@ -22,22 +22,23 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
   children,
 }) => {
   const { selectedChain, selectedParentChain } = useSelectedChain();
-  console.log("Web3ClientProvider", selectedChain, selectedParentChain);
-  const parentChainSelected = useMemo(() => {
-    console.log("parentCHainSelected rememo");
-    return defineChain({
-      ...selectedParentChain,
-      id: selectedParentChain.chainId,
-    });
-  }, [selectedParentChain?.chainId]);
+  const parentChainSelected = useMemo(
+    () =>
+      defineChain({
+        ...selectedParentChain,
+        id: selectedParentChain.chainId,
+      }),
+    [selectedParentChain?.chainId],
+  );
 
-  const childChainSelected = useMemo(() => {
-    console.log("parentCHainSelected rememo");
-    return defineChain({
-      ...selectedChain,
-      id: selectedChain.chainId,
-    });
-  }, [selectedChain?.chainId]);
+  const childChainSelected = useMemo(
+    () =>
+      defineChain({
+        ...selectedChain,
+        id: selectedChain.chainId,
+      }),
+    [selectedChain?.chainId],
+  );
   const publicParentClient = useMemo(
     () =>
       createPublicClient({

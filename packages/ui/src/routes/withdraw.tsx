@@ -83,7 +83,6 @@ function WithdrawScreen() {
 
   function onContinue(address: Address) {
     setLoading(true);
-    console.log("signerinsitu: ", signer);
     signer &&
       initiateWithdraw(amountInWei, signer)
         .then((l2Txhash) => {

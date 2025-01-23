@@ -3,12 +3,16 @@ import { CreateChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
+import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
 
 export function useCustomChain() {
-  const [chains, setChains] = useState<CustomChain[]>([]);
+  const [chains, setChains] = useState<CustomChain[]>([
+    CustomChainService.getChainById(defaultCustomMainnet.chainId) ||
+      defaultCustomMainnet,
+    CustomChainService.getChainById(defaultCustomChain.chainId) ||
+      defaultCustomChain,
+  ]);
   const [loading, setLoading] = useState(false);
-
-  
 
   const createChain = async (chain: CreateChainPayload) => {
     setLoading(true);

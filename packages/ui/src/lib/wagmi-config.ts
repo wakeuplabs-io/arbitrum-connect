@@ -1,13 +1,12 @@
-import { sepoliaOverride } from "@/components/hocs/wagmi-provider";
 import envParsed from "@/envParsed";
 import { CustomChain } from "@/types";
 import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 
 export const l2Chain = envParsed().IS_TESTNET ? arbitrumSepolia : arbitrum;
-export const l1Chain = envParsed().IS_TESTNET ? sepoliaOverride : mainnet;
+export const l1Chain = envParsed().IS_TESTNET ? sepolia : mainnet;
 
-export const defaultCustomMainnet : CustomChain = {
+export const defaultCustomMainnet: CustomChain = {
   ...l1Chain,
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
@@ -17,12 +16,12 @@ export const defaultCustomMainnet : CustomChain = {
   confirmPeriodBlocks: 0,
   rpcUrls: {
     default: {
-      http: [l1Chain.rpcUrls.default.http[0]],
+      http: [l1Chain.id === sepolia.id ? "https://ethereum-sepolia-rpc.publicnode.com" : l1Chain.rpcUrls.default.http[0]],
     },
   },
 };
 const defaultArbNetwork = getArbitrumNetwork(l2Chain.id);
-export const defaultCustomChain : CustomChain = {
+export const defaultCustomChain: CustomChain = {
   ...l2Chain,
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
