@@ -20,14 +20,14 @@ export const SearchInput = ({
     }, [debouncedSearchTerm]);
 
     return (
-        <div className="bg-white flex items-center border border-[#D9D9D9] gap-2 md:gap-4 rounded-[20px] md:rounded-[30px] py-3 px-4">
-            <SearchIcon className="" />
+        <div className="bg-white flex items-center border border-[#D9D9D9] gap-2 md:gap-4 rounded-full md:rounded-full py-3 px-4">
             <input
                 type="search"
-                className="grow text-gray-dark text-base placeholder-gray-dark font-normal ring-0 outline-none"
+                className="grow text-gray-dark text-base leading-none placeholder-gray-dark font-normal ring-0 outline-none"
                 placeholder="Search by name"
                 onChange={(e) => setSearchTerm(e.target.value)}
             />
+            <SearchIcon className="" />
         </div>
     );
 };

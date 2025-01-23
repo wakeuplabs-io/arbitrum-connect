@@ -12,6 +12,7 @@ export const l1Chain = envParsed().IS_TESTNET ? sepolia : mainnet;
 
 export const defaultCustomMainnet : CustomChain = {
   ...mainnet,
+  isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
   chainId: mainnet.id,
   parentChainId: 0,
@@ -26,6 +27,7 @@ export const defaultCustomMainnet : CustomChain = {
 const defaultArbNetwork = getArbitrumNetwork(l2Chain.id);
 export const defaultCustomChain : CustomChain = {
   ...l2Chain,
+  isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
   chainId: defaultArbNetwork.chainId,
   parentChainId: defaultArbNetwork.parentChainId,

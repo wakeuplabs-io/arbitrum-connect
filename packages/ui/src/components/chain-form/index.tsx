@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Input } from "../input";
 import { requiredAddress } from "@/lib/validations";
-import { ChainType, CreateChainPayload } from "@/types";
+import { ChainType, CreateChainPayload, CustomChain } from "@/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCustomChain } from "@/hooks/use-custom-chain";
@@ -34,7 +34,7 @@ const schema = z.object({
 });
 
 // Todo: improve valids
-export const AddChain = () => {
+export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
   const { address } = useAccount();
   const { createChain } = useCustomChain();
   const { setSelectedChain } = useSelectedChain();
@@ -43,26 +43,25 @@ export const AddChain = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: {
-      chainId: 24802239149,
-      name: "L3 Juanchi Sep",
-      parentChainId: 421614,
-      bridge: "0x9079816621B094389C940acb382331d5A3b6424F",
-      inbox: "0x5f8FA47BdB016916AE9134B155A86442410645c6",
-      sequencerInbox: "0x1fd74A0204724AEbF2507c37e156619B7cC95687",
-      outbox: "0x044b686C13966729B20B558710ee8f99EFF93e60",
-      rollup: "0x7A08988fF97D55Cde8AFF6964A21eF29886777A1",
-      nativeCurrencyName: "Arbitrum Juanchi Ether",
-      nativeCurrencySymbol: "ETH",
-      nativeCurrencyDecimals: 18,
-      publicRpcUrl: "https://6318-181-209-117-220.ngrok-free.app",
-      localRpcUrl: "https://6318-181-209-117-220.ngrok-free.app",
-      logoURI: "",
+     defaultValues: {
+      chainId: chain?.chainId,
+      name: chain?.name,
+      parentChainId: chain?.parentChainId,
+      bridge: chain?.ethBridge?.bridge,
+      inbox: chain?.ethBridge?.inbox,
+      sequencerInbox: chain?.ethBridge?.sequencerInbox,
+      outbox: chain?.ethBridge?.outbox,
+      rollup: chain?.ethBridge?.rollup,
+      nativeCurrencyName: chain?.nativeCurrency.name,
+      nativeCurrencySymbol: chain?.nativeCurrency.symbol,
+      nativeCurrencyDecimals: chain?.nativeCurrency.decimals,
+      publicRpcUrl: chain?.rpcUrls.default.http[0],
+      localRpcUrl: chain?.rpcUrls.default.http[0],
+      logoURI: chain?.logoURI,
       chainType: ChainType.L3, // Assuming ChainType is an enum with L1, L2, etc.
-    },
+    }, 
   });
 
   const onSubmit = async (data: any) => {
@@ -77,7 +76,6 @@ export const AddChain = () => {
       navigate({ to: "/" });
     }
   };
-  console.log(errors);
   return (
     <section className="max-w-xl mx-auto">
       <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">

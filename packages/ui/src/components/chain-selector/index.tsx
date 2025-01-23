@@ -8,14 +8,16 @@ import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { ListItem } from "./list-item";
 import { useNavigate } from "@tanstack/react-router";
 import { AssetFilters } from "./filters";
+import { useModal } from "@/contexts/modal-context";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
-  const { chains, getUserChains } = useCustomChain();
+  const { chains, getUserChains, deleteChain } = useCustomChain();
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
@@ -30,6 +32,13 @@ export const ChainSelector = ({}: {}) => {
     navigate({ to: "/" });
   };
 
+  const handleDeleteChain = (chain: CustomChain) => {
+    console.log(chain);
+    openModal("Delete Chain", `Confirm action delete ${chain.name}`, () => {
+      if (!address) return;
+      deleteChain(address, chain.chainId);
+    });
+  };
   return (
     <section className="max-w-xl mx-auto">
       <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
@@ -37,11 +46,14 @@ export const ChainSelector = ({}: {}) => {
           Selected Chain:{" "}
           <span className="font-bold">{selectedChain.name}</span>
         </h1>
-
-        <div className="mt-8">
-          <SearchInput onChange={(value) => setSearchTerm(value)} />
+        <div className="mt-8 lg:flex justify-between lg:items-center gap-4">
+          <div className="flex-shrink lg:flex-grow">
+            <SearchInput onChange={(value) => setSearchTerm(value)} />
+          </div>
+          <div className="flex flex-shrink-0">
+            <AssetFilters onChange={handleFiltersChange} value={filter} />
+          </div>
         </div>
-        <AssetFilters onChange={handleFiltersChange} value={filter} />
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
           {chains.map((chain) => {
             return (
@@ -49,9 +61,7 @@ export const ChainSelector = ({}: {}) => {
                 key={`listItem_chain_${chain.chainId}`}
                 chain={chain}
                 onSelect={handleSelectChain}
-                onDeleteClick={(c) => {
-                  console.log(c);
-                }} //TODO: implement
+                onDeleteClick={handleDeleteChain}
                 onFeaturedClick={(c) => {
                   console.log(c);
                 }} //TODO: implement

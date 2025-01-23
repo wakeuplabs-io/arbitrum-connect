@@ -8,8 +8,6 @@ export function useCustomChain() {
   const [chains, setChains] = useState<CustomChain[]>([]);
   const [loading, setLoading] = useState(false);
 
-  
-
   const createChain = async (chain: CreateChainPayload) => {
     setLoading(true);
     const newChain = await CustomChainService.createChain(chain);
@@ -60,6 +58,20 @@ export function useCustomChain() {
     return chain || null;
   };
 
+  const editChain = async (chain: CustomChain) => {
+    setLoading(true);
+    const editedChain = await CustomChainService.editChain(chain);
+    setChains((currentChains) => {
+      return currentChains.map((c) => {
+        if (c.chainId === editedChain.chainId) {
+          return editedChain;
+        }
+        return c;
+      });
+    });
+    setLoading(false);
+    return editedChain;
+  };
   return {
     chains,
     loading,
@@ -68,5 +80,6 @@ export function useCustomChain() {
     getUserChains,
     getAllChains,
     getChainById,
+    editChain
   };
 }

@@ -12,6 +12,8 @@ import "./main.css";
 import { routeTree } from "./routeTree.gen";
 import WagmiSetup from "./components/hocs/wagmi-provider";
 import { SelectedChainProvider } from "./contexts/selected-chain";
+import ConfirmModal from "./components/layout/confirm-modal";
+import { ModalProvider } from "./contexts/modal-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -36,10 +38,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             theme={lightTheme({ borderRadius: "medium" })}
           >
             <Web3ClientProvider>
-              <AlertProvider>
-                <ErrorAlert />
-                <RouterProvider router={router} />
-              </AlertProvider>
+              <ModalProvider>
+                <AlertProvider>
+                  <ErrorAlert />
+                  <ConfirmModal />
+                  <RouterProvider router={router} />
+                </AlertProvider>
+              </ModalProvider>
             </Web3ClientProvider>
           </RainbowKitProvider>
         </QueryClientProvider>
