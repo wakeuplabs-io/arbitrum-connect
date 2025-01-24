@@ -1,5 +1,4 @@
 import { FILTERS } from "@/constants";
-import envParsed from "@/envParsed";
 import { CreateChainPayload, CustomChain } from "@/types";
 import { Address, zeroAddress } from "viem";
 

@@ -8,6 +8,8 @@ import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useNavigate } from "@tanstack/react-router";
+import Button from "../button";
+import { l2Chain } from "@/lib/wagmi-config";
 
 const schema = z.object({
   chainId: z.preprocess((val) => Number(val), z.number().min(1)),
@@ -40,15 +42,11 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
   const { setSelectedChain } = useSelectedChain();
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-  } = useForm({
+  const { register, handleSubmit } = useForm({
     resolver: zodResolver(schema),
-     defaultValues: {
+    defaultValues: {
       chainId: chain?.chainId,
       name: chain?.name,
-      parentChainId: chain?.parentChainId,
       bridge: chain?.ethBridge?.bridge,
       inbox: chain?.ethBridge?.inbox,
       sequencerInbox: chain?.ethBridge?.sequencerInbox,
@@ -61,7 +59,7 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
       localRpcUrl: chain?.rpcUrls.default.http[0],
       logoURI: chain?.logoURI,
       chainType: ChainType.L3, // Assuming ChainType is an enum with L1, L2, etc.
-    }, 
+    },
   });
 
   const onSubmit = async (data: any) => {
@@ -69,6 +67,7 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
     const payload: CreateChainPayload = {
       ...data,
       user: address,
+      parentChainId: l2Chain.id,
     };
     if (address) {
       const newChain = await createChain(payload);
@@ -78,12 +77,12 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
   };
   return (
     <section className="max-w-xl mx-auto">
-      <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-        <h1 className="text-2xl text-black text-left">Add Chain</h1>
-        <form
-          className="mt-8 w-full flex flex-col gap-4"
-          onSubmit={handleSubmit(onSubmit)}
-        >
+      <h1 className="text-2xl text-black text-left">Add Chain</h1>
+      <form
+        className="mt-8 w-full flex flex-col gap-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
           <Input
             name="chainId"
             type="number"
@@ -95,13 +94,6 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
             name="name"
             label="Chain name"
             placeholder="Chain name"
-            register={register}
-          />
-          {/* //TODO: Add parent chain id validation, it must exist before creating the new one */}
-          <Input
-            name="parentChainId"
-            label="Parent chain id"
-            placeholder="Parent chain ID"
             register={register}
           />
           <Input
@@ -180,9 +172,9 @@ export const ChainForm = ({ chain }: { chain?: CustomChain | null }) => {
             placeholder="Chain Type"
             register={register}
           />
-          <input type="submit" />
-        </form>
-      </div>
+        </div>
+        <Button type="submit">Submit</Button>
+      </form>
     </section>
   );
 };
