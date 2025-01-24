@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreateChainPayload, CustomChain } from "@/types";
+import { CustomChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
@@ -36,7 +36,7 @@ export function useCustomChain() {
   const [chains, setChains] = useState<CustomChain[]>(getAllChains());
   const [loading, setLoading] = useState(false);
 
-  const createChain = (chain: CreateChainPayload) => {
+  const createChain = (chain: CustomChainPayload) => {
     setLoading(true);
     const newChain = CustomChainService.createChain(chain);
     setChains((currentChains) => {
@@ -79,7 +79,7 @@ export function useCustomChain() {
     return chain || null;
   };
 
-  const editChain = async (chain: CustomChain) => {
+  const editChain = async (chain: CustomChainPayload) => {
     setLoading(true);
     const editedChain = await CustomChainService.editChain(chain);
     setChains((currentChains) => {

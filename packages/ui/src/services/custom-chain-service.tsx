@@ -1,9 +1,9 @@
 import { FILTERS } from "@/constants";
-import { CreateChainPayload, CustomChain } from "@/types";
+import { CustomChainPayload, CustomChain } from "@/types";
 import { Address, zeroAddress } from "viem";
 
 export default class CustomChainService {
-  static formatChainPayload(data: CreateChainPayload): CustomChain {
+  static formatChainPayload(data: CustomChainPayload): CustomChain {
     return {
       isTestnet: data.isTestnet,
       user: data.user,
@@ -33,7 +33,7 @@ export default class CustomChainService {
     };
   }
 
-  static createChain = (payload: CreateChainPayload) => {
+  static createChain = (payload: CustomChainPayload) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
       ? JSON.parse(storedChains)
@@ -57,9 +57,7 @@ export default class CustomChainService {
       ? JSON.parse(storedChains)
       : [];
 
-    const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId,
-    );
+    const chainExists = parsedChains.find((c) => c.chainId === chain.chainId);
     if (chainExists) throw new Error("Chain already exists");
 
     parsedChains.push(chain);
@@ -134,13 +132,14 @@ export default class CustomChainService {
     return chain || null;
   };
 
-  static editChain = async (chain: CustomChain) => {
+  static editChain = async (payload: CustomChainPayload) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
       ? JSON.parse(storedChains)
       : [];
+    const chain = CustomChainService.formatChainPayload(payload);
     const newChains = parsedChains.map((c) => {
-      if (c.chainId === chain.chainId) {
+      if (c.chainId === payload.chainId) {
         return chain;
       }
       return c;

@@ -28,7 +28,7 @@ export enum ChainType {
   L3 = 'L3',
 }
 
-export type CreateChainPayload = {
+export type CustomChainPayload = {
   isTestnet: boolean;
   chainId: number;
   name: string;

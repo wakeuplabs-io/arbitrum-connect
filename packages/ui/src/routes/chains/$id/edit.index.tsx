@@ -9,7 +9,7 @@ import {
 const EditChain = () => {
   const { chain } = useLoaderData({ from: "/chains/$id/edit/" }); // Especifica el tipo aquí
 
-  return <ChainForm chain={chain} />;
+  return <ChainForm chain={chain} editing />;
 };
 
 export const Route = createFileRoute("/chains/$id/edit/")({
