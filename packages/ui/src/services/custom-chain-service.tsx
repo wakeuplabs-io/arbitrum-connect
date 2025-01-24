@@ -6,7 +6,7 @@ import { Address, zeroAddress } from "viem";
 export default class CustomChainService {
   static formatChainPayload(data: CreateChainPayload): CustomChain {
     return {
-      isTestnet: envParsed().IS_TESTNET,
+      isTestnet: data.isTestnet,
       user: data.user,
       chainId: data.chainId,
       name: data.name,
@@ -59,7 +59,7 @@ export default class CustomChainService {
       : [];
 
     const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId && c.user === chain.user,
+      (c) => c.chainId === chain.chainId,
     );
     if (chainExists) throw new Error("Chain already exists");
 

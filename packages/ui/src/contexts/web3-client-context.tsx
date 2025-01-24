@@ -22,7 +22,6 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
   children,
 }) => {
   const { selectedChain, selectedParentChain } = useSelectedChain();
-	console.log("Web3ClientProvider", selectedChain, selectedParentChain)
   const parentChainSelected = useMemo(
     () =>
       defineChain({

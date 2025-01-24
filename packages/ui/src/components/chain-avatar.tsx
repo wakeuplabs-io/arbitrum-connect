@@ -19,7 +19,6 @@ const ChainAvatar: React.FC<AvatarProps> = ({ src, alt = "Avatar", size = 48 }) 
       setIsImageValid(false);
     }
   }, [src]);
-  console.log('imageValid', isImageValid)
   return isImageValid ? (
     <img
       src={src}

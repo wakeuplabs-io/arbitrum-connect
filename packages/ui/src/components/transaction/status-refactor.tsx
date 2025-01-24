@@ -23,12 +23,14 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
     fetchingClaimStatus,
     fetchingL2ToL1Msg,
     l2ToL1Msg,
-    canClaim
+    canClaim,
   } = useTransaction({ tx: tx, enabled: triggered });
 
   const transactionState = useTransactionStatus(transaction);
   useEffect(() => {
-    if (!triggered && isVisible) setTriggered(true);
+    if (!triggered && isVisible) {
+      setTriggered(true);
+    }
   }, [isVisible]);
 
   return (
@@ -37,33 +39,37 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
         ref={ref}
         className="flex flex-col grow justify-between text-primary-700 px-4 md:px-6"
       >
-        <InitiateWithdrawal transaction={transaction} />
-        <ConfirmWithdrawal
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          fetchingInboxTxTimestamp={fetchingInboxTxTimestamp}
-          updateTx={updateTx}
-          state={transactionState}
-        />
-        <ForceStep
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          triggered={triggered}
-          fetchingClaimStatus={fetchingClaimStatus}
-          fetchingL2ToL1Msg={fetchingL2ToL1Msg}
-          state={transactionState}
-        />
-        <ClaimStep
-          transaction={transaction}
-          onError={(e) => setError(e.message)}
-          fetchingClaimStatus={fetchingClaimStatus}
-          fetchingQueries={fetchingClaimStatus || fetchingL2ToL1Msg}
-          l2ToL1Msg={l2ToL1Msg!}
-          updateTx={updateTx}
-          state={transactionState}
-          fetchingL2ToL1Msg={fetchingL2ToL1Msg}
-          canClaim={canClaim}
-        />
+        {triggered && (
+          <>
+            <InitiateWithdrawal transaction={transaction} />
+            <ConfirmWithdrawal
+              transaction={transaction}
+              onError={(e) => setError(e.message)}
+              fetchingInboxTxTimestamp={fetchingInboxTxTimestamp}
+              updateTx={updateTx}
+              state={transactionState}
+            />
+            <ForceStep
+              transaction={transaction}
+              onError={(e) => setError(e.message)}
+              triggered={triggered}
+              fetchingClaimStatus={fetchingClaimStatus}
+              fetchingL2ToL1Msg={fetchingL2ToL1Msg}
+              state={transactionState}
+            />
+            <ClaimStep
+              transaction={transaction}
+              onError={(e) => setError(e.message)}
+              fetchingClaimStatus={fetchingClaimStatus}
+              fetchingQueries={fetchingClaimStatus || fetchingL2ToL1Msg}
+              l2ToL1Msg={l2ToL1Msg!}
+              updateTx={updateTx}
+              state={transactionState}
+              fetchingL2ToL1Msg={fetchingL2ToL1Msg}
+              canClaim={canClaim}
+            />
+          </>
+        )}
       </div>
 
       <div className="bg-gray-200 mt-4 px-4 py-3 text-center">

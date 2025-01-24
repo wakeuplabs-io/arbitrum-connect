@@ -1,51 +1,56 @@
 import { useMemo } from "react";
 import { createConfig, WagmiProvider } from "wagmi";
-import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
-import { defineChain, http } from "viem";
-import envParsed from "@/envParsed";
+import { defineChain, http, Chain } from "viem";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { CustomChain } from "@/types";
-import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { useCustomChain } from "@/hooks/use-custom-chain";
+import { braveWallet } from "@rainbow-me/rainbowkit/wallets";
+import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
 
 function WagmiSetup({ children }: { children: React.ReactNode }) {
-  const {
-    selectedChain,
-    selectedParentChain,
-  } = useSelectedChain();
+  const { chains } = useCustomChain();
 
-  const customChains = [selectedChain, selectedParentChain];
-
-  const definedChains = useMemo(() => {
-    return customChains.map((chain: CustomChain) => {
-      return defineChain({
-        ...chain,
-        id: chain.chainId,
-      });
+  const definedChains: [Chain, ...Chain[]] = useMemo(() => {
+    let myChains: [Chain, ...Chain[]] = [
+      defineChain({
+        ...defaultCustomMainnet,
+        id: defaultCustomMainnet.chainId,
+      }),
+      defineChain({
+        ...defaultCustomChain,
+        id: defaultCustomChain.chainId,
+      }),
+    ];
+    chains.forEach((chain: CustomChain) => {
+      if (
+        chain.chainId !== defaultCustomChain.chainId &&
+        chain.chainId !== defaultCustomMainnet.chainId
+      )
+        myChains.push(
+          defineChain({
+            ...chain,
+            id: chain.chainId,
+          }),
+        );
     });
-  }, [customChains]);
 
-  const allChains = envParsed().IS_TESTNET
-    ? [arbitrumSepolia, sepolia, ...definedChains] as const
-    : [arbitrum, mainnet, ...definedChains] as const;
-    
+    return myChains;
+  }, [chains]);
+
   const transports = useMemo(() => {
     const transportMap: Record<number, ReturnType<typeof http>> = {};
-    allChains.forEach((chain) => {
+    definedChains.forEach((chain) => {
       transportMap[chain.id] = http();
     });
     return transportMap;
-  }, [allChains]);
-  
-  definedChains.forEach((chain) => {
-    transports[chain.id] = http();
-  });
+  }, [definedChains]);
 
   const connectors = connectorsForWallets(
     [
       {
         groupName: "My Wallets",
-        wallets: [metaMaskWallet],
+        wallets: [metaMaskWallet, braveWallet],
       },
     ],
     {
@@ -55,7 +60,7 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
   );
 
   const config = createConfig({
-    chains: allChains,
+    chains: definedChains,
     transports,
     connectors,
     ssr: false,

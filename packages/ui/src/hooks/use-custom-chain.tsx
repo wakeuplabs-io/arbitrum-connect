@@ -3,14 +3,42 @@ import { CreateChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
+import {
+  getArbitrumNetworks,
+  registerCustomArbitrumNetwork,
+} from "@arbitrum/sdk";
+import { arbitrum, arbitrumSepolia } from "viem/chains";
+
+const getAllChains = () => {
+  const allChains = CustomChainService.getAllChains();
+  const arbNetworks = getArbitrumNetworks();
+  allChains
+    .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
+    .forEach((chain) => {
+      if (
+        chain.chainId !== arbitrumSepolia.id &&
+        chain.chainId !== arbitrum.id
+      ) {
+        const arbNetwork = {
+          ...chain,
+          isCustom: true,
+        };
+        registerCustomArbitrumNetwork(arbNetwork, {
+          throwIfAlreadyRegistered: false,
+        });
+      }
+    });
+
+  return allChains;
+};
 
 export function useCustomChain() {
-  const [chains, setChains] = useState<CustomChain[]>([]);
+  const [chains, setChains] = useState<CustomChain[]>(getAllChains());
   const [loading, setLoading] = useState(false);
 
-  const createChain = async (chain: CreateChainPayload) => {
+  const createChain = (chain: CreateChainPayload) => {
     setLoading(true);
-    const newChain = await CustomChainService.createChain(chain);
+    const newChain = CustomChainService.createChain(chain);
     setChains((currentChains) => {
       return [...currentChains, newChain];
     });
@@ -18,31 +46,24 @@ export function useCustomChain() {
     return newChain;
   };
 
-  const deleteChain = async (userAddress: Address, chainId: number) => {
+  const deleteChain = (userAddress: Address, chainId: number) => {
     setLoading(true);
-    const chains = await CustomChainService.deleteChain(userAddress, chainId);
+    const chains = CustomChainService.deleteChain(userAddress, chainId);
     setChains(chains || []);
   };
 
-  const getUserChains = async (
+  const getUserChains = (
     userAddress: Address,
     search: string = "",
     filter: FILTERS,
   ) => {
     setLoading(true);
-    const filteredChains = await CustomChainService.getUserChains(
+    const filteredChains = CustomChainService.getUserChains(
       userAddress,
       search,
       filter,
     );
     setChains(filteredChains);
-    setLoading(false);
-  };
-
-  const getAllChains = async () => {
-    setLoading(true);
-    const chains = await CustomChainService.getAllChains();
-    setChains(chains);
     setLoading(false);
   };
 
@@ -78,7 +99,6 @@ export function useCustomChain() {
     createChain,
     deleteChain,
     getUserChains,
-    getAllChains,
     getChainById,
     editChain
   };

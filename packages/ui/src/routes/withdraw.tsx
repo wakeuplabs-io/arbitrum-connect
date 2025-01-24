@@ -19,6 +19,7 @@ import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 interface SearchParams {
   amount: string;
@@ -32,7 +33,7 @@ export const Route = createFileRoute("/withdraw")({
       return {
         amount:
           BigNumber.from(
-            (search.amount as string).replace(/"/g, "")
+            (search.amount as string).replace(/"/g, ""),
           ).toString() ?? "0",
       };
     } catch (e) {
@@ -43,17 +44,23 @@ export const Route = createFileRoute("/withdraw")({
 
 function WithdrawScreen() {
   const navigate = useNavigate();
-  const { address } = useAccount()
+  const { address } = useAccount();
   const { parentProvider, childProvider } = useWeb3ClientContext();
   const { amount: amountInWei } = Route.useSearch();
   const { ethPrice } = useEthPrice();
+
+  const { selectedParentChain, selectedChain } = useSelectedChain();
 
   const [approvedAproxFees, setApprovedAproxFees] = useState<boolean>(false);
   const [approvedSequencerMaySpeedUp, setApprovedSequencerMaySpeedUp] =
     useState<boolean>(false);
   const [approvedTime, setApprovedTime] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  const { initiateWithdraw, signer } = useArbitrumBridge();
+  //Confirm withdraw seems to have stopped working
+  const { initiateWithdraw, signer } = useArbitrumBridge({
+    parentChainId: selectedParentChain.chainId,
+    childChainId: selectedChain.chainId,
+  });
   const { setError } = useAlertContext();
   const { data: withdrawPrice, isFetching: withdrawPriceFetching } = useQuery({
     queryKey: ["withdrawPrice"],
@@ -83,6 +90,8 @@ function WithdrawScreen() {
             bridgeHash: l2Txhash,
             amount: amountInWei,
             claimStatus: ClaimStatus.PENDING,
+            parentChainId: selectedParentChain.chainId,
+            childChainId: selectedChain.chainId,
           };
           transactionsStorageService.create(tx, address);
           navigate({ to: `/activity/${tx.bridgeHash}` });
@@ -115,7 +124,9 @@ function WithdrawScreen() {
         onClick={() => navigate({ to: "/" })}
       >
         <ChevronLeft size={20} />
-        <div className="font-semibold text-xl text-primary-700">Review and confirm</div>
+        <div className="font-semibold text-xl text-primary-700">
+          Review and confirm
+        </div>
       </button>
 
       {/* amount */}
@@ -277,11 +288,13 @@ function WithdrawScreen() {
       {/* confirm */}
       <button
         type="button"
-        className={cn("btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200")}
-        disabled={!canContinue || loading || !address}
+        className={cn(
+          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
+        )}
+        disabled={!canContinue || loading || !address || !signer}
         onClick={() => address && onContinue(address)}
       >
-        {loading ? "Loading..." : "Confirm Withdrawal"}
+        {loading || signer === undefined ? "Loading..." : "Confirm Withdrawal"}
       </button>
     </div>
   );
