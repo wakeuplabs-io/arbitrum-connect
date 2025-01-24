@@ -10,6 +10,9 @@ export default {
         "primary-100": "#C2DCFF",
         "primary-700": "#15202E",
         "neutral-50": "#F9FAFB",
+        "neutral-100": "#F2F2F3",
+        "black": "#1E1E1E",
+        "gray-light": "#B3B3B3",
       },
       width: {
         150: "37.5rem",

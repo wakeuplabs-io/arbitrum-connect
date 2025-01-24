@@ -5,7 +5,6 @@ import {
   ChildTransactionReceipt,
   getArbitrumNetwork,
   InboxTools,
-  registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import { ArbSys__factory } from "@arbitrum/sdk/dist/lib/abi/factories/ArbSys__factory";
 import { ARB_SYS_ADDRESS } from "@arbitrum/sdk/dist/lib/dataEntities/constants";
@@ -14,39 +13,24 @@ import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
-import { useEffect } from "react";
-import { useCustomChainContext } from "./use-custom-chain";
-
 export enum ClaimStatus {
   PENDING = "PENDING",
   CLAIMABLE = "CLAIMABLE",
   CLAIMED = "CLAIMED",
 }
 
-export default function useArbitrumBridge() {
-  const { selectedChain } = useCustomChainContext();
-  const parentChainId = selectedChain?.parentChainId;
-  const networkId = selectedChain?.chainId;
-
-  useEffect(() => {
-    if (selectedChain) {
-      const arbNetwork = {
-        ...selectedChain,
-        isCustom: true,
-      };
-
-      registerCustomArbitrumNetwork(arbNetwork, {
-        throwIfAlreadyRegistered: false,
-      });
-    }
-  }, [selectedChain]);
+export default function useArbitrumBridge(props: {
+  parentChainId: number;
+  childChainId: number;
+}) {
+  const parentChainId = props.parentChainId;
+  const childChainId = props.childChainId;
 
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
-  
-  const arbNetwork =
-    selectedChain && getArbitrumNetwork(selectedChain?.chainId);
+
+  const arbNetwork = getArbitrumNetwork(childChainId);
 
   async function ensureChainId(chainId: number) {
     return switchChainAsync({ chainId });
@@ -56,15 +40,15 @@ export default function useArbitrumBridge() {
     tx: ITxReq,
     childSigner: ethers.providers.JsonRpcSigner,
   ) {
-    if (!networkId || !arbNetwork) {
+    if (!childChainId || !arbNetwork) {
       throw new Error("No child network available");
     }
-    await ensureChainId(networkId);
+    await ensureChainId(childChainId);
     const inboxSdk = new InboxTools(signer!, arbNetwork);
 
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
-    const l2Txhash = (await inboxSdk.signChildTx(tx, childSigner)) as Address;
-
+    const l2Txhash = (await inboxSdk.sendChildTx(tx, childSigner)) as Address;
+    
     return l2Txhash;
   }
 
@@ -133,11 +117,11 @@ export default function useArbitrumBridge() {
     l2SignedTx: Address;
     parentSigner: ethers.providers.JsonRpcSigner;
   }) {
-    if (!parentChainId || !networkId) {
+    if (!parentChainId || !childChainId) {
       throw new Error("No child network available");
     }
-    await ensureChainId(parentChainId);
-    const l3Network = getArbitrumNetwork(networkId);
+    await ensureChainId(childChainId);
+    const l3Network = getArbitrumNetwork(childChainId);
     const inboxSdk = new InboxTools(props.parentSigner, l3Network);
 
     // send tx to l1 delayed inbox

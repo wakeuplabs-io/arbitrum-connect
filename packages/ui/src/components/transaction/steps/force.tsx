@@ -7,6 +7,7 @@ import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
 import { Step, TransactionState } from "@/constants";
 import { calculateRemainingHours } from "@/lib/helpers";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 function ForceIncludeButton({
   transaction,
@@ -15,7 +16,11 @@ function ForceIncludeButton({
   transaction: Transaction;
   onForce: () => void;
 }) {
-  const { signer, isForceIncludePossible } = useArbitrumBridge();
+  const { selectedParentChain, selectedChain } = useSelectedChain();
+  const { signer, isForceIncludePossible } = useArbitrumBridge({
+    parentChainId: selectedParentChain.chainId,
+    childChainId: selectedChain.chainId,
+  });
 
   const { data: canForceInclude, isFetching: fetchingForceIncludeStatus } =
     useQuery({
@@ -40,7 +45,7 @@ export default function ForceStep({
   //Then remove
   fetchingClaimStatus,
   fetchingL2ToL1Msg,
-  state
+  state,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
@@ -49,7 +54,10 @@ export default function ForceStep({
   triggered: boolean;
   state: TransactionState;
 }) {
-  const { signer, forceInclude } = useArbitrumBridge();
+  const { signer, forceInclude } = useArbitrumBridge({
+    parentChainId: transaction.parentChainId,
+    childChainId: transaction.childChainId,
+  });
   const { ACTIVE, DONE } = useStepStatus(Step.FORCE_WITHDRAWAL, state);
   const remainingHours = transaction.delayedInboxTimestamp
     ? calculateRemainingHours(transaction.delayedInboxTimestamp)
@@ -60,9 +68,10 @@ export default function ForceStep({
     onError,
   });
 
-  const isLoading = forceIncludeTx.isPending || fetchingClaimStatus || fetchingL2ToL1Msg;
+  const isLoading =
+    forceIncludeTx.isPending || fetchingClaimStatus || fetchingL2ToL1Msg;
   const isWating24 = !!remainingHours && remainingHours > 0;
-  
+
   function onForce() {
     if (!signer) return;
 

@@ -8,6 +8,8 @@ export interface Transaction {
   delayedInboxHash?: Address;
   claimStatus: ClaimStatus;
   account?: Address;
+  parentChainId: number;
+  childChainId: number;
 }
 
 export class TransactionsStorageService {

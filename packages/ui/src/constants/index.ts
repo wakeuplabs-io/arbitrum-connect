@@ -33,3 +33,10 @@ export enum StepState {
   DONE = "DONE",
   PENDING = "PENDING",
 }
+
+export enum FILTERS {
+  ALL = "All",
+  FEATURED = "Featured",
+  OWN = "Own",
+}
+export const FILTERS_ARRAY = [FILTERS.ALL, FILTERS.FEATURED, FILTERS.OWN];
