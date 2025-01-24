@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import ChainItem from "@/components/chain-item";
+import Button from "@/components/button";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
@@ -31,7 +32,7 @@ function HomeScreen() {
   const [amountEth, setAmountEth] = useState<string>("");
   const [error, setError] = useState<FormError>();
   const { ethPrice } = useEthPrice();
-  const { selectedChain, selectedParentChain} = useSelectedChain()
+  const { selectedChain, selectedParentChain } = useSelectedChain();
   function handleSubmit() {
     const amount = parseUnits(amountEth, 18);
     if (amount.lte("0")) {
@@ -58,7 +59,11 @@ function HomeScreen() {
         <div className="flex text-left justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
           <ChainItem chain={selectedChain} selectable={true} header="From" />
           <CircleArrowRight strokeWidth={1.5} size={29} color="#363853" />
-          <ChainItem chain={selectedParentChain} selectable={false} header="To" />
+          <ChainItem
+            chain={selectedParentChain}
+            selectable={false}
+            header="To"
+          />
         </div>
         <div className="flex flex-col grow justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-4 pt-0 h-[21rem]">
           <div className="flex flex-col grow items-center">
@@ -154,7 +159,7 @@ function HomeScreen() {
             </div>
           </div> */}
         </div>
-        <button
+        <Button
           id="continue-btn"
           onClick={(e) => {
             e.preventDefault();
@@ -163,10 +168,6 @@ function HomeScreen() {
             } else handleSubmit();
           }}
           type="submit"
-          className={cn(
-            "btn btn-primary font-normal rounded-3xl text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
-            { "animate-shake": error },
-          )}
           disabled={!address || !arbBalance}
         >
           {address
@@ -174,7 +175,7 @@ function HomeScreen() {
               ? "Continue"
               : "Loading balance..."
             : "Connect your wallet to withdraw"}
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -9,6 +9,7 @@ import { ListItem } from "./list-item";
 import { useNavigate } from "@tanstack/react-router";
 import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
+import Button from "../button";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
@@ -39,6 +40,14 @@ export const ChainSelector = ({}: {}) => {
       deleteChain(address, chain.chainId);
     });
   };
+
+  const handleEditChain = (chain: CustomChain) => {
+    navigate({ to: `/chains/${chain.chainId}/edit` });
+  };
+
+  const handleAddChain = () => {
+    navigate({ to: "/chains/add" });
+  }
   return (
     <section className="max-w-xl mx-auto">
       <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
@@ -46,7 +55,7 @@ export const ChainSelector = ({}: {}) => {
           Selected Chain:{" "}
           <span className="font-bold">{selectedChain.name}</span>
         </h1>
-        <div className="mt-8 lg:flex justify-between lg:items-center gap-4">
+        <div className="mt-8 flex flex-col lg:flex-row justify-between lg:items-center gap-4">
           <div className="flex-shrink lg:flex-grow">
             <SearchInput onChange={(value) => setSearchTerm(value)} />
           </div>
@@ -64,11 +73,15 @@ export const ChainSelector = ({}: {}) => {
                 onDeleteClick={handleDeleteChain}
                 onFeaturedClick={(c) => {
                   console.log(c);
-                }} //TODO: implement
+                }}
+                onEditClick={handleEditChain}
               />
             );
           })}
         </div>
+      </div>
+      <div className="w-full my-6">
+        <Button onClick={handleAddChain}>Add Chain</Button>
       </div>
     </section>
   );
