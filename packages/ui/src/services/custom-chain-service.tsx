@@ -1,4 +1,5 @@
 import { FILTERS } from "@/constants";
+import envParsed from "@/envParsed";
 import { CreateChainPayload, CustomChain } from "@/types";
 import { Address, zeroAddress } from "viem";
 
@@ -132,5 +133,20 @@ export default class CustomChainService {
       (chain: CustomChain) => chain.chainId === chainId,
     );
     return chain || null;
+  };
+
+  static editChain = async (chain: CustomChain) => {
+    const storedChains = localStorage.getItem(`chains`);
+    const parsedChains: CustomChain[] = storedChains
+      ? JSON.parse(storedChains)
+      : [];
+    const newChains = parsedChains.map((c) => {
+      if (c.chainId === chain.chainId) {
+        return chain;
+      }
+      return c;
+    });
+    localStorage.setItem(`chains`, JSON.stringify(newChains));
+    return chain;
   };
 }

@@ -79,6 +79,20 @@ export function useCustomChain() {
     return chain || null;
   };
 
+  const editChain = async (chain: CustomChain) => {
+    setLoading(true);
+    const editedChain = await CustomChainService.editChain(chain);
+    setChains((currentChains) => {
+      return currentChains.map((c) => {
+        if (c.chainId === editedChain.chainId) {
+          return editedChain;
+        }
+        return c;
+      });
+    });
+    setLoading(false);
+    return editedChain;
+  };
   return {
     chains,
     loading,
@@ -86,5 +100,6 @@ export function useCustomChain() {
     deleteChain,
     getUserChains,
     getChainById,
+    editChain
   };
 }

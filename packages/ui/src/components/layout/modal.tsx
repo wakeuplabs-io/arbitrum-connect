@@ -1,22 +1,32 @@
-import React from "react";
+import classNames from "classnames";
+import { ReactNode } from "react";
+import { createPortal } from "react-dom";
 
-export default function Modal({
-  children,
-  isOpen,
-}: {
-  children: React.ReactNode;
+interface ModalProps {
   isOpen: boolean;
-}) {
-  React.useEffect(() => {
-    const dialog = document?.getElementById("terms-modal") as HTMLDialogElement;
-    isOpen ? dialog?.showModal() : dialog?.close();
-  }, [isOpen]);
-
-  return (
-    <>
-      <dialog id="terms-modal" className="modal">
-        <div className="modal-box flex flex-col items-center">{children}</div>
-      </dialog>
-    </>
-  );
+  onClose?: () => void;
+  children: ReactNode;
 }
+
+const Modal = ({ isOpen, onClose, children }: ModalProps) => {
+  if (!isOpen) return null;
+
+  const modalRoot = document.getElementById("modal-root");
+  if (!modalRoot)
+    throw new Error("The modal root element was not found in the DOM.");
+
+  return createPortal(
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div
+      className="absolute inset-0 bg-black opacity-50"
+      onClick={onClose}
+    />
+    <div className={classNames("relative bg-white rounded-lg p-6 shadow-lg w-1/4")}>
+      {children}
+    </div>
+  </div>,
+    modalRoot,
+  );
+};
+
+export default Modal;
