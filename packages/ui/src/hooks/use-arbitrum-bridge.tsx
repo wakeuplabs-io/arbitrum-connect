@@ -48,7 +48,7 @@ export default function useArbitrumBridge(props: {
 
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
     const l2Txhash = (await inboxSdk.sendChildTx(tx, childSigner)) as Address;
-    
+
     return l2Txhash;
   }
 

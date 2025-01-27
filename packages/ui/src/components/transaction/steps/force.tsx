@@ -7,7 +7,6 @@ import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
 import { Step, TransactionState } from "@/constants";
 import { calculateRemainingHours } from "@/lib/helpers";
-import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 function ForceIncludeButton({
   transaction,
@@ -16,17 +15,19 @@ function ForceIncludeButton({
   transaction: Transaction;
   onForce: () => void;
 }) {
-  const { selectedParentChain, selectedChain } = useSelectedChain();
   const { signer, isForceIncludePossible } = useArbitrumBridge({
-    parentChainId: selectedParentChain.chainId,
-    childChainId: selectedChain.chainId,
+    parentChainId: transaction.parentChainId,
+    childChainId: transaction.childChainId,
   });
 
   const { data: canForceInclude, isFetching: fetchingForceIncludeStatus } =
     useQuery({
       queryKey: ["forceIncludeStatus", transaction.delayedInboxHash],
       queryFn: () => isForceIncludePossible(signer!),
+      enabled: !!signer,
     });
+
+  console.log("canForceInclude", canForceInclude);
 
   if (!canForceInclude || fetchingForceIncludeStatus) {
     return null;

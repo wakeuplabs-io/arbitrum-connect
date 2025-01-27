@@ -8,7 +8,6 @@ import { StatusStep } from "../status-step";
 import { Countdown } from "../countdown";
 import { useStepStatus } from "@/hooks/use-step-status";
 import { Step, TransactionState } from "@/constants";
-import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 export default function ClaimStep({
   transaction,
@@ -30,10 +29,9 @@ export default function ClaimStep({
   fetchingL2ToL1Msg: boolean;
   canClaim: boolean;
 }) {
-  const { selectedParentChain, selectedChain } = useSelectedChain();
   const { signer, claimFunds } = useArbitrumBridge({
-    parentChainId: selectedParentChain.chainId,
-    childChainId: selectedChain.chainId,
+    parentChainId: transaction.parentChainId,
+    childChainId: transaction.childChainId,
   });
   const { childProvider } = useWeb3ClientContext();
   const { ACTIVE, DONE } = useStepStatus(Step.CLAIM, state);

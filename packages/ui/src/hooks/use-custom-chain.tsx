@@ -3,37 +3,11 @@ import { CustomChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
-import {
-  getArbitrumNetworks,
-  registerCustomArbitrumNetwork,
-} from "@arbitrum/sdk";
-import { arbitrum, arbitrumSepolia } from "viem/chains";
-
-const getAllChains = () => {
-  const allChains = CustomChainService.getAllChains();
-  const arbNetworks = getArbitrumNetworks();
-  allChains
-    .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
-    .forEach((chain) => {
-      if (
-        chain.chainId !== arbitrumSepolia.id &&
-        chain.chainId !== arbitrum.id
-      ) {
-        const arbNetwork = {
-          ...chain,
-          isCustom: true,
-        };
-        registerCustomArbitrumNetwork(arbNetwork, {
-          throwIfAlreadyRegistered: false,
-        });
-      }
-    });
-
-  return allChains;
-};
+import { useChains } from "./use-chains";
 
 export function useCustomChain() {
-  const [chains, setChains] = useState<CustomChain[]>(getAllChains());
+  const { chains, setChains } = useChains();
+  const [customChains, setCustomChains] = useState(chains);
   const [loading, setLoading] = useState(false);
 
   const createChain = (chain: CustomChainPayload) => {
@@ -63,7 +37,7 @@ export function useCustomChain() {
       search,
       filter,
     );
-    setChains(filteredChains);
+    setCustomChains(filteredChains);
     setLoading(false);
   };
 
@@ -94,12 +68,13 @@ export function useCustomChain() {
     return editedChain;
   };
   return {
-    chains,
+    customChains,
     loading,
     createChain,
     deleteChain,
     getUserChains,
     getChainById,
-    editChain
+    editChain,
+    setCustomChains,
   };
 }

@@ -4,12 +4,12 @@ import { defineChain, http, Chain } from "viem";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { CustomChain } from "@/types";
-import { useCustomChain } from "@/hooks/use-custom-chain";
 import { braveWallet } from "@rainbow-me/rainbowkit/wallets";
 import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
+import { useChains } from "@/hooks/use-chains";
 
 function WagmiSetup({ children }: { children: React.ReactNode }) {
-  const { chains } = useCustomChain();
+  const { chains } = useChains();
 
   const definedChains: [Chain, ...Chain[]] = useMemo(() => {
     let myChains: [Chain, ...Chain[]] = [

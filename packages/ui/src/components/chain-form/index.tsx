@@ -44,7 +44,6 @@ const schema = (editing: boolean) =>
     }),
   });
 
-// Todo: improve valids
 export const ChainForm = ({
   chain,
   editing = false,
@@ -76,7 +75,7 @@ export const ChainForm = ({
       publicRpcUrl: chain?.rpcUrls.default.http[0],
       localRpcUrl: chain?.rpcUrls.default.http[0],
       logoURI: chain?.logoURI,
-      chainType: ChainType.L3, // Assuming ChainType is an enum with L1, L2, etc.
+      chainType: ChainType.L3,
     },
   });
 
