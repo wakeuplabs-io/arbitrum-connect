@@ -13,6 +13,7 @@ export default {
         "neutral-100": "#F2F2F3",
         "black": "#1E1E1E",
         "gray-light": "#B3B3B3",
+        "gray-icon": "#ADB2BC"
       },
       width: {
         150: "37.5rem",

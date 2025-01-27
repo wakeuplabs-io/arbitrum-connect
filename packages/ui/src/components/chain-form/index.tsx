@@ -12,14 +12,18 @@ import Button from "../button";
 import { l2Chain } from "@/lib/wagmi-config";
 import { EnumSelect } from "../enum-select";
 import CustomChainService from "@/services/custom-chain-service";
+import { Address } from "viem";
 
-const schema = (editing: boolean) =>
+const schema = (editing: boolean, userAddress?: Address) =>
   z.object({
     chainId: z
       .preprocess((val) => Number(val), z.number().min(1))
-      .refine((val) => editing || !CustomChainService.getChainById(val), {
-        message: "Chain already exists",
-      }),
+      .refine(
+        (val) => editing || !CustomChainService.getChainById(val, userAddress),
+        {
+          message: "Chain already exists",
+        },
+      ),
     name: z.string().min(1, { message: "Required" }),
 
     // EthBridge fields
@@ -60,7 +64,7 @@ export const ChainForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema(editing)),
+    resolver: zodResolver(schema(editing, address!)),
     defaultValues: {
       chainId: chain?.chainId,
       name: chain?.name,

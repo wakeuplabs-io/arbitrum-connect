@@ -32,8 +32,12 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
 }
 const getAllChains = () => {
   const allChains = CustomChainService.getAllChains();
+  const dedupedChains = allChains.filter(
+    (obj, index, self) =>
+      self.findIndex((o) => o.chainId === obj.chainId) === index,
+  );
   const arbNetworks = getArbitrumNetworks();
-  allChains
+  dedupedChains
     .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
     .forEach((chain) => {
       if (
@@ -50,5 +54,6 @@ const getAllChains = () => {
       }
     });
 
-  return allChains;
+  console.log("dedupped: ", dedupedChains);
+  return dedupedChains;
 };

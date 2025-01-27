@@ -13,7 +13,8 @@ import Button from "../button";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
-  const { customChains, getUserChains, deleteChain } = useCustomChain();
+  const { customChains, getUserChains, deleteChain, featureChain } =
+    useCustomChain();
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,6 +40,11 @@ export const ChainSelector = ({}: {}) => {
       if (!address) return;
       deleteChain(address, chain.chainId);
     });
+  };
+
+  const handleFeatureChain = (chain: CustomChain) => {
+    if (!address) return;
+    featureChain(address, chain.chainId);
   };
 
   const handleEditChain = (chain: CustomChain) => {
@@ -71,9 +77,7 @@ export const ChainSelector = ({}: {}) => {
                 chain={chain}
                 onSelect={handleSelectChain}
                 onDeleteClick={handleDeleteChain}
-                onFeaturedClick={(c) => {
-                  console.log(c);
-                }}
+                onFeaturedClick={handleFeatureChain}
                 onEditClick={handleEditChain}
               />
             );
