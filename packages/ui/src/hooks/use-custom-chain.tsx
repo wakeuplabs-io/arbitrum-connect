@@ -58,7 +58,6 @@ export function useCustomChain() {
       FILTERS.ALL,
     );
 
-    console.log("allChains: ", allChains);
     if (
       !allChains.some(
         (x) => x.chainId === defaultCustomChain.chainId && x.user === address,

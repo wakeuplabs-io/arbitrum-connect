@@ -54,6 +54,5 @@ const getAllChains = () => {
       }
     });
 
-  console.log("dedupped: ", dedupedChains);
   return dedupedChains;
 };

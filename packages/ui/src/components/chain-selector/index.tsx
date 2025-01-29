@@ -35,7 +35,6 @@ export const ChainSelector = ({}: {}) => {
   };
 
   const handleDeleteChain = (chain: CustomChain) => {
-    console.log(chain);
     openModal("Delete Chain", `Confirm action delete ${chain.name}`, () => {
       if (!address) return;
       deleteChain(address, chain.chainId);

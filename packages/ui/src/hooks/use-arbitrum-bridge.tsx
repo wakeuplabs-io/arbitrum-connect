@@ -60,9 +60,8 @@ export default function useArbitrumBridge(props: {
     }
     await ensureChainId(parentChainId);
     const inboxSdk = new InboxTools(parentSigner, childNetwork);
-    debugger;
     const canForceInclude = await inboxSdk.getForceIncludableEvent();
-    console.log("canForceIncludeResult: ", canForceInclude);
+
     return !!canForceInclude;
   }
 

@@ -86,7 +86,6 @@ export const ChainForm = ({
   });
 
   const onSubmit = async (data: any) => {
-    console.log(data);
     const payload: CustomChainPayload = {
       ...data,
       user: address,
