@@ -1,4 +1,5 @@
 import { FILTERS } from "@/constants";
+import { db } from "@/db/db";
 import { CustomChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 
@@ -35,154 +36,116 @@ export default class CustomChainService {
       logoURI: data.logoURI,
       isCustom: true,
       confirmPeriodBlocks: 0,
+      chainType: data.chainType,
     };
   }
 
-  static createChain = (payload: CustomChainPayload) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    const chainExists = parsedChains.find(
-      (c) => c.chainId === payload.chainId && c.user === payload.user,
-    );
+  static createChain = async (payload: CustomChainPayload) => {
+    const chainExists = await db.chains
+      .where(["user", "chainId"])
+      .equals([payload.user, payload.chainId])
+      .first();
+    console.log("chainexists: ", chainExists);
     if (chainExists) throw new Error("Chain already exists");
 
     const chain = CustomChainService.formatChainPayload(payload);
 
-    parsedChains.push(chain);
-    localStorage.setItem(`chains`, JSON.stringify(parsedChains));
+    db.chains.add(chain);
+
     return chain;
   };
 
-  static addChain = (chain: CustomChain) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId && c.user === chain.user,
-    );
+  static addChain = async (chain: CustomChain) => {
+    const chainExists = await db.chains.get(chain.chainId);
     if (chainExists) throw new Error("Chain already exists");
 
-    parsedChains.push(chain);
-    localStorage.setItem(`chains`, JSON.stringify(parsedChains));
+    db.chains.add(chain);
+
     return chain;
   };
 
-  static deleteChain = (userAddress: Address, chainId: number) => {
-    const storedChains = localStorage.getItem(`chains`);
-    if (!storedChains) return [];
-    const parsedChains: CustomChain[] = JSON.parse(storedChains).filter(
-      (chain: CustomChain) =>
-        chain.chainId !== chainId && chain.user === userAddress,
-    );
-    localStorage.setItem(`chains`, JSON.stringify(parsedChains));
-    return parsedChains;
+  static deleteChain = async (userAddress: Address, chainId: number) => {
+    await db.chains.where({ user: userAddress, chainId }).delete();
+
+    return await db.chains.where("user").equals(userAddress).toArray();
   };
 
-  static filterChain(chain: CustomChain, filter: FILTERS, user: Address) {
+  static filterChain(chain: CustomChain, filter: FILTERS) {
     switch (filter) {
       case FILTERS.ALL:
         return true;
       case FILTERS.FEATURED:
         return !!chain.featured;
       case FILTERS.OWN:
-        return chain.user === user;
+        return chain.isCustom;
     }
   }
-  static getUserChains = (
+  static getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS, //TODO: implement
+    filter: FILTERS,
   ) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    const filteredChains = parsedChains.filter((chain: CustomChain) => {
-      const matchesUser = chain.user === userAddress;
-      const matchesSearch = search
-        ? chain.name.toLowerCase().includes(search.toLowerCase())
-        : true;
-      const matchFilter = CustomChainService.filterChain(
-        chain,
-        filter,
-        userAddress,
-      );
-      return matchesUser && matchesSearch && matchFilter;
-    });
+    const filteredChains = await db.chains
+      .where({ user: userAddress })
+      .and((c) =>
+        search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
+      )
+      .and((c) => CustomChainService.filterChain(c, filter))
+      .toArray();
     return filteredChains;
   };
 
-  static getAllChains = () => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-    return parsedChains;
+  static getAllChains = async () => {
+    const dbChains = await db.chains.toArray();
+
+    return dbChains;
   };
 
-  static getChainById = (chainId: number, userAddress?: Address) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains).filter((chain: CustomChain) =>
-          userAddress ? chain.user === userAddress : true,
-        )
-      : [];
-    const chain = parsedChains.find(
-      (chain: CustomChain) => chain.chainId === chainId,
-    );
+  static getChainById = async (chainId: number, userAddress?: Address) => {
+    let chain: CustomChain | undefined;
+    if (userAddress)
+      chain = await db.chains
+        .where(["user", "chainId"])
+        .equals([userAddress, chainId])
+        .first();
+    else chain = await db.chains.get(chainId);
+
     return chain || null;
   };
 
   static editChain = async (payload: CustomChainPayload) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
     const chain = CustomChainService.formatChainPayload(payload);
-    const newChains = parsedChains.map((c) => {
-      if (c.chainId === payload.chainId && c.user === payload.user) {
-        return chain;
-      }
-      return c;
-    });
-    localStorage.setItem(`chains`, JSON.stringify(newChains));
+
+    await db.chains.update(
+      { user: chain.user, chainId: chain.chainId } as CustomChain,
+      { ...chain },
+    );
+
     return chain;
   };
 
-  static featureChain = (userAddress: Address, chainId: number) => {
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-
-    let chain = parsedChains.find(
-      (c) => c.chainId === chainId && c.user === userAddress,
-    );
+  static featureChain = async (userAddress: Address, chainId: number) => {
+    let chain = await db.chains.where({ user: userAddress, chainId }).first();
 
     if (!chain) {
-      chain = parsedChains.find(
-        (chain: CustomChain) => chain.chainId === chainId,
-      );
+      chain = await db.chains.where({ chainId }).first();
       if (!chain) throw new Error("Chain doesn't exist");
 
-      chain = CustomChainService.addChain({ ...chain, user: userAddress });
+      chain = await CustomChainService.addChain({
+        ...chain,
+        user: userAddress,
+        featured: true,
+      });
     }
 
     chain.featured = !chain.featured;
 
-    const newChains = parsedChains.map((c) => {
-      if (c.chainId === chainId && c.user === userAddress) {
-        return chain;
-      }
-      return c;
-    });
-    localStorage.setItem(`chains`, JSON.stringify(newChains));
+    await db.chains.update(
+      { user: userAddress, chainId: chainId } as CustomChain,
+      {
+        featured: chain.featured,
+      },
+    );
 
     return chain;
   };

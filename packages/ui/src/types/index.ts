@@ -23,13 +23,15 @@ type NetworkConfig = {
   nativeCurrency: NativeCurrency;
   rpcUrls: RpcUrls;
   logoURI?: string;
-  user?: string;
+  user?: Address;
   featured?: boolean;
+  chainType: ChainType;
 };
 
 export type CustomChain = ArbitrumNetwork & NetworkConfig
 
 export enum ChainType {
+  L1 = 'L1',
   L2 = 'L2',
   L3 = 'L3',
 }
@@ -51,4 +53,5 @@ export type CustomChainPayload = {
   publicRpcUrl: string;
   logoURI: string;
   user: Address;
+  chainType: ChainType;
 };

@@ -68,7 +68,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   }, [selectedChain?.chainId]);
 
   useEffect(() => {
-    const initDefaultChains = () => {
+    const initDefaultChains = async () => {
       const childChainExists = CustomChainService.getChainById(
         defaultCustomChain.chainId,
       );

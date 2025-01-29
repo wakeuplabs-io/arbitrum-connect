@@ -1,4 +1,4 @@
-import { createContext, useState, ReactNode } from "react";
+import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
 import {
   getArbitrumNetworks,
@@ -17,7 +17,11 @@ export const ChainsContext = createContext<ChainsContextType | undefined>(
 );
 
 export function ChainsProvider({ children }: { children: ReactNode }) {
-  const [chains, setChains] = useState(getAllChains());
+  const [chains, setChains] = useState<CustomChain[]>([]);
+
+  useEffect(() => {
+    getAllChains();
+  }, []);
 
   return (
     <ChainsContext.Provider
@@ -30,8 +34,8 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
     </ChainsContext.Provider>
   );
 }
-const getAllChains = () => {
-  const allChains = CustomChainService.getAllChains();
+const getAllChains = async () => {
+  const allChains = await CustomChainService.getAllChains();
   const dedupedChains = allChains.filter(
     (obj, index, self) =>
       self.findIndex((o) => o.chainId === obj.chainId) === index,

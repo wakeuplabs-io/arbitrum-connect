@@ -2,7 +2,7 @@ import { z } from "zod";
 import { Input } from "../input";
 import { requiredAddress } from "@/lib/validations";
 import { ChainType, CustomChainPayload, CustomChain } from "@/types";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useAccount } from "wagmi";
@@ -12,61 +12,54 @@ import Button from "../button";
 import { l1Chain, l2Chain } from "@/lib/wagmi-config";
 import { EnumSelect } from "../enum-select";
 import CustomChainService from "@/services/custom-chain-service";
-import { Address } from "viem";
+import { useEffect } from "react";
 
-const schema = (editing: boolean, userAddress?: Address) =>
-  z.object({
-    chainId: z
-      .preprocess((val) => Number(val), z.number().min(1))
-      .refine(
-        (val) => editing || !CustomChainService.getChainById(val, userAddress),
-        {
-          message: "Chain already exists",
-        },
-      ),
-    name: z.string().min(1, { message: "Required" }),
+const schema = z.object({
+  chainId: z.preprocess((val) => Number(val), z.number().min(1)),
+  name: z.string().min(1, { message: "Required" }),
 
-    // EthBridge fields
-    bridge: requiredAddress,
-    inbox: requiredAddress,
-    sequencerInbox: requiredAddress,
-    outbox: requiredAddress,
-    rollup: requiredAddress,
+  // EthBridge fields
+  bridge: requiredAddress,
+  inbox: requiredAddress,
+  sequencerInbox: requiredAddress,
+  outbox: requiredAddress,
+  rollup: requiredAddress,
 
-    // Separated NetworkConfig fields
-    nativeCurrencyName: z.string().min(1, { message: "Required" }),
-    nativeCurrencySymbol: z.string().min(1, { message: "Required" }),
-    nativeCurrencyDecimals: z.preprocess(
-      (val) => Number(val),
-      z.number().min(1),
-    ),
-    explorerUrl: z.string().url().min(1),
-    publicRpcUrl: z.string().url().min(1),
-    localRpcUrl: z.string().url().min(1),
-    logoURI: z.string().url().optional(),
-    chainType: z.nativeEnum(ChainType, {
-      required_error: "Chain type is required",
-    }),
-  });
+  // Separated NetworkConfig fields
+  nativeCurrencyName: z.string().min(1, { message: "Required" }),
+  nativeCurrencySymbol: z.string().min(1, { message: "Required" }),
+  nativeCurrencyDecimals: z.preprocess((val) => Number(val), z.number().min(1)),
+  explorerUrl: z.string().url().min(1),
+  publicRpcUrl: z.string().url().min(1),
+  localRpcUrl: z.string().url().min(1),
+  logoURI: z.string().url().optional(),
+  chainType: z.nativeEnum(ChainType, {
+    required_error: "Chain type is required",
+  }),
+});
 
 export const ChainForm = ({
   chain,
   editing = false,
 }: {
   chain?: CustomChain | null;
-  editing?: boolean;
+  editing: boolean;
 }) => {
   const { address } = useAccount();
   const { createChain, editChain } = useCustomChain();
   const { setSelectedChain } = useSelectedChain();
   const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    control,
+    setError,
+    clearErrors,
+    formState: { errors, isSubmitting, isValid },
   } = useForm({
-    resolver: zodResolver(schema(editing, address!)),
-    defaultValues: {
+    resolver: zodResolver(schema),
+    values: {
       chainId: chain?.chainId,
       name: chain?.name,
       bridge: chain?.ethBridge?.bridge,
@@ -81,9 +74,10 @@ export const ChainForm = ({
       publicRpcUrl: chain?.rpcUrls.default.http[0],
       localRpcUrl: chain?.rpcUrls.default.http[0],
       logoURI: chain?.logoURI,
-      chainType: ChainType.L3,
+      chainType: chain?.chainType,
     },
   });
+  const chainId = useWatch({ control, name: "chainId" });
 
   const onSubmit = async (data: any) => {
     const payload: CustomChainPayload = {
@@ -98,6 +92,29 @@ export const ChainForm = ({
       navigate({ to: "/" });
     }
   };
+
+  useEffect(() => {
+    if (!chainId || editing) return;
+
+    const validateChainId = async () => {
+      const chainExists = await CustomChainService.getChainById(
+        Number(chainId),
+        address,
+      );
+      if (chainExists) {
+        // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms
+        setError("chainId", {
+          type: "manual",
+          message: "Chain already exists",
+        });
+      } else {
+        clearErrors("chainId");
+      }
+    };
+
+    validateChainId();
+  }, [chainId, address, editing, setError, clearErrors]);
+
   return (
     <section className="max-w-xl mx-auto">
       <h1 className="text-2xl text-black text-left">
@@ -219,7 +236,12 @@ export const ChainForm = ({
             register={register}
           />
         </div>
-        <Button type="submit">Submit</Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting || !!errors.chainId || !isValid}
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Button>
       </form>
     </section>
   );

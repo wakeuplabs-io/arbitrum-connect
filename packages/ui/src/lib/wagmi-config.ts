@@ -1,5 +1,5 @@
 import envParsed from "@/envParsed";
-import { CustomChain } from "@/types";
+import { ChainType, CustomChain } from "@/types";
 import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 
@@ -24,6 +24,7 @@ export const defaultCustomMainnet: CustomChain = {
       http: [l1Chain.id === sepolia.id ? "https://ethereum-sepolia-rpc.publicnode.com" : l1Chain.rpcUrls.default.http[0]],
     },
   },
+  chainType: ChainType.L1
 };
 const defaultArbNetwork = getArbitrumNetwork(l2Chain.id);
 export const defaultCustomChain: CustomChain = {
@@ -44,4 +45,5 @@ export const defaultCustomChain: CustomChain = {
       http: [l2Chain.rpcUrls.default.http[0]],
     },
   },
+  chainType: ChainType.L2
 };

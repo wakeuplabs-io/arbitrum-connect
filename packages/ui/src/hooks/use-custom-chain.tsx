@@ -15,12 +15,12 @@ export function useCustomChain() {
 
   useEffect(() => {
     if (!address) return;
-    fixUserChains();
+    (async () => await fixUserChains())();
   }, [address]);
 
-  const createChain = (chain: CustomChainPayload) => {
+  const createChain = async (chain: CustomChainPayload) => {
     setLoading(true);
-    const newChain = CustomChainService.createChain(chain);
+    const newChain = await CustomChainService.createChain(chain);
     setChains((currentChains) => {
       return [...currentChains, newChain];
     });
@@ -28,19 +28,19 @@ export function useCustomChain() {
     return newChain;
   };
 
-  const deleteChain = (userAddress: Address, chainId: number) => {
+  const deleteChain = async (userAddress: Address, chainId: number) => {
     setLoading(true);
-    const newChains = CustomChainService.deleteChain(userAddress, chainId);
+    const newChains = await CustomChainService.deleteChain(userAddress, chainId);
     setChains(newChains);
   };
 
-  const getUserChains = (
+  const getUserChains = async (
     userAddress: Address,
     search: string = "",
     filter: FILTERS,
   ) => {
     setLoading(true);
-    const filteredChains = CustomChainService.getUserChains(
+    const filteredChains = await CustomChainService.getUserChains(
       userAddress,
       search,
       filter,
@@ -50,9 +50,9 @@ export function useCustomChain() {
   };
 
   //Creates new default chains for the current user
-  const fixUserChains = () => {
+  const fixUserChains = async () => {
     if (!address) return;
-    const allChains = CustomChainService.getUserChains(
+    const allChains = await CustomChainService.getUserChains(
       address,
       "",
       FILTERS.ALL,
@@ -63,7 +63,7 @@ export function useCustomChain() {
         (x) => x.chainId === defaultCustomChain.chainId && x.user === address,
       )
     ) {
-      const fixedChain = CustomChainService.addChain({
+      const fixedChain = await CustomChainService.addChain({
         ...defaultCustomChain,
         user: address,
       });
@@ -73,7 +73,7 @@ export function useCustomChain() {
     }
   };
 
-  const getChainById = (chainId: number, userAddress?: Address) => {
+  const getChainById = async (chainId: number, userAddress?: Address) => {
     setLoading(true);
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
@@ -91,7 +91,7 @@ export function useCustomChain() {
         );
         if (!chain) throw new Error("Chain doesn't exist");
 
-        CustomChainService.addChain({ ...chain, user: userAddress });
+        await CustomChainService.addChain({ ...chain, user: userAddress });
       }
     } else {
       chain = parsedChains.find(
@@ -119,7 +119,7 @@ export function useCustomChain() {
 
   const featureChain = async (userAddress: Address, chainId: number) => {
     setLoading(true);
-    let chain = CustomChainService.featureChain(userAddress, chainId);
+    let chain = await CustomChainService.featureChain(userAddress, chainId);
 
     setCustomChains((currentChains) => {
       return currentChains.map((c) => {
