@@ -27,7 +27,6 @@ function ForceIncludeButton({
       enabled: !!signer,
     });
 
-  console.log("canForceInclude", canForceInclude);
 
   if (!canForceInclude || fetchingForceIncludeStatus) {
     return null;
@@ -55,6 +54,13 @@ export default function ForceStep({
   triggered: boolean;
   state: TransactionState;
 }) {
+  console.log("rendered forceStep: ", {
+    transaction,
+    fetchingClaimStatus,
+    fetchingL2ToL1Msg,
+    state,
+  });
+
   const { signer, forceInclude } = useArbitrumBridge({
     parentChainId: transaction.parentChainId,
     childChainId: transaction.childChainId,

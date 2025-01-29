@@ -14,6 +14,11 @@ export const defaultCustomMainnet: CustomChain = {
   parentChainId: 0,
   ethBridge: "0x" as any,
   confirmPeriodBlocks: 0,
+  explorer: {
+    default: {
+      url: l1Chain.blockExplorers.default.url,
+    }
+  },
   rpcUrls: {
     default: {
       http: [l1Chain.id === sepolia.id ? "https://ethereum-sepolia-rpc.publicnode.com" : l1Chain.rpcUrls.default.http[0]],
@@ -29,6 +34,11 @@ export const defaultCustomChain: CustomChain = {
   parentChainId: defaultArbNetwork.parentChainId,
   ethBridge: defaultArbNetwork.ethBridge,
   confirmPeriodBlocks: defaultArbNetwork.confirmPeriodBlocks,
+  explorer: {
+    default: {
+      url: l2Chain.blockExplorers.default.url,
+    }
+  },
   rpcUrls: {
     default: {
       http: [l2Chain.rpcUrls.default.http[0]],

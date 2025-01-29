@@ -10,6 +10,11 @@ export default class CustomChainService {
       chainId: data.chainId,
       name: data.name,
       parentChainId: data.parentChainId,
+      explorer: {
+        default: {
+          url: data.explorerUrl,
+        },
+      },
       ethBridge: {
         bridge: data.bridge,
         inbox: data.inbox,

@@ -2,23 +2,29 @@ import { ArbitrumNetwork } from "@arbitrum/sdk";
 import { Address } from "viem";
 
 type NativeCurrency = {
- name: string;
- symbol: string;
- decimals: number;
+  name: string;
+  symbol: string;
+  decimals: number;
 };
 
 type RpcUrls = {
- default: {
-   http: string[];
- };
+  default: {
+    http: string[];
+  };
 };
+type BlockExplorers = {
+  default: {
+    url: string;
+  }
+}
 
 type NetworkConfig = {
- nativeCurrency: NativeCurrency;
- rpcUrls: RpcUrls;
- logoURI?: string;
- user?: string;
- featured?: boolean;
+  explorer: BlockExplorers;
+  nativeCurrency: NativeCurrency;
+  rpcUrls: RpcUrls;
+  logoURI?: string;
+  user?: string;
+  featured?: boolean;
 };
 
 export type CustomChain = ArbitrumNetwork & NetworkConfig
@@ -38,6 +44,7 @@ export type CustomChainPayload = {
   sequencerInbox: string;
   outbox: string;
   rollup: string;
+  explorerUrl: string;
   nativeCurrencyName: string;
   nativeCurrencySymbol: string;
   nativeCurrencyDecimals: number;

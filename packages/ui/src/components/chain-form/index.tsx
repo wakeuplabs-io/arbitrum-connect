@@ -40,6 +40,7 @@ const schema = (editing: boolean, userAddress?: Address) =>
       (val) => Number(val),
       z.number().min(1),
     ),
+    explorerUrl: z.string().url().min(1),
     publicRpcUrl: z.string().url().min(1),
     localRpcUrl: z.string().url().min(1),
     logoURI: z.string().url().optional(),
@@ -73,6 +74,7 @@ export const ChainForm = ({
       sequencerInbox: chain?.ethBridge?.sequencerInbox,
       outbox: chain?.ethBridge?.outbox,
       rollup: chain?.ethBridge?.rollup,
+      explorerUrl: chain?.explorer.default.url,
       nativeCurrencyName: chain?.nativeCurrency.name,
       nativeCurrencySymbol: chain?.nativeCurrency.symbol,
       nativeCurrencyDecimals: chain?.nativeCurrency.decimals,
@@ -157,6 +159,13 @@ export const ChainForm = ({
             placeholder="Rollup"
             register={register}
             error={errors.rollup?.message}
+          />
+          <Input
+            name="explorerUrl"
+            label="Explorer URL"
+            placeholder="Explorer URL"
+            register={register}
+            error={errors.explorerUrl?.message}
           />
           <Input
             name="nativeCurrencyName"
