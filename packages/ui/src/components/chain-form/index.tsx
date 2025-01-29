@@ -9,7 +9,7 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useNavigate } from "@tanstack/react-router";
 import Button from "../button";
-import { l2Chain } from "@/lib/wagmi-config";
+import { l1Chain, l2Chain } from "@/lib/wagmi-config";
 import { EnumSelect } from "../enum-select";
 import CustomChainService from "@/services/custom-chain-service";
 import { Address } from "viem";
@@ -90,7 +90,7 @@ export const ChainForm = ({
     const payload: CustomChainPayload = {
       ...data,
       user: address,
-      parentChainId: l2Chain.id,
+      parentChainId: data.chainType === ChainType.L3 ? l2Chain.id : l1Chain.id,
     };
     if (address) {
       if (editing) setSelectedChain(await editChain(payload));
