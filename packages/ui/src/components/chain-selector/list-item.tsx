@@ -20,7 +20,7 @@ export const ListItem = ({
   return (
     <ul
       key={chain.chainId}
-      className="group w-full text-black rounded-md p-1 cursor-pointer flex items-center justify-between gap-2 pr-3"
+      className="group w-full text-black rounded-md p-1 cursor-pointer flex items-center justify-between gap-2 pr-3 hover:font-semibold hover:stroke-black"
     >
       <li
         className="flex items-center gap-3 text-base text-black"
