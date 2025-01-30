@@ -27,22 +27,11 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   const [selectedParentChain, setSelectedParentChain] =
     useState<CustomChain>(defaultCustomMainnet);
 
-  const getChainById = (chainId: number) => {
-    setLoading(true);
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-    const chain = parsedChains.find(
-      (chain: CustomChain) => chain.chainId === chainId,
-    );
-    return chain || null;
-  };
-
   useEffect(() => {
-    const getParent = () => {
+    const getParent = async () => {
       if (selectedChain?.parentChainId) {
-        const parentChain = getChainById(selectedChain?.parentChainId);
+        setLoading(true);
+        const parentChain = await CustomChainService.getChainById(selectedChain?.parentChainId);
         if (parentChain) setSelectedParentChain(parentChain);
       }
     };

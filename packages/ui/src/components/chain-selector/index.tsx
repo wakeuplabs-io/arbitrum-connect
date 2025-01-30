@@ -53,12 +53,13 @@ export const ChainSelector = ({}: {}) => {
   const handleAddChain = () => {
     navigate({ to: "/chains/add" });
   };
+
   return (
     <section className="max-w-xl mx-auto">
       <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-        <h1 className="text-2xl text-black text-left">
+        <h1 className="text-2xl text-black text-left flex flex-wrap">
           Selected Chain:{" "}
-          <span className="font-bold">{selectedChain.name}</span>
+          <p className="font-bold">{selectedChain.name}</p>
         </h1>
         <div className="mt-8 flex flex-col lg:flex-row justify-between lg:items-center gap-4">
           <div className="flex-shrink lg:flex-grow">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CustomChainPayload, CustomChain } from "@/types";
+import { CustomChainPayload } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
@@ -73,35 +73,6 @@ export function useCustomChain() {
     }
   };
 
-  const getChainById = async (chainId: number, userAddress?: Address) => {
-    setLoading(true);
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-    let chain: CustomChain | undefined;
-    if (userAddress) {
-      chain = parsedChains.find(
-        (chain: CustomChain) =>
-          chain.chainId === chainId && userAddress === chain.user,
-      );
-      if (!chain) {
-        chain = parsedChains.find(
-          (chain: CustomChain) => chain.chainId === chainId,
-        );
-        if (!chain) throw new Error("Chain doesn't exist");
-
-        await CustomChainService.addChain({ ...chain, user: userAddress });
-      }
-    } else {
-      chain = parsedChains.find(
-        (chain: CustomChain) => chain.chainId === chainId,
-      );
-    }
-
-    return chain || null;
-  };
-
   const editChain = async (chain: CustomChainPayload) => {
     setLoading(true);
     const editedChain = await CustomChainService.editChain(chain);
@@ -138,7 +109,6 @@ export function useCustomChain() {
     createChain,
     deleteChain,
     getUserChains,
-    getChainById,
     editChain,
     setCustomChains,
     featureChain,

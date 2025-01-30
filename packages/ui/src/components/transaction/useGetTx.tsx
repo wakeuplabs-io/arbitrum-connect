@@ -1,6 +1,6 @@
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
-import { Transaction, transactionsStorageService } from "@/lib/transactions";
+import { Transaction, TransactionsStorageService } from "@/lib/transactions";
 import { getTimestampFromTxHash } from "@/lib/tx-actions";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -63,9 +63,9 @@ export const useTransaction = ({
       });
   }, []);
 
-  function updateTx(updatedTx: Transaction) {
+  async function updateTx(updatedTx: Transaction) {
     setTransaction(updatedTx);
-    transactionsStorageService.update(updatedTx);
+    await TransactionsStorageService.update(updatedTx);
   }
 
   const canClaim =

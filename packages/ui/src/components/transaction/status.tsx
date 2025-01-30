@@ -2,7 +2,7 @@ import { useAlertContext } from "@/contexts/alert/alert-context";
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import useOnScreen from "@/hooks/use-on-screen";
-import { Transaction, transactionsStorageService } from "@/lib/transactions";
+import { Transaction, TransactionsStorageService } from "@/lib/transactions";
 import { getTimestampFromTxHash } from "@/lib/tx-actions";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import cn from "classnames";
@@ -113,7 +113,7 @@ export function TransactionStatus(props: {
 
   function updateTx(updatedTx: Transaction) {
     setTransaction(updatedTx);
-    transactionsStorageService.update(updatedTx);
+    TransactionsStorageService.update(updatedTx);
   }
 
   function onConfirm() {

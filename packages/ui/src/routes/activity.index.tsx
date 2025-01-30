@@ -1,9 +1,9 @@
 import HomeButton from "@/components/layout/home-button";
 import { TransactionStatusHeader } from "@/components/transaction/status-header";
 import { TransactionStatus } from "@/components/transaction/status-refactor";
-import { transactionsStorageService } from "@/lib/transactions";
+import { Transaction, TransactionsStorageService } from "@/lib/transactions";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
 export const Route = createFileRoute("/activity/")({
@@ -12,10 +12,14 @@ export const Route = createFileRoute("/activity/")({
 
 function ActivityScreen() {
   const { address } = useAccount();
+  const [txHistory, setTxHistory] = useState<Transaction[]>([]);
 
-  const txHistory = useMemo(() => {
-    return address ? transactionsStorageService.getByAccount(address) : [];
-  }, [address, transactionsStorageService]);
+  useEffect(() => {
+    if (address)
+      TransactionsStorageService.getByAccount(address).then((x) =>
+        setTxHistory(x),
+      );
+  }, [address]);
 
   return (
     <div className="flex flex-col max-w-xl mx-auto">

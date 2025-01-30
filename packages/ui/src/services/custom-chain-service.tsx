@@ -45,7 +45,7 @@ export default class CustomChainService {
       .where(["user", "chainId"])
       .equals([payload.user, payload.chainId])
       .first();
-    console.log("chainexists: ", chainExists);
+
     if (chainExists) throw new Error("Chain already exists");
 
     const chain = CustomChainService.formatChainPayload(payload);

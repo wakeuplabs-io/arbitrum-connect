@@ -9,7 +9,7 @@ import {
   getMockedL2WithdrawPrice,
   getMockedSendL1MsgPrice,
 } from "@/lib/get-tx-price";
-import { Transaction, transactionsStorageService } from "@/lib/transactions";
+import { Transaction, TransactionsStorageService } from "@/lib/transactions";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
@@ -93,8 +93,9 @@ function WithdrawScreen() {
             parentChainId: selectedParentChain.chainId,
             childChainId: selectedChain.chainId,
           };
-          transactionsStorageService.create(tx, address);
-          navigate({ to: `/activity/${tx.bridgeHash}` });
+          TransactionsStorageService.create(tx, address).then(() =>
+            navigate({ to: `/activity/${tx.bridgeHash}` }),
+          );
         })
         .catch((e) => {
           setError(e);
