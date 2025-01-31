@@ -6,22 +6,27 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "prettier": "pnpm -r prettier",
+    "lint": "pnpm -r --if-present type-check && eslint .",
     "dev": "pnpm -r --stream dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "7.6.0",
     "@typescript-eslint/parser": "7.6.0",
     "concurrently": "8.2.2",
     "eslint": "8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.6",
+    "prettier": "^3.4.2",
     "typescript": "5.5.3"
   },
   "dependencies": {
     "dotenv": "16.4.5",
     "zod": "3.22.4"
-  }
+  },
+  "packageManager": "pnpm@9.14.2+sha512.6e2baf77d06b9362294152c851c4f278ede37ab1eba3a55fda317a4a17b209f4dbb973fb250a77abc463a341fcb1f17f17cfa24091c4eb319cda0d9b84278387"
 }

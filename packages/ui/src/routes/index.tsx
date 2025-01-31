@@ -1,24 +1,27 @@
-import ArbitrumIcon from "@/assets/arbitrum-icon.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 import WalletIcon from "@/assets/wallet.svg";
 import CustomConnectButton from "@/components/connect-wallet";
 import ErrorMessage from "@/components/error-message";
 import { useEthPrice } from "@/hooks/use-eth-price";
-import useArbitrumBalance from "@/hooks/useArbitrumBalance";
+import useArbitrumBalance from "@/hooks/use-arbitrum-balance";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
 import { parseUnits } from "ethers/lib/utils";
-import { CircleArrowRight } from 'lucide-react';
+import { CircleArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useAccount } from "wagmi";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
+import ChainItem from "@/components/chain-item";
+import Button from "@/components/button";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
 });
 
 interface FormError {
-  balance?: boolean, amount?: boolean
+  balance?: boolean;
+  amount?: boolean;
 }
 
 function HomeScreen() {
@@ -29,7 +32,7 @@ function HomeScreen() {
   const [amountEth, setAmountEth] = useState<string>("");
   const [error, setError] = useState<FormError>();
   const { ethPrice } = useEthPrice();
-  
+  const { selectedChain, selectedParentChain } = useSelectedChain();
   function handleSubmit() {
     const amount = parseUnits(amountEth, 18);
     if (amount.lte("0")) {
@@ -45,36 +48,22 @@ function HomeScreen() {
     navigate({ to: "/withdraw", search: { amount: amount.toString() } });
   }
   function triggerError(error: FormError) {
-    setError(error)
+    setError(error);
   }
-  
+
   const amountUSD = Math.max(+amountEth, 0) * (ethPrice ?? 0);
 
   return (
     <form className="max-w-xl mx-auto" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-6">
         <div className="flex text-left justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-          <div className="flex flex-row gap-3 items-start">
-            <img src={ArbitrumIcon} alt="arbitrum icon" />
-            <div>
-              <div className="md:text-sm text-xs text-neutral-500">From</div>
-              <div className="font-semibold text-2xl text-primary-700 hidden md:block">
-                Arbitrum
-              </div>
-              <div className="font-semibold text-xl text-primary-700 md:hidden">ARB</div>
-            </div>
-          </div>
+          <ChainItem chain={selectedChain} selectable={true} header="From" />
           <CircleArrowRight strokeWidth={1.5} size={29} color="#363853" />
-          <div className="flex flex-row gap-3 items-start">
-            <img src={EthereumIcon} alt="ethereum icon" />
-            <div>
-              <div className="text-xs md:text-sm text-neutral-500">To</div>
-              <div className="font-semibold text-2xl text-primary-700 hidden md:block ">
-                Ethereum
-              </div>
-              <div className="font-semibold text-xl text-primary-700 md:hidden">ETH</div>
-            </div>
-          </div>
+          <ChainItem
+            chain={selectedParentChain}
+            selectable={false}
+            header="To"
+          />
         </div>
         <div className="flex flex-col grow justify-between items-center bg-neutral-50 border border-neutral-200 rounded-2xl p-4 pt-0 h-[21rem]">
           <div className="flex flex-col grow items-center">
@@ -82,21 +71,29 @@ function HomeScreen() {
               <input
                 id="amount-input"
                 value={amountEth}
-                onChange={(e) => { setAmountEth(e.target.value); setError(undefined); }}
+                onChange={(e) => {
+                  setAmountEth(e.target.value);
+                  setError(undefined);
+                }}
                 placeholder="0"
                 type="number"
-                className={cn("flex bg-transparent text-primary-700 text-center text-7xl w-full outline-none remove-arrow font-semibold duration-200 ease-in-out focus:placeholder-transparent", { "text-red-600": error })}
+                className={cn(
+                  "flex bg-transparent text-primary-700 text-center text-7xl w-full outline-none remove-arrow font-semibold duration-200 ease-in-out focus:placeholder-transparent",
+                  { "text-red-600": error },
+                )}
               />
               <div className="flex gap-1 ml-4 text-neutral-400 items-center">
-                <div className="text-base">
-                  ~ {amountUSD?.toFixed(2)} USD
-                </div>
+                <div className="text-base">~ {amountUSD?.toFixed(2)} USD</div>
               </div>
             </div>
             <div className={cn("flex justify-self-end text-red-600 h-8")}>
               {/* <a className={cn("duration-200 ease-in-out", { "opacity-0": !error })}> */}
-              {error?.amount && <ErrorMessage label="Only positive amounts allowed" />}
-              {error?.balance && <ErrorMessage label="Amount exceeds your balance" />}
+              {error?.amount && (
+                <ErrorMessage label="Only positive amounts allowed" />
+              )}
+              {error?.balance && (
+                <ErrorMessage label="Amount exceeds your balance" />
+              )}
               {/* </a> */}
             </div>
           </div>
@@ -105,8 +102,22 @@ function HomeScreen() {
             <div className="flex items-center gap-4">
               <img src={EthereumIcon} alt="ethereum icon" />
               <div className="flex flex-col text-left">
-                <div className={cn("text-primary-700 font-bold text-xl duration-200 ease-in-out", { "text-red-600": error?.balance })}>ETH</div>
-                <span className={cn("text-neutral-500 duration-200 ease-in-out", { "text-red-600": error?.balance })} id="balance">Balance {arbBalance.slice(0, 10)}</span>
+                <div
+                  className={cn(
+                    "text-primary-700 font-bold text-xl duration-200 ease-in-out",
+                    { "text-red-600": error?.balance },
+                  )}
+                >
+                  ETH
+                </div>
+                <span
+                  className={cn("text-neutral-500 duration-200 ease-in-out", {
+                    "text-red-600": error?.balance,
+                  })}
+                  id="balance"
+                >
+                  Balance {arbBalance.slice(0, 10)}
+                </span>
               </div>
             </div>
             <div className="flex flex-row items-center gap-5">
@@ -148,7 +159,7 @@ function HomeScreen() {
             </div>
           </div> */}
         </div>
-        <button
+        <Button
           id="continue-btn"
           onClick={(e) => {
             e.preventDefault();
@@ -157,9 +168,6 @@ function HomeScreen() {
             } else handleSubmit();
           }}
           type="submit"
-          className={cn(
-            "btn btn-primary font-normal rounded-3xl text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200", { "animate-shake": error }
-          )}
           disabled={!address || !arbBalance}
         >
           {address
@@ -167,8 +175,8 @@ function HomeScreen() {
               ? "Continue"
               : "Loading balance..."
             : "Connect your wallet to withdraw"}
-        </button>
+        </Button>
       </div>
-    </form >
+    </form>
   );
 }
