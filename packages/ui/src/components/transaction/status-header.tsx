@@ -4,11 +4,19 @@ import EthereumIconCheck from "@/assets/ethereum-icon-check.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 import CustomChainService from "@/services/custom-chain-service";
 import { formatEther } from "ethers/lib/utils";
+import { useEffect, useState } from "react";
+import { CustomChain } from "@/types";
 
 export function TransactionStatusHeader(props: { tx: Transaction }) {
-  const txChildChain = CustomChainService.getChainById(props.tx.childChainId);
+  const [txChildChain, setTxChildChain] = useState<CustomChain | null>();
 
-  if (!txChildChain)
+  useEffect(() => {
+    CustomChainService.getChainById(props.tx.childChainId).then((x) => {
+      setTxChildChain(x);
+    });
+  }, []);
+
+  if (txChildChain === null)
     return <>Missing configuration for chain id: {props.tx.childChainId}</>;
 
   return (
@@ -22,7 +30,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
             <img src={EthereumIcon} />
           )}
           <div className="overflow-hidden flex flex-col">
-            <div className="truncate text-base">{txChildChain.name}</div>
+            <div className="truncate text-base">{txChildChain?.name}</div>
             <div className="text-sm">Withdrawal</div>
           </div>
         </div>

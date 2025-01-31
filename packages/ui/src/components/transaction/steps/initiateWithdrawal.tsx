@@ -2,16 +2,22 @@ import { ArrowUpRight } from "lucide-react";
 import { StatusStep } from "../status-step";
 import { Transaction } from "@/lib/transactions";
 import CustomChainService from "@/services/custom-chain-service";
+import { useEffect, useState } from "react";
 
 export default function InitiateWithdrawal({
   transaction,
 }: {
   transaction: Transaction;
 }) {
-  const childChain = CustomChainService.getChainById(transaction.childChainId);
+  const [l2TxUrl, setL2TxUrl] = useState("");
 
-  const l2TxUrl = `${childChain?.explorer.default.url}/tx/${transaction.bridgeHash}`;
- 
+  useEffect(() => {
+    CustomChainService.getChainById(transaction.childChainId).then((x) => {
+      const txUrl = `${x?.explorer.default.url}/tx/${transaction.bridgeHash}`;
+      setL2TxUrl(txUrl);
+    });
+  }, []);
+
   return (
     <StatusStep
       done

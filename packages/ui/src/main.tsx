@@ -31,8 +31,8 @@ const queryClient = new QueryClient();
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ChainsProvider>
-      <SelectedChainProvider>
-        <WagmiSetup>
+      <WagmiSetup>
+        <SelectedChainProvider>
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider
               showRecentTransactions
@@ -50,8 +50,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               </Web3ClientProvider>
             </RainbowKitProvider>
           </QueryClientProvider>
-        </WagmiSetup>
-      </SelectedChainProvider>
+        </SelectedChainProvider>
+      </WagmiSetup>
     </ChainsProvider>
   </React.StrictMode>,
 );

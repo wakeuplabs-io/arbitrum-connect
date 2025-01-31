@@ -8,6 +8,7 @@ import { Transaction } from "@/lib/transactions";
 import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
 import CustomChainService from "@/services/custom-chain-service";
+import { useEffect, useState } from "react";
 
 export default function ConfirmWithdrawal({
   transaction,
@@ -19,18 +20,16 @@ export default function ConfirmWithdrawal({
   transaction: Transaction;
   onError: (error: Error) => void;
   fetchingInboxTxTimestamp: boolean;
-  updateTx: (tx: Transaction) => void;
+  updateTx: (tx: Transaction) => Promise<void>;
   state: TransactionState;
 }) {
+  const [parentTxUrl, setParentTxUrl] = useState("");
   const { signer, pushChildTxToParent } = useArbitrumBridge({
     parentChainId: transaction.parentChainId,
     childChainId: transaction.childChainId,
   });
   const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
-  const parentChain = CustomChainService.getChainById(
-    transaction.parentChainId,
-  );
-  const l1TxUrl = `${parentChain?.explorer.default.url}/tx/${transaction.delayedInboxHash}`;
+
   const confirmTx = useMutation({
     mutationFn: pushChildTxToParent,
     onError,
@@ -55,7 +54,7 @@ export default function ConfirmWithdrawal({
             ...transaction,
             delayedInboxHash: inboxTx.hash as Address,
           };
-          updateTx(updatedTx);
+          await updateTx(updatedTx);
 
           await inboxTx.wait();
           updateTx({
@@ -67,6 +66,12 @@ export default function ConfirmWithdrawal({
     );
   }
 
+  useEffect(() => {
+    CustomChainService.getChainById(transaction.parentChainId).then((x) => {
+      const txUrl = `${x?.explorer.default.url}/tx/${transaction.delayedInboxHash}`;
+      setParentTxUrl(txUrl);
+    });
+  }, []);
   return (
     <StatusStep
       done={DONE}
@@ -77,13 +82,13 @@ export default function ConfirmWithdrawal({
       description="Send the Arbitrum withdraw transaction through the delayed inbox"
       className="pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 flex items-start flex-col md:flex-row md:items-center"
     >
-      {ACTIVE && !isLoading && (
+      {ACTIVE && (
         <button
           onClick={onConfirm}
           className={classNames("btn btn-primary btn-sm", {
-            "opacity-50": confirmTx.isPending,
+            "opacity-50": isRunning,
           })}
-          disabled={confirmTx.isPending}
+          disabled={isRunning}
         >
           Confirm
         </button>
@@ -91,11 +96,11 @@ export default function ConfirmWithdrawal({
 
       {DONE && (
         <a
-          href={l1TxUrl}
+          href={parentTxUrl}
           target="_blank"
           className="link text-sm flex space-x-1 items-center "
         >
-          <span>Ethereum delayed inbox tx </span>
+          <span>Parent delayed inbox tx </span>
           <ArrowUpRight className="h-3 w-3" />
         </a>
       )}

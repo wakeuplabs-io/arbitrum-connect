@@ -1,47 +1,98 @@
 import envParsed from "@/envParsed";
-import { CustomChain } from "@/types";
+import { ChainType, CustomChain } from "@/types";
 import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 
 export const l2Chain = envParsed().IS_TESTNET ? arbitrumSepolia : arbitrum;
-export const l1Chain = envParsed().IS_TESTNET ? sepolia : mainnet;
 
-export const defaultCustomMainnet: CustomChain = {
-  ...l1Chain,
+export const customMainnet: CustomChain = {
+  ...mainnet,
+  logoURI: "src/assets/ethereum-icon.svg",
+  isTestnet: false,
+  isCustom: false,
+  chainId: mainnet.id,
+  parentChainId: 0,
+  ethBridge: "0x" as any,
+  confirmPeriodBlocks: 0,
+  rpcUrls: {
+    default: {
+      http: [mainnet.rpcUrls.default.http[0]],
+    },
+  },
+  explorer: {
+    default: {
+      url: mainnet.blockExplorers.default.url,
+    }
+  },
+  chainType: "L1"
+};
+export const customSepolia: CustomChain = {
+  ...sepolia,
+  logoURI: "src/assets/ethereum-icon.svg",
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
-  chainId: l1Chain.id,
+  chainId: sepolia.id,
   parentChainId: 0,
   ethBridge: "0x" as any,
   confirmPeriodBlocks: 0,
   explorer: {
     default: {
-      url: l1Chain.blockExplorers.default.url,
+      url: sepolia.blockExplorers.default.url,
     }
   },
   rpcUrls: {
     default: {
-      http: [l1Chain.id === sepolia.id ? "https://ethereum-sepolia-rpc.publicnode.com" : l1Chain.rpcUrls.default.http[0]],
+      http: ["https://ethereum-sepolia-rpc.publicnode.com"],
     },
   },
+  chainType: "L1"
 };
-const defaultArbNetwork = getArbitrumNetwork(l2Chain.id);
-export const defaultCustomChain: CustomChain = {
-  ...l2Chain,
+
+export const defaultCustomMainnet = envParsed().IS_TESTNET ? customSepolia : customMainnet;
+
+const arbitrumNetwork = getArbitrumNetwork(arbitrum.id);
+export const customArbitrum: CustomChain = {
+  ...arbitrum,
+  logoURI: "src/assets/arbitrum-icon.svg",
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
-  chainId: defaultArbNetwork.chainId,
-  parentChainId: defaultArbNetwork.parentChainId,
-  ethBridge: defaultArbNetwork.ethBridge,
-  confirmPeriodBlocks: defaultArbNetwork.confirmPeriodBlocks,
+  chainId: arbitrumNetwork.chainId,
+  parentChainId: arbitrumNetwork.parentChainId,
+  ethBridge: arbitrumNetwork.ethBridge,
+  confirmPeriodBlocks: arbitrumNetwork.confirmPeriodBlocks,
   explorer: {
     default: {
-      url: l2Chain.blockExplorers.default.url,
+      url: arbitrum.blockExplorers.default.url,
     }
   },
   rpcUrls: {
     default: {
-      http: [l2Chain.rpcUrls.default.http[0]],
+      http: [arbitrum.rpcUrls.default.http[0]],
     },
   },
+  chainType: ChainType.L2
 };
+const arbitrumSepoliaNetwork = getArbitrumNetwork(arbitrumSepolia.id);
+export const customArbitrumSepolia: CustomChain = {
+  ...arbitrumSepolia,
+  logoURI: "src/assets/arbitrum-icon.svg",
+  isTestnet: envParsed().IS_TESTNET,
+  isCustom: false,
+  chainId: arbitrumSepoliaNetwork.chainId,
+  parentChainId: arbitrumSepoliaNetwork.parentChainId,
+  ethBridge: arbitrumSepoliaNetwork.ethBridge,
+  confirmPeriodBlocks: arbitrumSepoliaNetwork.confirmPeriodBlocks,
+  explorer: {
+    default: {
+      url: arbitrumSepolia.blockExplorers.default.url,
+    }
+  },
+  rpcUrls: {
+    default: {
+      http: [arbitrumSepolia.rpcUrls.default.http[0]],
+    },
+  },
+  chainType: ChainType.L2
+};
+
+export const defaultCustomChild = envParsed().IS_TESTNET ? customArbitrumSepolia : customArbitrum;

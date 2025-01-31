@@ -19,12 +19,14 @@ type BlockExplorers = {
 }
 
 type NetworkConfig = {
+  id?: number;
   explorer: BlockExplorers;
   nativeCurrency: NativeCurrency;
   rpcUrls: RpcUrls;
   logoURI?: string;
-  user?: string;
+  user?: Address;
   featured?: boolean;
+  chainType: ChainType | "L1";
 };
 
 export type CustomChain = ArbitrumNetwork & NetworkConfig
@@ -51,4 +53,5 @@ export type CustomChainPayload = {
   publicRpcUrl: string;
   logoURI: string;
   user: Address;
+  chainType: ChainType | "L1";
 };

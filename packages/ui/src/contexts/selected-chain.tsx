@@ -1,19 +1,31 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
-import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
+import {
+  customArbitrum,
+  customArbitrumSepolia,
+  customMainnet,
+  customSepolia,
+  defaultCustomChild,
+  defaultCustomMainnet,
+} from "@/lib/wagmi-config";
 import {
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import CustomChainService from "@/services/custom-chain-service";
-import { zeroAddress } from "viem";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
+import { useAccount } from "wagmi";
+import { FILTERS } from "@/constants";
+import { Address } from "viem";
+import { useChains } from "@/hooks/use-chains";
 
 type SelectedChainContextType = {
   loading: boolean;
   selectedChain: CustomChain;
   selectedParentChain: CustomChain;
   setSelectedChain: React.Dispatch<React.SetStateAction<CustomChain>>;
+  customChains: CustomChain[];
+  setCustomChains: React.Dispatch<React.SetStateAction<CustomChain[]>>;
 };
 
 export const SelectedChainContext = createContext<
@@ -23,28 +35,66 @@ export const SelectedChainContext = createContext<
 export function SelectedChainProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [selectedChain, setSelectedChain] =
-    useState<CustomChain>(defaultCustomChain);
+    useState<CustomChain>(defaultCustomChild);
   const [selectedParentChain, setSelectedParentChain] =
     useState<CustomChain>(defaultCustomMainnet);
+  const { address } = useAccount();
+  const [customChains, setCustomChains] = useState<CustomChain[]>([]);
+  const { chains } = useChains();
 
-  const getChainById = (chainId: number) => {
-    setLoading(true);
-    const storedChains = localStorage.getItem(`chains`);
-    const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
-      : [];
-    const chain = parsedChains.find(
-      (chain: CustomChain) => chain.chainId === chainId,
+  const initializeCustomChains = async (address: Address) => {
+    let userChains = await CustomChainService.getUserChains(
+      address,
+      "",
+      FILTERS.ALL,
     );
-    return chain || null;
+    if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
+      const defaultChain = { ...customArbitrum, user: address };
+      userChains.push({ ...defaultChain, user: address });
+      await CustomChainService.addChain(defaultChain, address);
+    }
+    if (!userChains.some((x) => x.chainId === customMainnet.chainId)) {
+      const defaultChain = { ...customMainnet, user: address };
+      await CustomChainService.addChain(defaultChain, address);
+    }
+    if (!userChains.some((x) => x.chainId === customSepolia.chainId)) {
+      const defaultChain = { ...customSepolia, user: address };
+      await CustomChainService.addChain(defaultChain, address);
+    }
+    if (!userChains.some((x) => x.chainId === customArbitrumSepolia.chainId)) {
+      const defaultChain = { ...customArbitrumSepolia, user: address };
+      userChains.push({ ...defaultChain, user: address });
+      await CustomChainService.addChain(defaultChain, address);
+    }
+
+    if (!userChains.some((x) => x.chainId === selectedChain.chainId))
+      setSelectedChain(defaultCustomChild);
+
+    setCustomChains(userChains);
   };
 
   useEffect(() => {
-    const getParent = () => {
-      if (selectedChain?.parentChainId) {
-        const parentChain = getChainById(selectedChain?.parentChainId);
-        if (parentChain) setSelectedParentChain(parentChain);
-      }
+    if (!address) return;
+    initializeCustomChains(address);
+  }, [address]);
+
+  useEffect(() => {
+    const getParent = async () => {
+      if (!selectedChain) return;
+
+      setLoading(true);
+      let parentChain = await CustomChainService.getChainById(
+        selectedChain.parentChainId,
+        address,
+      );
+      if (!parentChain)
+        parentChain = chains.filter(
+          (x) => x.chainId === selectedChain.parentChainId,
+        )[0];
+      if (!parentChain) return;
+
+      setSelectedParentChain(parentChain);
+      setLoading(false);
     };
     getParent();
   }, [selectedChain?.parentChainId]);
@@ -67,28 +117,6 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     }
   }, [selectedChain?.chainId]);
 
-  useEffect(() => {
-    const initDefaultChains = () => {
-      const childChainExists = CustomChainService.getChainById(
-        defaultCustomChain.chainId,
-      );
-      const parentChainExists = CustomChainService.getChainById(
-        defaultCustomChain.chainId,
-      );
-      if (!childChainExists)
-        CustomChainService.addChain({
-          ...defaultCustomChain,
-          user: zeroAddress,
-        });
-      if (!parentChainExists)
-        CustomChainService.addChain({
-          ...defaultCustomMainnet,
-          user: zeroAddress,
-        });
-    };
-    initDefaultChains();
-  }, []);
-
   return (
     <SelectedChainContext.Provider
       value={{
@@ -96,6 +124,8 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
         selectedChain,
         setSelectedChain,
         selectedParentChain,
+        customChains,
+        setCustomChains,
       }}
     >
       {children}
