@@ -5,6 +5,7 @@ import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 import ArbitrumIcon from "@/assets/arbitrum-icon.svg";
 import EthereumIcon from "@/assets/ethereum-icon.svg";
 
+
 export const l2Chain = envParsed().IS_TESTNET ? arbitrumSepolia : arbitrum;
 
 export const customMainnet: CustomChain = {
