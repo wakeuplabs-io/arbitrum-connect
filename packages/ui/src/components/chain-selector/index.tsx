@@ -10,6 +10,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
 import Button from "../button";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
@@ -20,6 +21,7 @@ export const ChainSelector = ({}: {}) => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { openModal } = useModal();
+  const { openConnectModal } = useConnectModal();
 
   const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
@@ -58,8 +60,8 @@ export const ChainSelector = ({}: {}) => {
     <section className="max-w-xl mx-auto">
       <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
         <h1 className="text-2xl text-black text-left flex flex-wrap">
-          Selected Chain:{" "}
-          <p className="font-bold">{selectedChain.name}</p>
+          Selected Chain:
+          <p className="font-bold sm:ml-3">{selectedChain.name}</p>
         </h1>
         <div className="mt-8 flex flex-col lg:flex-row justify-between lg:items-center gap-4">
           <div className="flex-shrink lg:flex-grow">
@@ -70,22 +72,35 @@ export const ChainSelector = ({}: {}) => {
           </div>
         </div>
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
-          {customChains.map((chain) => {
-            return (
-              <ListItem
-                key={`listItem_chain_${chain.chainId}`}
-                chain={chain}
-                onSelect={handleSelectChain}
-                onDeleteClick={handleDeleteChain}
-                onFeaturedClick={handleFeatureChain}
-                onEditClick={handleEditChain}
-              />
-            );
-          })}
+          {address
+            ? customChains.map((chain) => {
+                return (
+                  <ListItem
+                    key={`listItem_chain_${chain.chainId}`}
+                    chain={chain}
+                    onSelect={handleSelectChain}
+                    onDeleteClick={handleDeleteChain}
+                    onFeaturedClick={handleFeatureChain}
+                    onEditClick={handleEditChain}
+                  />
+                );
+              })
+            : null}
         </div>
       </div>
       <div className="w-full my-6">
-        <Button onClick={handleAddChain}>Add Chain</Button>
+        {
+          <Button
+            id="continue-btn"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!address && openConnectModal) openConnectModal();
+              else handleAddChain();
+            }}
+          >
+            {address ? "Add Chain" : "Connect your wallet to get started"}
+          </Button>
+        }
       </div>
     </section>
   );

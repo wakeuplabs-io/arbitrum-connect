@@ -5,7 +5,12 @@ import { connectorsForWallets } from "@rainbow-me/rainbowkit";
 import { metaMaskWallet } from "@rainbow-me/rainbowkit/wallets";
 import { CustomChain } from "@/types";
 import { braveWallet } from "@rainbow-me/rainbowkit/wallets";
-import { defaultCustomChain, defaultCustomMainnet } from "@/lib/wagmi-config";
+import {
+  customArbitrum,
+  customArbitrumSepolia,
+  customMainnet,
+  customSepolia
+} from "@/lib/wagmi-config";
 import { useChains } from "@/hooks/use-chains";
 
 function WagmiSetup({ children }: { children: React.ReactNode }) {
@@ -14,18 +19,30 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
   const definedChains: [Chain, ...Chain[]] = useMemo(() => {
     let myChains: [Chain, ...Chain[]] = [
       defineChain({
-        ...defaultCustomMainnet,
-        id: defaultCustomMainnet.chainId,
+        ...customMainnet,
+        id: customMainnet.chainId,
       }),
       defineChain({
-        ...defaultCustomChain,
-        id: defaultCustomChain.chainId,
+        ...customSepolia,
+        id: customSepolia.chainId,
+      }),
+      defineChain({
+        ...customArbitrum,
+        id: customArbitrum.chainId,
+      }),
+      defineChain({
+        ...customArbitrumSepolia,
+        id: customArbitrumSepolia.chainId,
       }),
     ];
     chains.forEach((chain: CustomChain) => {
       if (
-        chain.chainId !== defaultCustomChain.chainId &&
-        chain.chainId !== defaultCustomMainnet.chainId
+        ![
+          customMainnet.chainId,
+          customSepolia.chainId,
+          customArbitrum.chainId,
+          customArbitrumSepolia.chainId,
+        ].includes(chain.chainId)
       )
         myChains.push(
           defineChain({

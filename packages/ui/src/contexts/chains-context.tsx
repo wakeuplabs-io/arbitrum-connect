@@ -1,12 +1,11 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
+import CustomChainService from "@/services/custom-chain-service";
 import {
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
-import CustomChainService from "@/services/custom-chain-service";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
-
 type ChainsContextType = {
   chains: CustomChain[];
   setChains: React.Dispatch<React.SetStateAction<CustomChain[]>>;
@@ -20,6 +19,35 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<CustomChain[]>([]);
 
   useEffect(() => {
+    const getAllChains = async () => {
+      // All chains must be registered to wagmi & to the arb sdk
+      const allChains = await CustomChainService.getAllChains();
+      // So we de-duplicate since we use the same table for every user
+      const dedupedChains = allChains.filter(
+        (obj, index, self) =>
+          self.findIndex((o) => o.chainId === obj.chainId) === index,
+      );
+      const arbNetworks = getArbitrumNetworks();
+      dedupedChains
+        .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
+        .forEach((chain) => {
+          if (
+            chain.chainId !== arbitrumSepolia.id &&
+            chain.chainId !== arbitrum.id
+          ) {
+            const arbNetwork = {
+              ...chain,
+              isCustom: true,
+            };
+            registerCustomArbitrumNetwork(arbNetwork, {
+              throwIfAlreadyRegistered: false,
+            });
+          }
+        });
+
+
+      setChains(dedupedChains);
+    };
     getAllChains();
   }, []);
 
@@ -34,29 +62,3 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
     </ChainsContext.Provider>
   );
 }
-const getAllChains = async () => {
-  const allChains = await CustomChainService.getAllChains();
-  const dedupedChains = allChains.filter(
-    (obj, index, self) =>
-      self.findIndex((o) => o.chainId === obj.chainId) === index,
-  );
-  const arbNetworks = getArbitrumNetworks();
-  dedupedChains
-    .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
-    .forEach((chain) => {
-      if (
-        chain.chainId !== arbitrumSepolia.id &&
-        chain.chainId !== arbitrum.id
-      ) {
-        const arbNetwork = {
-          ...chain,
-          isCustom: true,
-        };
-        registerCustomArbitrumNetwork(arbNetwork, {
-          throwIfAlreadyRegistered: false,
-        });
-      }
-    });
-
-  return dedupedChains;
-};

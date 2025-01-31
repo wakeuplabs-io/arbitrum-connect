@@ -9,10 +9,17 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useNavigate } from "@tanstack/react-router";
 import Button from "../button";
-import { l1Chain, l2Chain } from "@/lib/wagmi-config";
+import {
+  customSepolia,
+  customArbitrumSepolia,
+  customArbitrum,
+  customMainnet,
+} from "@/lib/wagmi-config";
 import { EnumSelect } from "../enum-select";
 import CustomChainService from "@/services/custom-chain-service";
 import { useEffect } from "react";
+import { Checkbox } from "../checkbox";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 
 const schema = z.object({
   chainId: z.preprocess((val) => Number(val), z.number().min(1)),
@@ -36,6 +43,7 @@ const schema = z.object({
   chainType: z.nativeEnum(ChainType, {
     required_error: "Chain type is required",
   }),
+  isTestnet: z.boolean(),
 });
 
 export const ChainForm = ({
@@ -49,6 +57,7 @@ export const ChainForm = ({
   const { createChain, editChain } = useCustomChain();
   const { setSelectedChain } = useSelectedChain();
   const navigate = useNavigate();
+  const { openConnectModal } = useConnectModal();
 
   const {
     register,
@@ -75,15 +84,23 @@ export const ChainForm = ({
       localRpcUrl: chain?.rpcUrls.default.http[0],
       logoURI: chain?.logoURI,
       chainType: chain?.chainType,
+      isTestnet: chain?.isTestnet,
     },
   });
   const chainId = useWatch({ control, name: "chainId" });
 
   const onSubmit = async (data: any) => {
+    let parentChainId;
+    if (data.chainType === ChainType.L3)
+      parentChainId = data.isTestnet ? customArbitrumSepolia.chainId : customArbitrum.chainId;
+    if (data.chainType === ChainType.L2)
+      parentChainId = data.isTestnet ? customSepolia.chainId : customMainnet.chainId;
+
+    if (!parentChainId) throw new Error("invalid chainType");
     const payload: CustomChainPayload = {
       ...data,
       user: address,
-      parentChainId: data.chainType === ChainType.L3 ? l2Chain.id : l1Chain.id,
+      parentChainId,
     };
     if (address) {
       if (editing) setSelectedChain(await editChain(payload));
@@ -120,129 +137,147 @@ export const ChainForm = ({
       <h1 className="text-2xl text-black text-left">
         {editing ? "Edit" : "Add"} Chain
       </h1>
-      <form
-        className="mt-8 w-full flex flex-col gap-4"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-          <Input
-            disabled={editing}
-            name="chainId"
-            type="number"
-            label="Chain id"
-            placeholder="Chain ID"
-            register={register}
-            error={errors.chainId?.message}
-          />
-          <Input
-            name="name"
-            label="Chain name"
-            placeholder="Chain name"
-            register={register}
-            error={errors.name?.message}
-          />
-          <Input
-            name="bridge"
-            label="Bridge"
-            placeholder="Bridge"
-            register={register}
-            error={errors.bridge?.message}
-          />
-          <Input
-            name="inbox"
-            label="Inbox"
-            placeholder="Inbox"
-            register={register}
-            error={errors.inbox?.message}
-          />
-          <Input
-            name="sequencerInbox"
-            label="Sequencer Inbox"
-            placeholder="Sequencer Inbox"
-            register={register}
-            error={errors.sequencerInbox?.message}
-          />
-          <Input
-            name="outbox"
-            label="Outbox"
-            placeholder="Outbox"
-            register={register}
-            error={errors.outbox?.message}
-          />
-          <Input
-            name="rollup"
-            label="Rollup"
-            placeholder="Rollup"
-            register={register}
-            error={errors.rollup?.message}
-          />
-          <Input
-            name="explorerUrl"
-            label="Explorer URL"
-            placeholder="Explorer URL"
-            register={register}
-            error={errors.explorerUrl?.message}
-          />
-          <Input
-            name="nativeCurrencyName"
-            label="Native Currency Name"
-            placeholder="Native Currency Name"
-            register={register}
-            error={errors.nativeCurrencyName?.message}
-          />
-          <Input
-            name="nativeCurrencySymbol"
-            label="Native Currency Symbol"
-            placeholder="Native Currency Symbol"
-            register={register}
-            error={errors.nativeCurrencySymbol?.message}
-          />
-          <Input
-            name="nativeCurrencyDecimals"
-            type="number"
-            label="Native Currency Decimals"
-            placeholder="Native Currency Decimals"
-            register={register}
-            error={errors.nativeCurrencyDecimals?.message}
-          />
-          <Input
-            name="publicRpcUrl"
-            label="Public RPC URL"
-            placeholder="Public RPC URL"
-            register={register}
-            type="url"
-            error={errors.publicRpcUrl?.message}
-          />
-          <Input
-            name="localRpcUrl"
-            label="Local RPC URL"
-            placeholder="Local RPC URL"
-            register={register}
-            type="url"
-            error={errors.localRpcUrl?.message}
-          />
-          <Input
-            name="logoURI"
-            label="Logo URI"
-            placeholder="Logo URI"
-            register={register}
-            type="url"
-            error={errors.logoURI?.message}
-          />
-          <EnumSelect
-            name="chainType"
-            label="Chain Type"
-            enumValues={ChainType}
-            register={register}
-          />
-        </div>
+      {!address && (
         <Button
+          id="continue-btn"
+          onClick={(e) => {
+            e.preventDefault();
+            if (openConnectModal) {
+              openConnectModal();
+            }
+          }}
+          className="w-5/6 mt-8"
           type="submit"
-          disabled={isSubmitting || !!errors.chainId || !isValid}
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
+          {address ? "Continue" : "Connect your wallet to get started"}
         </Button>
-      </form>
+      )}
+      {address && (
+        <form
+          className="mt-8 w-full flex flex-col gap-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
+            <Input
+              disabled={editing}
+              name="chainId"
+              type="number"
+              label="Chain id"
+              placeholder="Chain ID"
+              register={register}
+              error={errors.chainId?.message}
+            />
+            <Input
+              name="name"
+              label="Chain name"
+              placeholder="Chain name"
+              register={register}
+              error={errors.name?.message}
+            />
+            <Input
+              name="bridge"
+              label="Bridge"
+              placeholder="Bridge"
+              register={register}
+              error={errors.bridge?.message}
+            />
+            <Input
+              name="inbox"
+              label="Inbox"
+              placeholder="Inbox"
+              register={register}
+              error={errors.inbox?.message}
+            />
+            <Input
+              name="sequencerInbox"
+              label="Sequencer Inbox"
+              placeholder="Sequencer Inbox"
+              register={register}
+              error={errors.sequencerInbox?.message}
+            />
+            <Input
+              name="outbox"
+              label="Outbox"
+              placeholder="Outbox"
+              register={register}
+              error={errors.outbox?.message}
+            />
+            <Input
+              name="rollup"
+              label="Rollup"
+              placeholder="Rollup"
+              register={register}
+              error={errors.rollup?.message}
+            />
+            <Input
+              name="explorerUrl"
+              label="Explorer URL"
+              placeholder="Explorer URL"
+              register={register}
+              error={errors.explorerUrl?.message}
+            />
+            <Input
+              name="nativeCurrencyName"
+              label="Native Currency Name"
+              placeholder="Native Currency Name"
+              register={register}
+              error={errors.nativeCurrencyName?.message}
+            />
+            <Input
+              name="nativeCurrencySymbol"
+              label="Native Currency Symbol"
+              placeholder="Native Currency Symbol"
+              register={register}
+              error={errors.nativeCurrencySymbol?.message}
+            />
+            <Input
+              name="nativeCurrencyDecimals"
+              type="number"
+              label="Native Currency Decimals"
+              placeholder="Native Currency Decimals"
+              register={register}
+              error={errors.nativeCurrencyDecimals?.message}
+            />
+            <Input
+              name="publicRpcUrl"
+              label="Public RPC URL"
+              placeholder="Public RPC URL"
+              register={register}
+              type="url"
+              error={errors.publicRpcUrl?.message}
+            />
+            <Input
+              name="localRpcUrl"
+              label="Local RPC URL"
+              placeholder="Local RPC URL"
+              register={register}
+              type="url"
+              error={errors.localRpcUrl?.message}
+            />
+            <Input
+              name="logoURI"
+              label="Logo URI"
+              placeholder="Logo URI"
+              register={register}
+              type="url"
+              error={errors.logoURI?.message}
+            />
+            <Checkbox name="isTestnet" label="Is Testnet" register={register} />
+            <EnumSelect
+              name="chainType"
+              label="Chain Type"
+              enumValues={ChainType}
+              register={register}
+            />
+          </div>
+          <Button
+            type="submit"
+            disabled={isSubmitting || !!errors.chainId || !isValid}
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </form>
+      )}
     </section>
   );
 };

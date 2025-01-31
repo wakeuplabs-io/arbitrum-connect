@@ -55,11 +55,15 @@ export default class CustomChainService {
     return chain;
   };
 
-  static addChain = async (chain: CustomChain) => {
-    const chainExists = await db.chains.get(chain.chainId);
-    if (chainExists) throw new Error("Chain already exists");
+  static addChain = async (chain: CustomChain, userAddress: Address) => {
+    const existingChain = await CustomChainService.getChainById(
+      chain.chainId,
+      userAddress,
+    );
 
-    db.chains.add(chain);
+    if (existingChain) return existingChain;
+
+    await db.chains.add({ ...chain, id: undefined });
 
     return chain;
   };
@@ -91,6 +95,7 @@ export default class CustomChainService {
         search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
       )
       .and((c) => CustomChainService.filterChain(c, filter))
+      .and((c) => c.chainType !== "L1")
       .toArray();
     return filteredChains;
   };
@@ -103,12 +108,13 @@ export default class CustomChainService {
 
   static getChainById = async (chainId: number, userAddress?: Address) => {
     let chain: CustomChain | undefined;
+
     if (userAddress)
       chain = await db.chains
         .where(["user", "chainId"])
         .equals([userAddress, chainId])
         .first();
-    else chain = await db.chains.get(chainId);
+    else chain = await db.chains.where("chainId").equals(chainId).first();
 
     return chain || null;
   };
@@ -116,8 +122,18 @@ export default class CustomChainService {
   static editChain = async (payload: CustomChainPayload) => {
     const chain = CustomChainService.formatChainPayload(payload);
 
+    const dbChain = await CustomChainService.getChainById(
+      payload.chainId,
+      payload.user,
+    );
+    if (!dbChain) throw new Error("attempting to edit another user's chain");
+
     await db.chains.update(
-      { user: chain.user, chainId: chain.chainId } as CustomChain,
+      {
+        id: dbChain.id,
+        user: chain.user,
+        chainId: chain.chainId,
+      } as CustomChain,
       { ...chain },
     );
 
@@ -127,21 +143,12 @@ export default class CustomChainService {
   static featureChain = async (userAddress: Address, chainId: number) => {
     let chain = await db.chains.where({ user: userAddress, chainId }).first();
 
-    if (!chain) {
-      chain = await db.chains.where({ chainId }).first();
-      if (!chain) throw new Error("Chain doesn't exist");
-
-      chain = await CustomChainService.addChain({
-        ...chain,
-        user: userAddress,
-        featured: true,
-      });
-    }
+    if (!chain) throw new Error("Chain doesn't exist for the user");
 
     chain.featured = !chain.featured;
 
     await db.chains.update(
-      { user: userAddress, chainId: chainId } as CustomChain,
+      { id: chain.id, user: userAddress, chainId: chainId } as CustomChain,
       {
         featured: chain.featured,
       },
