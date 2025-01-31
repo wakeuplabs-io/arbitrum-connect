@@ -1,15 +1,17 @@
-import { arbitrumScan } from "@/constants";
 import { ArrowUpRight } from "lucide-react";
 import { StatusStep } from "../status-step";
 import { Transaction } from "@/lib/transactions";
+import CustomChainService from "@/services/custom-chain-service";
 
 export default function InitiateWithdrawal({
   transaction,
 }: {
   transaction: Transaction;
 }) {
-  const l2TxUrl = `${arbitrumScan}/tx/${transaction.bridgeHash}`;
+  const childChain = CustomChainService.getChainById(transaction.childChainId);
 
+  const l2TxUrl = `${childChain?.explorer.default.url}/tx/${transaction.bridgeHash}`;
+ 
   return (
     <StatusStep
       done

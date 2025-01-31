@@ -3,10 +3,11 @@ import classNames from "classnames";
 import { ArrowUpRight } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import useArbitrumBridge from "@/hooks/use-arbitrum-bridge";
-import { l1Scan, Step, TransactionState } from "@/constants";
+import { Step, TransactionState } from "@/constants";
 import { Transaction } from "@/lib/transactions";
 import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
+import CustomChainService from "@/services/custom-chain-service";
 
 export default function ConfirmWithdrawal({
   transaction,
@@ -26,7 +27,10 @@ export default function ConfirmWithdrawal({
     childChainId: transaction.childChainId,
   });
   const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
-  const l1TxUrl = `${l1Scan}/tx/${transaction.delayedInboxHash}`;
+  const parentChain = CustomChainService.getChainById(
+    transaction.parentChainId,
+  );
+  const l1TxUrl = `${parentChain?.explorer.default.url}/tx/${transaction.delayedInboxHash}`;
   const confirmTx = useMutation({
     mutationFn: pushChildTxToParent,
     onError,
@@ -42,7 +46,7 @@ export default function ConfirmWithdrawal({
 
     confirmTx.mutate(
       {
-        l2SignedTx: transaction.bridgeHash,
+        childSignedTx: transaction.bridgeHash,
         parentSigner: signer,
       },
       {

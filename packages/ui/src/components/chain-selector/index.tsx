@@ -13,7 +13,8 @@ import Button from "../button";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
-  const { chains, getUserChains, deleteChain } = useCustomChain();
+  const { customChains, getUserChains, deleteChain, featureChain } =
+    useCustomChain();
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,11 +35,15 @@ export const ChainSelector = ({}: {}) => {
   };
 
   const handleDeleteChain = (chain: CustomChain) => {
-    console.log(chain);
     openModal("Delete Chain", `Confirm action delete ${chain.name}`, () => {
       if (!address) return;
       deleteChain(address, chain.chainId);
     });
+  };
+
+  const handleFeatureChain = (chain: CustomChain) => {
+    if (!address) return;
+    featureChain(address, chain.chainId);
   };
 
   const handleEditChain = (chain: CustomChain) => {
@@ -47,7 +52,7 @@ export const ChainSelector = ({}: {}) => {
 
   const handleAddChain = () => {
     navigate({ to: "/chains/add" });
-  }
+  };
   return (
     <section className="max-w-xl mx-auto">
       <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
@@ -64,16 +69,14 @@ export const ChainSelector = ({}: {}) => {
           </div>
         </div>
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
-          {chains.map((chain) => {
+          {customChains.map((chain) => {
             return (
               <ListItem
                 key={`listItem_chain_${chain.chainId}`}
                 chain={chain}
                 onSelect={handleSelectChain}
                 onDeleteClick={handleDeleteChain}
-                onFeaturedClick={(c) => {
-                  console.log(c);
-                }}
+                onFeaturedClick={handleFeatureChain}
                 onEditClick={handleEditChain}
               />
             );

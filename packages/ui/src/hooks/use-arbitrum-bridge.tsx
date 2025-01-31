@@ -30,7 +30,7 @@ export default function useArbitrumBridge(props: {
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
 
-  const arbNetwork = getArbitrumNetwork(childChainId);
+  const childNetwork = getArbitrumNetwork(childChainId);
 
   async function ensureChainId(chainId: number) {
     return switchChainAsync({ chainId });
@@ -40,36 +40,37 @@ export default function useArbitrumBridge(props: {
     tx: ITxReq,
     childSigner: ethers.providers.JsonRpcSigner,
   ) {
-    if (!childChainId || !arbNetwork) {
+    if (!childChainId || !childNetwork) {
       throw new Error("No child network available");
     }
     await ensureChainId(childChainId);
-    const inboxSdk = new InboxTools(signer!, arbNetwork);
+    const inboxSdk = new InboxTools(signer!, childNetwork);
 
     // extract l2's tx hash first so we can check if this tx executed on l2 later.
     const l2Txhash = (await inboxSdk.sendChildTx(tx, childSigner)) as Address;
-    
+
     return l2Txhash;
   }
 
   async function isForceIncludePossible(
     parentSigner: ethers.providers.JsonRpcSigner,
   ) {
-    if (!arbNetwork || !parentChainId) {
+    if (!childNetwork || !parentChainId) {
       throw new Error("No child network available");
     }
     await ensureChainId(parentChainId);
-    const inboxSdk = new InboxTools(parentSigner, arbNetwork);
+    const inboxSdk = new InboxTools(parentSigner, childNetwork);
     const canForceInclude = await inboxSdk.getForceIncludableEvent();
+
     return !!canForceInclude;
   }
 
   async function forceInclude(parentSigner: ethers.providers.JsonRpcSigner) {
-    if (!arbNetwork || !parentChainId) {
+    if (!childNetwork || !parentChainId) {
       throw new Error("No child network available");
     }
     await ensureChainId(parentChainId);
-    const inboxTools = new InboxTools(parentSigner, arbNetwork);
+    const inboxTools = new InboxTools(parentSigner, childNetwork);
 
     if (!(await inboxTools.getForceIncludableEvent())) {
       throw new Error("Force inclusion is not possible");
@@ -114,18 +115,17 @@ export default function useArbitrumBridge(props: {
   }
 
   async function pushChildTxToParent(props: {
-    l2SignedTx: Address;
+    childSignedTx: Address;
     parentSigner: ethers.providers.JsonRpcSigner;
   }) {
     if (!parentChainId || !childChainId) {
       throw new Error("No child network available");
     }
-    await ensureChainId(childChainId);
-    const l3Network = getArbitrumNetwork(childChainId);
-    const inboxSdk = new InboxTools(props.parentSigner, l3Network);
+    await ensureChainId(parentChainId);
+    const inboxSdk = new InboxTools(props.parentSigner, childNetwork);
 
     // send tx to l1 delayed inbox
-    const childTx = await inboxSdk.sendChildSignedTx(props.l2SignedTx);
+    const childTx = await inboxSdk.sendChildSignedTx(props.childSignedTx);
     if (childTx == null)
       throw new Error(`Failed to send tx to l1 delayed inbox!`);
 

@@ -1,16 +1,20 @@
 import { FILTERS } from "@/constants";
-import envParsed from "@/envParsed";
-import { CreateChainPayload, CustomChain } from "@/types";
-import { Address, zeroAddress } from "viem";
+import { CustomChainPayload, CustomChain } from "@/types";
+import { Address } from "viem";
 
 export default class CustomChainService {
-  static formatChainPayload(data: CreateChainPayload): CustomChain {
+  static formatChainPayload(data: CustomChainPayload): CustomChain {
     return {
       isTestnet: data.isTestnet,
       user: data.user,
       chainId: data.chainId,
       name: data.name,
       parentChainId: data.parentChainId,
+      explorer: {
+        default: {
+          url: data.explorerUrl,
+        },
+      },
       ethBridge: {
         bridge: data.bridge,
         inbox: data.inbox,
@@ -34,7 +38,7 @@ export default class CustomChainService {
     };
   }
 
-  static createChain = (payload: CreateChainPayload) => {
+  static createChain = (payload: CustomChainPayload) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
       ? JSON.parse(storedChains)
@@ -59,7 +63,7 @@ export default class CustomChainService {
       : [];
 
     const chainExists = parsedChains.find(
-      (c) => c.chainId === chain.chainId,
+      (c) => c.chainId === chain.chainId && c.user === chain.user,
     );
     if (chainExists) throw new Error("Chain already exists");
 
@@ -100,9 +104,7 @@ export default class CustomChainService {
       : [];
 
     const filteredChains = parsedChains.filter((chain: CustomChain) => {
-      const matchesUser =
-        chain.user === userAddress ||
-        (chain.user === zeroAddress && !!chain.parentChainId);
+      const matchesUser = chain.user === userAddress;
       const matchesSearch = search
         ? chain.name.toLowerCase().includes(search.toLowerCase())
         : true;
@@ -124,10 +126,12 @@ export default class CustomChainService {
     return parsedChains;
   };
 
-  static getChainById = (chainId: number) => {
+  static getChainById = (chainId: number, userAddress?: Address) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
-      ? JSON.parse(storedChains)
+      ? JSON.parse(storedChains).filter((chain: CustomChain) =>
+          userAddress ? chain.user === userAddress : true,
+        )
       : [];
     const chain = parsedChains.find(
       (chain: CustomChain) => chain.chainId === chainId,
@@ -135,18 +139,51 @@ export default class CustomChainService {
     return chain || null;
   };
 
-  static editChain = async (chain: CustomChain) => {
+  static editChain = async (payload: CustomChainPayload) => {
     const storedChains = localStorage.getItem(`chains`);
     const parsedChains: CustomChain[] = storedChains
       ? JSON.parse(storedChains)
       : [];
+    const chain = CustomChainService.formatChainPayload(payload);
     const newChains = parsedChains.map((c) => {
-      if (c.chainId === chain.chainId) {
+      if (c.chainId === payload.chainId && c.user === payload.user) {
         return chain;
       }
       return c;
     });
     localStorage.setItem(`chains`, JSON.stringify(newChains));
+    return chain;
+  };
+
+  static featureChain = (userAddress: Address, chainId: number) => {
+    const storedChains = localStorage.getItem(`chains`);
+    const parsedChains: CustomChain[] = storedChains
+      ? JSON.parse(storedChains)
+      : [];
+
+    let chain = parsedChains.find(
+      (c) => c.chainId === chainId && c.user === userAddress,
+    );
+
+    if (!chain) {
+      chain = parsedChains.find(
+        (chain: CustomChain) => chain.chainId === chainId,
+      );
+      if (!chain) throw new Error("Chain doesn't exist");
+
+      chain = CustomChainService.addChain({ ...chain, user: userAddress });
+    }
+
+    chain.featured = !chain.featured;
+
+    const newChains = parsedChains.map((c) => {
+      if (c.chainId === chainId && c.user === userAddress) {
+        return chain;
+      }
+      return c;
+    });
+    localStorage.setItem(`chains`, JSON.stringify(newChains));
+
     return chain;
   };
 }

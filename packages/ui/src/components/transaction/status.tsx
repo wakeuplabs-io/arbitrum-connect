@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { Address } from "viem";
 import { AddToCalendarButton } from "../add-to-calendar";
 import { StatusStep } from "./status-step";
-import { arbitrumScan, l1Scan, LEARN_MORE_URI } from "@/constants";
+import { LEARN_MORE_URI } from "@/constants";
 import { Countdown } from "./countdown";
 
 //TODO: refactor this code : make it more readable and clean
@@ -33,7 +33,6 @@ export function TransactionStatus(props: {
     parentChainId: props.tx.parentChainId,
     childChainId: props.tx.childChainId,
   });
-
   const [transaction, setTransaction] = useState<Transaction>(props.tx);
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useOnScreen(ref);
@@ -122,7 +121,7 @@ export function TransactionStatus(props: {
 
     confirmTx.mutate(
       {
-        l2SignedTx: transaction.bridgeHash,
+        childSignedTx: transaction.bridgeHash,
         parentSigner: signer,
       },
       {
@@ -186,8 +185,8 @@ export function TransactionStatus(props: {
     if (!triggered && isVisible) setTriggered(true);
   }, [isVisible]);
 
-  const l2TxUrl = `${arbitrumScan}/tx/${transaction.bridgeHash}`;
-  const l1TxUrl = `${l1Scan}/tx/${transaction.delayedInboxHash}`;
+  const l2TxUrl = `"old-component-should-delete"/tx/${transaction.bridgeHash}`;
+  const l1TxUrl = `"old-component-should-delete"/tx/${transaction.delayedInboxHash}`;
 
   const confirmWithdraw =
     !transaction.delayedInboxHash || !transaction.delayedInboxTimestamp;

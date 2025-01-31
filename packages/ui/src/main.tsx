@@ -14,6 +14,7 @@ import WagmiSetup from "./components/hocs/wagmi-provider";
 import { SelectedChainProvider } from "./contexts/selected-chain";
 import ConfirmModal from "./components/layout/confirm-modal";
 import { ModalProvider } from "./contexts/modal-context";
+import { ChainsProvider } from "./contexts/chains-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -29,26 +30,28 @@ const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <SelectedChainProvider>
-      <WagmiSetup>
-        <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider
-            showRecentTransactions
-            coolMode
-            theme={lightTheme({ borderRadius: "medium" })}
-          >
-            <Web3ClientProvider>
-              <ModalProvider>
-                <AlertProvider>
-                  <ErrorAlert />
-                  <ConfirmModal />
-                  <RouterProvider router={router} />
-                </AlertProvider>
-              </ModalProvider>
-            </Web3ClientProvider>
-          </RainbowKitProvider>
-        </QueryClientProvider>
-      </WagmiSetup>
-    </SelectedChainProvider>
+    <ChainsProvider>
+      <SelectedChainProvider>
+        <WagmiSetup>
+          <QueryClientProvider client={queryClient}>
+            <RainbowKitProvider
+              showRecentTransactions
+              coolMode
+              theme={lightTheme({ borderRadius: "medium" })}
+            >
+              <Web3ClientProvider>
+                <ModalProvider>
+                  <AlertProvider>
+                    <ErrorAlert />
+                    <ConfirmModal />
+                    <RouterProvider router={router} />
+                  </AlertProvider>
+                </ModalProvider>
+              </Web3ClientProvider>
+            </RainbowKitProvider>
+          </QueryClientProvider>
+        </WagmiSetup>
+      </SelectedChainProvider>
+    </ChainsProvider>
   </React.StrictMode>,
 );

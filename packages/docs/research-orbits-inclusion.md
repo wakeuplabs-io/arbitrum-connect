@@ -215,7 +215,6 @@ As a proof of concept, we deployed a rollup over Arbitrum. This resulted in the 
   "chainId": 24802239149,
   "chainName": "My Arbitrum L3 Chain",
   "minL2BaseFee": 100000000,
-  "parentChainId": 421614,
   "parent-chain-node-url": "https://sepolia-rollup.arbitrum.io/rpc",
   "utils": "0x7C100c97a54e2D309a194752Df2f66922A802be3",
   "rollup": "0x7A08988fF97D55Cde8AFF6964A21eF29886777A1",
