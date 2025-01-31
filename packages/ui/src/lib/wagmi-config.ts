@@ -2,15 +2,12 @@ import envParsed from "@/envParsed";
 import { ChainType, CustomChain } from "@/types";
 import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
-import ArbitrumIcon from "@/assets/arbitrum-icon.svg";
-import EthereumIcon from "@/assets/ethereum-icon.svg";
-
 
 export const l2Chain = envParsed().IS_TESTNET ? arbitrumSepolia : arbitrum;
 
 export const customMainnet: CustomChain = {
   ...mainnet,
-  logoURI: EthereumIcon,
+  logoURI: new URL("@/assets/ethereum-icon.svg", import.meta.url).href,
   isTestnet: false,
   isCustom: false,
   chainId: mainnet.id,
@@ -31,7 +28,7 @@ export const customMainnet: CustomChain = {
 };
 export const customSepolia: CustomChain = {
   ...sepolia,
-  logoURI: EthereumIcon,
+  logoURI: new URL("@/assets/ethereum-icon.svg", import.meta.url).href,
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
   chainId: sepolia.id,
@@ -56,7 +53,7 @@ export const defaultCustomMainnet = envParsed().IS_TESTNET ? customSepolia : cus
 const arbitrumNetwork = getArbitrumNetwork(arbitrum.id);
 export const customArbitrum: CustomChain = {
   ...arbitrum,
-  logoURI: ArbitrumIcon,
+  logoURI: new URL("@/assets/arbitrum-icon.svg", import.meta.url).href,
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
   chainId: arbitrumNetwork.chainId,
@@ -78,7 +75,7 @@ export const customArbitrum: CustomChain = {
 const arbitrumSepoliaNetwork = getArbitrumNetwork(arbitrumSepolia.id);
 export const customArbitrumSepolia: CustomChain = {
   ...arbitrumSepolia,
-  logoURI: ArbitrumIcon,
+  logoURI: new URL("@/assets/arbitrum-icon.svg", import.meta.url).href,
   isTestnet: envParsed().IS_TESTNET,
   isCustom: false,
   chainId: arbitrumSepoliaNetwork.chainId,
