@@ -7,18 +7,21 @@
   "license": "ISC",
   "scripts": {
     "prettier": "pnpm -r prettier",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "pnpm -r --if-present type-check && eslint .",
     "dev": "pnpm -r --stream dev",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "7.6.0",
     "@typescript-eslint/parser": "7.6.0",
     "concurrently": "8.2.2",
     "eslint": "8.57.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react": "7.34.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react-refresh": "0.4.6",
+    "prettier": "^3.4.2",
     "typescript": "5.5.3"
   },
   "dependencies": {
