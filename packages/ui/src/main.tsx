@@ -16,7 +16,6 @@ import ConfirmModal from "./components/layout/confirm-modal";
 import { ModalProvider } from "./contexts/modal-context";
 import { ChainsProvider } from "./contexts/chains-context";
 
-// Create a new router instance
 const router = createRouter({ routeTree });
 
 declare module "@tanstack/react-router" {
