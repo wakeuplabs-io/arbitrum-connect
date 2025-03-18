@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid()) @db.Uuid
+  address     String        @unique
+  transactions Transaction[]
+  chains      Chain[]       // Custom chains created by user
+  favorites   UserFavoriteChain[]
+
+  @@map("users")
+}
+
+model Transaction {
+  id            String   @id @default(uuid()) @db.Uuid
+  bridgeHash    String   @unique
+  amount        String
+  claimStatus   String   @default("PENDING")
+  parentChainId Int
+  childChainId  Int
+  account       String
+  userId        String   @db.Uuid
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@map("transactions")
+}
+
+model Chain {
+  id                String   @id @default(uuid()) @db.Uuid
+  name              String
+  chainId           Int
+  parentChainId     Int?
+  
+  // Structured data as JSON
+  nativeCurrency    Json    
+  rpcUrls          Json    
+  blockExplorers   Json    
+  contracts        Json?   
+  ethBridge        Json?   
+  explorer         Json?   
+  
+  // Basic fields
+  isTestnet         Boolean  @default(false)
+  testnet          Boolean? 
+  isCustom          Boolean  @default(false)
+  chainType         String   
+  featured          Boolean  @default(false)
+  logoURI           String?
+  confirmPeriodBlocks Int?
+  
+  // User relation (only for custom chains)
+  userId           String?  @db.Uuid
+  user             User?    @relation(fields: [userId], references: [id])
+  userFavorites    UserFavoriteChain[]
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([chainId, userId])
+  @@map("chains")
+}
+
+model UserFavoriteChain {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  chainId   String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
+  chain     Chain    @relation(fields: [chainId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, chainId])
+  @@map("user_favorite_chains")
+}
+
