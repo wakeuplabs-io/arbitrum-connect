@@ -1,0 +1,192 @@
+export const defaultChains = [
+  {
+    name: "Arbitrum One",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["https://arb1.arbitrum.io/rpc"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Arbiscan",
+        url: "https://arbiscan.io",
+        apiUrl: "https://api.arbiscan.io/api",
+      },
+    },
+    contracts: {
+      multicall3: {
+        address: "0xca11bde05977b3631167028862be2a173976ca11",
+        blockCreated: 7654707,
+      },
+    },
+    logoURI: "http://localhost:3000/src/assets/arbitrum-icon.svg",
+    isTestnet: false,
+    isCustom: false,
+    chainId: 42161,
+    parentChainId: 1,
+    ethBridge: {
+      bridge: "0x8315177aB297bA92A06054cE80a67Ed4DBd7ed3a",
+      inbox: "0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f",
+      sequencerInbox: "0x1c479675ad559DC151F6Ec7ed3FbF8ceE79582B6",
+      outbox: "0x0B9857ae2D4A3DBe74ffE1d7DF045bb7F96E4840",
+      rollup: "0x5eF0D09d1E6204141B4d37530808eD19f60FBa35",
+      classicOutboxes: {
+        "0x667e23ABd27E623c11d4CC00ca3EC4d0bD63337a": 0,
+        "0x760723CD2e632826c38Fef8CD438A4CC7E7E1A40": 30,
+      },
+    },
+    confirmPeriodBlocks: 45818,
+    explorer: {
+      default: {
+        url: "https://arbiscan.io",
+      },
+    },
+    chainType: "L2",
+    featured: false,
+  },
+  {
+    name: "Ethereum",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["https://cloudflare-eth.com"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Etherscan",
+        url: "https://etherscan.io",
+        apiUrl: "https://api.etherscan.io/api",
+      },
+    },
+    contracts: {
+      ensRegistry: {
+        address: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+      },
+      ensUniversalResolver: {
+        address: "0xce01f8eee7E479C928F8919abD53E553a36CeF67",
+        blockCreated: 19258213,
+      },
+      multicall3: {
+        address: "0xca11bde05977b3631167028862be2a173976ca11",
+        blockCreated: 14353601,
+      },
+    },
+    logoURI: "http://localhost:3000/src/assets/ethereum-icon.svg",
+    isTestnet: false,
+    isCustom: false,
+    chainId: 1,
+    parentChainId: 0,
+    ethBridge: "0x",
+    confirmPeriodBlocks: 0,
+    explorer: {
+      default: {
+        url: "https://etherscan.io",
+      },
+    },
+    chainType: "L1",
+  },
+  {
+    name: "Sepolia",
+    nativeCurrency: {
+      name: "Sepolia Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["https://ethereum-sepolia-rpc.publicnode.com"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Etherscan",
+        url: "https://sepolia.etherscan.io",
+        apiUrl: "https://api-sepolia.etherscan.io/api",
+      },
+    },
+    contracts: {
+      multicall3: {
+        address: "0xca11bde05977b3631167028862be2a173976ca11",
+        blockCreated: 751532,
+      },
+      ensRegistry: {
+        address: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+      },
+      ensUniversalResolver: {
+        address: "0xc8Af999e38273D658BE1b921b88A9Ddf005769cC",
+        blockCreated: 5317080,
+      },
+    },
+    testnet: true,
+    logoURI: "http://localhost:3000/src/assets/ethereum-icon.svg",
+    isTestnet: true,
+    isCustom: false,
+    chainId: 11155111,
+    parentChainId: 0,
+    ethBridge: "0x",
+    confirmPeriodBlocks: 0,
+    explorer: {
+      default: {
+        url: "https://sepolia.etherscan.io",
+      },
+    },
+    chainType: "L1",
+  },
+  {
+    name: "Arbitrum Sepolia",
+    nativeCurrency: {
+      name: "Arbitrum Sepolia Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    rpcUrls: {
+      default: {
+        http: ["https://sepolia-rollup.arbitrum.io/rpc"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Arbiscan",
+        url: "https://sepolia.arbiscan.io",
+        apiUrl: "https://api-sepolia.arbiscan.io/api",
+      },
+    },
+    contracts: {
+      multicall3: {
+        address: "0xca11bde05977b3631167028862be2a173976ca11",
+        blockCreated: 81930,
+      },
+    },
+    testnet: true,
+    logoURI: "http://localhost:3000/src/assets/arbitrum-icon.svg",
+    isTestnet: true,
+    isCustom: false,
+    chainId: 421614,
+    parentChainId: 11155111,
+    ethBridge: {
+      bridge: "0x38f918D0E9F1b721EDaA41302E399fa1B79333a9",
+      inbox: "0xaAe29B0366299461418F5324a79Afc425BE5ae21",
+      outbox: "0x65f07C7D521164a4d5DaC6eB8Fac8DA067A3B78F",
+      rollup: "0xd80810638dbDF9081b72C1B33c65375e807281C8",
+      sequencerInbox: "0x6c97864CE4bEf387dE0b3310A44230f7E3F1be0D",
+    },
+    confirmPeriodBlocks: 20,
+    explorer: {
+      default: {
+        url: "https://sepolia.arbiscan.io",
+      },
+    },
+    chainType: "L2",
+    featured: false,
+  },
+];
