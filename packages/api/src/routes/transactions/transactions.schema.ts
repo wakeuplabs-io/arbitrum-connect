@@ -1,6 +1,6 @@
 import { z } from "@hono/zod-openapi";
 
-// Schema base para las transacciones
+// Base schema for transactions
 export const TransactionSchema = z.object({
   id: z.string().uuid(),
   bridgeHash: z.string(),
@@ -11,26 +11,26 @@ export const TransactionSchema = z.object({
   account: z.string(),
   userId: z.string().uuid(),
   createdAt: z.date(),
-  // Incluimos la relación con el usuario
+  // Include user relationship
   user: z.object({
     id: z.string().uuid(),
     address: z.string(),
   }),
 });
 
-// Schema para crear una nueva transacción
+// Schema for creating a new transaction
 export const CreateTransactionSchema = TransactionSchema.omit({
   id: true,
   createdAt: true,
   user: true,
 });
 
-// Schema para actualizar el estado de una transacción
+// Schema for updating transaction status
 export const UpdateTransactionSchema = z.object({
   claimStatus: z.string(),
 });
 
-// Tipos exportados para uso en las rutas
+// Types exported for use in routes
 export type Transaction = z.infer<typeof TransactionSchema>;
 export type CreateTransaction = z.infer<typeof CreateTransactionSchema>;
 export type UpdateTransaction = z.infer<typeof UpdateTransactionSchema>;

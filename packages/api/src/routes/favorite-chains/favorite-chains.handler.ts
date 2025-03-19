@@ -37,7 +37,7 @@ export const toggleFavoriteChain: AppRouteHandler<
 > = async (c) => {
   const { userId, chainId } = c.req.valid("json");
 
-  // Verificar si ya existe el favorito
+  // Check if favorite already exists
   const existingFavorite = await prisma.userFavoriteChain.findUnique({
     where: {
       userId_chainId: {
@@ -48,7 +48,7 @@ export const toggleFavoriteChain: AppRouteHandler<
   });
 
   if (existingFavorite) {
-    // Si existe, lo eliminamos
+    // If exists, delete it
     await prisma.userFavoriteChain.delete({
       where: {
         userId_chainId: {
@@ -59,7 +59,7 @@ export const toggleFavoriteChain: AppRouteHandler<
     });
     return c.json({ status: "removed", removed: true }, HttpStatusCodes.OK);
   } else {
-    // Si no existe, lo creamos
+    // If doesn't exist, create it
     const favorite = await prisma.userFavoriteChain.create({
       data: {
         userId,

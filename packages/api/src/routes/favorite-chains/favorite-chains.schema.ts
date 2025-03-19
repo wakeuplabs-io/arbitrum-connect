@@ -5,7 +5,7 @@ export const UserFavoriteChainSchema = z.object({
   userId: z.string().uuid(),
   chainId: z.string().uuid(),
   createdAt: z.date(),
-  // Incluimos las relaciones para la respuesta
+  // Include relationships for the response
   chain: z.object({
     id: z.string().uuid(),
     name: z.string(),
@@ -14,7 +14,7 @@ export const UserFavoriteChainSchema = z.object({
   }),
 });
 
-// Schema para crear/eliminar favoritos
+// Schema for creating/deleting favorites
 export const ToggleFavoriteChainSchema = z.object({
   userId: z.string().uuid(),
   chainId: z.string().uuid(),
