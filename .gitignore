@@ -32,3 +32,6 @@ dist-ssr
 .serverless
 .aws-sam/
 routeTree.gen.ts
+
+# Environment variables
+.env
