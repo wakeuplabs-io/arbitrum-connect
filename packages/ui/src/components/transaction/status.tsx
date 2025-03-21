@@ -135,10 +135,10 @@ export function TransactionStatus(props: {
             updateTx({
               ...updatedTx,
               delayedInboxTimestamp: Date.now(),
-            }),
+            })
           );
         },
-      },
+      }
     );
   }
 
@@ -164,7 +164,7 @@ export function TransactionStatus(props: {
             claimStatus: ClaimStatus.CLAIMED,
           });
         },
-      },
+      }
     );
   }
 
@@ -206,7 +206,7 @@ export function TransactionStatus(props: {
     fetchingClaimStatus;
   const forceStepDone =
     ([ClaimStatus.CLAIMED, ClaimStatus.CLAIMABLE].includes(
-      transaction.claimStatus,
+      transaction.claimStatus
     ) ||
       (remainingHours == 0 && !canForceInclude)) &&
     (!fetchingClaimStatus || !fetchingL2ToL1Msg);
@@ -236,6 +236,7 @@ export function TransactionStatus(props: {
             href={l2TxUrl}
             target="_blank"
             className="link text-sm flex space-x-1 items-center"
+            rel="noreferrer"
           >
             <span>Arbitrum tx </span>
             <ArrowUpRight className="h-3 w-3" />

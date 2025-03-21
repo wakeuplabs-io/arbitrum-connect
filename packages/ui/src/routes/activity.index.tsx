@@ -1,7 +1,11 @@
 import HomeButton from "@/components/layout/home-button";
 import { TransactionStatusHeader } from "@/components/transaction/status-header";
 import { TransactionStatus } from "@/components/transaction/status-refactor";
-import { Transaction, TransactionsStorageService } from "@/lib/transactions";
+import {
+  Transaction,
+  //  TransactionsStorageService
+} from "@/lib/transactions";
+import { api } from "@/services/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -16,9 +20,12 @@ function ActivityScreen() {
 
   useEffect(() => {
     if (address)
-      TransactionsStorageService.getByAccount(address).then((x) =>
-        setTxHistory(x),
-      );
+      api.transactions
+        .getByAddress(address)
+        .then((x) => setTxHistory(x as unknown as Transaction[]));
+    // TransactionsStorageService.getByAccount(address).then((x) =>
+    //   setTxHistory(x)
+    // );
   }, [address]);
 
   return (

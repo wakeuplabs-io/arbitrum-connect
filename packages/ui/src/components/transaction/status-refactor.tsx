@@ -75,7 +75,12 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
       <div className="bg-gray-200 mt-4 px-4 py-3 text-center">
         <div className="text-sm">
           Have questions about this process?
-          <a className="link" href={LEARN_MORE_URI} target="_blank">
+          <a
+            className="link"
+            href={LEARN_MORE_URI}
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn More
           </a>
         </div>

@@ -11,19 +11,24 @@ export interface Transaction {
   account?: Address;
   parentChainId: number;
   childChainId: number;
+  userAddress: Address;
 }
 
 export class TransactionsStorageService {
   static async getByAccount(account: Address): Promise<Transaction[]> {
-    const transactions = await db.transactions.where("account")
-      .equals(account).toArray();
+    const transactions = await db.transactions
+      .where("account")
+      .equals(account)
+      .toArray();
 
     return transactions;
   }
 
   static async getByBridgeHash(hash: Address): Promise<Transaction | null> {
-    const transaction = await db.transactions.where("bridgeHash")
-      .equals(hash).first();
+    const transaction = await db.transactions
+      .where("bridgeHash")
+      .equals(hash)
+      .first();
     return transaction || null;
   }
 

@@ -17,6 +17,7 @@ export const getUsers: AppRouteHandler<GetUsersRoute> = async (c) => {
 
 export const getUser: AppRouteHandler<GetUserRoute> = async (c) => {
   const { address } = c.req.valid("param");
+
   const user = await prisma.user.findUnique({
     where: { address },
   });
@@ -32,6 +33,15 @@ export const getUser: AppRouteHandler<GetUserRoute> = async (c) => {
 
 export const createUser: AppRouteHandler<CreateUserRoute> = async (c) => {
   const user = c.req.valid("json");
+
+  const userExists = await prisma.user.findUnique({
+    where: { address: user.address },
+  });
+
+  if (userExists) {
+    return c.json(userExists, HttpStatusCodes.OK);
+  }
+
   const createdUser = await prisma.user.create({
     data: {
       address: user.address,

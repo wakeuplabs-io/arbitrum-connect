@@ -50,7 +50,7 @@ export default function ConfirmWithdrawal({
       },
       {
         onSuccess: async (inboxTx) => {
-          let updatedTx = {
+          const updatedTx = {
             ...transaction,
             delayedInboxHash: inboxTx.hash as Address,
           };
@@ -62,7 +62,7 @@ export default function ConfirmWithdrawal({
             delayedInboxTimestamp: Date.now(),
           });
         },
-      },
+      }
     );
   }
 
@@ -99,6 +99,7 @@ export default function ConfirmWithdrawal({
           href={parentTxUrl}
           target="_blank"
           className="link text-sm flex space-x-1 items-center "
+          rel="noreferrer"
         >
           <span>Parent delayed inbox tx </span>
           <ArrowUpRight className="h-3 w-3" />

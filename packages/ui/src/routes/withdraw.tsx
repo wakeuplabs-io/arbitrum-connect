@@ -9,7 +9,7 @@ import {
   getMockedL2WithdrawPrice,
   getMockedSendL1MsgPrice,
 } from "@/lib/get-tx-price";
-import { Transaction, TransactionsStorageService } from "@/lib/transactions";
+import { Transaction } from "@/lib/transactions";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { api } from "@/services/api";
 
 interface SearchParams {
   amount: string;
@@ -33,7 +34,7 @@ export const Route = createFileRoute("/withdraw")({
       return {
         amount:
           BigNumber.from(
-            (search.amount as string).replace(/"/g, ""),
+            (search.amount as string).replace(/"/g, "")
           ).toString() ?? "0",
       };
     } catch (e) {
@@ -85,17 +86,19 @@ function WithdrawScreen() {
     setLoading(true);
     signer &&
       initiateWithdraw(amountInWei, signer)
-        .then((l2Txhash) => {
+        .then(async (l2Txhash) => {
           const tx: Transaction = {
             bridgeHash: l2Txhash,
             amount: amountInWei,
             claimStatus: ClaimStatus.PENDING,
             parentChainId: selectedParentChain.chainId,
             childChainId: selectedChain.chainId,
+            userAddress: address,
           };
-          TransactionsStorageService.create(tx, address).then(() =>
-            navigate({ to: `/activity/${tx.bridgeHash}` }),
-          );
+
+          await Promise.all([api.transactions.create(tx)]);
+
+          navigate({ to: `/activity/${tx.bridgeHash}` });
         })
         .catch((e) => {
           setError(e);
@@ -116,7 +119,7 @@ function WithdrawScreen() {
     if (BigNumber.from(amountInWei).lte(0)) {
       navigate({ to: "/" });
     }
-  }, [amountInWei]);
+  }, [amountInWei, navigate]);
 
   return (
     <div className="flex flex-col max-w-xl mx-auto gap-6 text-primary-700">
@@ -150,7 +153,12 @@ function WithdrawScreen() {
         <div className="text-sm rounded-2xl p-4 bg-primary-100">
           You are about to withdraw funds from Arbitrum to Ethereum. This
           process requires 2 transactions and gas fees in ETH. Any doubts?{" "}
-          <a href={LEARN_MORE_URI} className="link" target="_blank">
+          <a
+            href={LEARN_MORE_URI}
+            className="link"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn More
           </a>
         </div>
@@ -290,7 +298,7 @@ function WithdrawScreen() {
       <button
         type="button"
         className={cn(
-          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
+          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200"
         )}
         disabled={!canContinue || loading || !address || !signer}
         onClick={() => address && onContinue(address)}

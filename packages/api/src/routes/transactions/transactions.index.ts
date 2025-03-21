@@ -6,6 +6,7 @@ const router = createRouter()
   .openapi(routes.getTransactions, handlers.getTransactions)
   .openapi(routes.getTransaction, handlers.getTransaction)
   .openapi(routes.createTransaction, handlers.createTransaction)
-  .openapi(routes.updateTransaction, handlers.updateTransaction);
+  .openapi(routes.updateTransaction, handlers.updateTransaction)
+  .openapi(routes.getTransactionsByAddress, handlers.getTransactionsByAddress);
 
 export default router;

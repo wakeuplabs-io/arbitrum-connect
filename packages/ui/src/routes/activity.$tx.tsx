@@ -1,6 +1,7 @@
 import HomeButton from "@/components/layout/home-button";
 import { TransactionStatus } from "@/components/transaction/status-refactor";
-import { TransactionsStorageService } from "@/lib/transactions";
+import { api } from "@/services/api";
+import { Transaction, TransactionsStorageService } from "@/lib/transactions";
 import {
   ErrorComponent,
   createFileRoute,
@@ -13,10 +14,14 @@ import { Address, formatEther } from "viem";
 
 export const Route = createFileRoute("/activity/$tx")({
   loader: async ({ params }) => {
+    // const tx = await api.transactions.getByBridgeHash(params.tx as Address);
+
     const tx = await TransactionsStorageService.getByBridgeHash(
-      (params.tx as Address) ?? "0x",
+      (params.tx as Address) ?? "0x"
     );
+
     if (!tx) throw notFound();
+
     return tx;
   },
   errorComponent: ErrorComponent,
@@ -29,6 +34,10 @@ export const Route = createFileRoute("/activity/$tx")({
 function PostComponent() {
   const tx = Route.useLoaderData();
   const navigate = useNavigate();
+
+  if ("message" in tx) {
+    return <p>Error: {tx.message}</p>;
+  }
 
   return (
     <div className="flex flex-col gap-6 max-w-xl mx-auto">
@@ -45,7 +54,7 @@ function PostComponent() {
       </div>
 
       {/* Steps */}
-      <TransactionStatus tx={tx} />
+      <TransactionStatus tx={tx as Transaction} />
       <button
         type="button"
         className={cn("btn btn-primary")}

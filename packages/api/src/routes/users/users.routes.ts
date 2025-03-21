@@ -47,6 +47,7 @@ export const createUser = createRoute({
   tags,
   responses: {
     [HttpStatusCodes.CREATED]: jsonContent(UserSchema, "The created user"),
+    [HttpStatusCodes.OK]: jsonContent(UserSchema, "The user already exists"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(CreateUserSchema),
       "Invalid user data"

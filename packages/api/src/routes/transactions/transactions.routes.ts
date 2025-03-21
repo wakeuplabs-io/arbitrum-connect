@@ -23,6 +23,27 @@ export const getTransactions = createRoute({
   },
 });
 
+export const getTransactionsByAddress = createRoute({
+  path: "/transactions/address/:address",
+  method: "get",
+  request: {
+    params: z.object({
+      address: z.string(),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(TransactionSchema),
+      "A list of transactions"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Transactions not found"
+    ),
+  },
+});
+
 export const getTransaction = createRoute({
   path: "/transactions/:bridgeHash",
   method: "get",
@@ -99,3 +120,4 @@ export type GetTransactionsRoute = typeof getTransactions;
 export type GetTransactionRoute = typeof getTransaction;
 export type CreateTransactionRoute = typeof createTransaction;
 export type UpdateTransactionRoute = typeof updateTransaction;
+export type GetTransactionsByAddressRoute = typeof getTransactionsByAddress;

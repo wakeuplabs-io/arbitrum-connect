@@ -8,8 +8,7 @@ export const TransactionSchema = z.object({
   claimStatus: z.string().default("PENDING"),
   parentChainId: z.number().int(),
   childChainId: z.number().int(),
-  account: z.string(),
-  userId: z.string().uuid(),
+  userAddress: z.string(),
   createdAt: z.date(),
   // Include user relationship
   user: z.object({
@@ -19,15 +18,25 @@ export const TransactionSchema = z.object({
 });
 
 // Schema for creating a new transaction
-export const CreateTransactionSchema = TransactionSchema.omit({
-  id: true,
-  createdAt: true,
-  user: true,
+export const CreateTransactionSchema = z.object({
+  bridgeHash: z.string(),
+  amount: z.string(),
+  claimStatus: z.string().default("PENDING"),
+  parentChainId: z.number().int(),
+  childChainId: z.number().int(),
+  userAddress: z.string(),
 });
 
 // Schema for updating transaction status
 export const UpdateTransactionSchema = z.object({
+  bridgeHash: z.string(),
+  amount: z.string(),
   claimStatus: z.string(),
+  parentChainId: z.number().int(),
+  childChainId: z.number().int(),
+  userAddress: z.string(),
+  delayedInboxHash: z.string().optional(),
+  delayedInboxTimestamp: z.number().optional(),
 });
 
 // Types exported for use in routes

@@ -28,6 +28,8 @@ model Transaction {
   userId        String   @db.Uuid
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())
+  delayedInboxHash String?
+  delayedInboxTimestamp Int?
 
   @@map("transactions")
 }
