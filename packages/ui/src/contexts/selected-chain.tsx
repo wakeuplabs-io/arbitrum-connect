@@ -50,7 +50,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     );
     if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
       const defaultChain = { ...customArbitrum, user: address };
-      userChains.push({ ...defaultChain, user: address });
+      userChains.push({ ...defaultChain, user: address } as any);
       await CustomChainService.addChain(defaultChain, address);
     }
     if (!userChains.some((x) => x.chainId === customMainnet.chainId)) {
@@ -63,14 +63,14 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     }
     if (!userChains.some((x) => x.chainId === customArbitrumSepolia.chainId)) {
       const defaultChain = { ...customArbitrumSepolia, user: address };
-      userChains.push({ ...defaultChain, user: address });
+      userChains.push({ ...defaultChain, user: address } as any);
       await CustomChainService.addChain(defaultChain, address);
     }
 
     if (!userChains.some((x) => x.chainId === selectedChain.chainId))
       setSelectedChain(defaultCustomChild);
 
-    setCustomChains(userChains);
+    setCustomChains(userChains as CustomChain[]);
   };
 
   useEffect(() => {
@@ -90,10 +90,10 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
       if (!parentChain)
         parentChain = chains.filter(
           (x) => x.chainId === selectedChain.parentChainId
-        )[0];
+        )[0] as any;
       if (!parentChain) return;
 
-      setSelectedParentChain(parentChain);
+      setSelectedParentChain(parentChain as any);
       setLoading(false);
     };
     getParent();

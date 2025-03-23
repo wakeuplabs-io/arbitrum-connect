@@ -107,7 +107,6 @@ export const ChainForm = ({
       parentChainId,
     };
     if (address) {
-      // TODO: ACA ES DONDE SE CREA O SE EDITA LA CADENA
       if (editing) setSelectedChain(await editChain(payload));
       else setSelectedChain(await createChain(payload));
 
@@ -119,13 +118,12 @@ export const ChainForm = ({
     if (!chainId || editing) return;
 
     const validateChainId = async () => {
-      // TODO: ACA SE VALIDA SI LA CADENA EXISTE EN LA BASE DE DATOS
       const chainExists = await CustomChainService.getChainById(
         Number(chainId),
         address
       );
-      // TODO: REVERTIR ESTO
-      if (!chainExists) {
+
+      if (chainExists) {
         // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms
         setError("chainId", {
           type: "manual",
