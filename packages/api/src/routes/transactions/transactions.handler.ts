@@ -4,7 +4,7 @@ import { AppRouteHandler } from "../../lib/types";
 import {
   GetTransactionsRoute,
   GetTransactionRoute,
-  CreateTransactionRoute,
+  // CreateTransactionRoute,
   UpdateTransactionRoute,
 } from "./transactions.routes";
 import { prisma } from "db";
@@ -41,16 +41,16 @@ export const getTransaction: AppRouteHandler<GetTransactionRoute> = async (
   return c.json(TransactionSchema.parse(transaction), HttpStatusCodes.OK);
 };
 
-export const createTransaction: AppRouteHandler<
-  CreateTransactionRoute
-> = async (c) => {
-  const data = c.req.valid("json");
-  const transaction = await prisma.transaction.create({
-    data,
-    include: { user: true },
-  });
-  return c.json(TransactionSchema.parse(transaction), HttpStatusCodes.CREATED);
-};
+// export const createTransaction: AppRouteHandler<
+//   CreateTransactionRoute
+// > = async (c) => {
+//   const data = c.req.valid("json");
+//   const transaction = await prisma.transaction.create({
+//     data,
+//     include: { user: true },
+//   });
+//   return c.json(TransactionSchema.parse(transaction), HttpStatusCodes.CREATED);
+// };
 
 export const updateTransaction: AppRouteHandler<
   UpdateTransactionRoute

@@ -5,7 +5,7 @@ import * as routes from "./transactions.routes";
 const router = createRouter()
   .openapi(routes.getTransactions, handlers.getTransactions)
   .openapi(routes.getTransaction, handlers.getTransaction)
-  .openapi(routes.createTransaction, handlers.createTransaction)
+  //.openapi(routes.createTransaction, handlers.createTransaction)
   .openapi(routes.updateTransaction, handlers.updateTransaction);
 
 export default router;

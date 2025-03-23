@@ -44,6 +44,7 @@ export const ListItem = ({
           </>
         )}
         <Star
+          // TODO: aca se setean las favoritas...
           onClick={() => onFeaturedClick(chain)}
           className={`w-[18px] stroke-gray-icon hover:animate-pulse ${chain.featured ? "fill-gray-icon hover:fill-none" : "fill-none hover:fill-gray-icon"}`}
         />

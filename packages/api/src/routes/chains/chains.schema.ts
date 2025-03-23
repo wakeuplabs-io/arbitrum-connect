@@ -61,22 +61,22 @@ export const ExplorerSchema = z
   .nullable();
 
 export const ChainSchema = z.object({
-  id: z.string().uuid(),
+  id: z.number().int(),
   name: z.string(),
   chainId: z.number().int(),
   parentChainId: z.number().int().nullable(),
 
   // Structured JSON data
-  nativeCurrency: NativeCurrencySchema,
-  rpcUrls: RpcUrlsSchema,
-  blockExplorers: BlockExplorersSchema,
-  contracts: ContractsSchema,
-  ethBridge: EthBridgeSchema,
-  explorer: ExplorerSchema,
+  nativeCurrency: NativeCurrencySchema.optional().nullable(),
+  rpcUrls: RpcUrlsSchema.optional().nullable(),
+  blockExplorers: BlockExplorersSchema.optional().nullable(),
+  contracts: ContractsSchema.optional().nullable(),
+  ethBridge: EthBridgeSchema.optional().nullable(),
+  explorer: ExplorerSchema.optional().nullable(),
 
   // Basic fields
   isTestnet: z.boolean().default(false),
-  testnet: z.boolean().nullable(),
+  testnet: z.boolean().optional().nullable(),
   isCustom: z.boolean().default(false),
   chainType: z.string(),
   featured: z.boolean().default(false),
@@ -84,7 +84,7 @@ export const ChainSchema = z.object({
   confirmPeriodBlocks: z.number().int().nullable(),
 
   // User relation
-  userId: z.string().uuid().nullable(),
+  userAddress: z.string().nullable(),
 
   // Timestamps
   createdAt: z.date(),
