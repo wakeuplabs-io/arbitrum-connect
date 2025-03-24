@@ -11,19 +11,24 @@ import {
 
 const tags = ["Transactions"];
 
-export const getTransactions = createRoute({
-  path: "/transactions/list",
+export const getTransactionByAccount = createRoute({
+  path: "/transactions/account/:account",
   method: "get",
+  request: {
+    params: z.object({
+      account: z.string(),
+    }),
+  },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
       z.array(TransactionSchema),
-      "A list of transactions"
+      "A list of transactions by account"
     ),
   },
 });
 
-export const getTransaction = createRoute({
+export const getTransactionByBridgeHash = createRoute({
   path: "/transactions/:bridgeHash",
   method: "get",
   request: {
@@ -95,7 +100,7 @@ export const updateTransaction = createRoute({
   },
 });
 
-export type GetTransactionsRoute = typeof getTransactions;
-export type GetTransactionRoute = typeof getTransaction;
+export type GetTransactionByAccountRoute = typeof getTransactionByAccount;
+export type GetTransactionByBridgeHashRoute = typeof getTransactionByBridgeHash;
 export type CreateTransactionRoute = typeof createTransaction;
 export type UpdateTransactionRoute = typeof updateTransaction;

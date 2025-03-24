@@ -7,7 +7,7 @@ async function seed() {
 
   for (const chain of defaultChains) {
     const exists = await prisma.chain.findFirst({
-      where: { chainId: chain.chainId, userId: null },
+      where: { chainId: chain.chainId, userAddress: null },
     });
 
     if (!exists) {
@@ -25,7 +25,7 @@ async function seed() {
           isCustom: chain.isCustom || false,
           featured: chain.featured || false,
           testnet: chain.testnet || false,
-          userId: null,
+          userAddress: null,
           // Required JSON fields
           nativeCurrency: chain.nativeCurrency || Prisma.JsonNull,
           rpcUrls: chain.rpcUrls || Prisma.JsonNull,

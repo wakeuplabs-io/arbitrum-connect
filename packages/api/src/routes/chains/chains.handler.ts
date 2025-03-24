@@ -1,18 +1,37 @@
 import * as HttpStatusCodes from "stoker/http-status-codes";
-import * as HttpStatusPhrases from "stoker/http-status-phrases";
 import { AppRouteHandler } from "../../lib/types";
 import {
-  GetChainsRoute,
-  GetChainRoute,
+  GetAllPublicChainsRoute,
   CreateChainRoute,
   UpdateChainRoute,
   DeleteChainRoute,
+  GetAllUserChainsRoute,
+  GetChainRoute,
+  SetFeaturedChainRoute,
 } from "./chains.routes";
 import { prisma } from "db";
 import { ChainSchema } from "./chains.schema";
 
-export const getChains: AppRouteHandler<GetChainsRoute> = async (c) => {
-  const chains = await prisma.chain.findMany();
+export const getAllPublicChains: AppRouteHandler<
+  GetAllPublicChainsRoute
+> = async (c) => {
+  const chains = await prisma.chain.findMany({
+    where: { isCustom: false },
+  });
+
+  return c.json(
+    chains.map((chain) => ChainSchema.parse(chain)),
+    HttpStatusCodes.OK
+  );
+};
+
+export const getAllUserChains: AppRouteHandler<GetAllUserChainsRoute> = async (
+  c
+) => {
+  const { userAddress } = c.req.valid("query");
+  const chains = await prisma.chain.findMany({
+    where: { userAddress },
+  });
   return c.json(
     chains.map((chain) => ChainSchema.parse(chain)),
     HttpStatusCodes.OK
@@ -21,13 +40,14 @@ export const getChains: AppRouteHandler<GetChainsRoute> = async (c) => {
 
 export const getChain: AppRouteHandler<GetChainRoute> = async (c) => {
   const { id } = c.req.valid("param");
-  const chain = await prisma.chain.findUnique({ where: { id } });
+  const chain = await prisma.chain.findFirst({
+    where: {
+      chainId: id,
+    },
+  });
 
   if (!chain) {
-    return c.json(
-      { message: HttpStatusPhrases.NOT_FOUND },
-      HttpStatusCodes.NOT_FOUND
-    );
+    return c.json({ message: "Chain not found" }, HttpStatusCodes.NOT_FOUND);
   }
 
   return c.json(ChainSchema.parse(chain), HttpStatusCodes.OK);
@@ -42,20 +62,37 @@ export const createChain: AppRouteHandler<CreateChainRoute> = async (c) => {
 };
 
 export const updateChain: AppRouteHandler<UpdateChainRoute> = async (c) => {
-  const { id } = c.req.valid("param");
   const chain = c.req.valid("json");
   const updatedChain = await prisma.chain.update({
-    where: { id },
+    where: {
+      chainId_userAddress: {
+        chainId: chain.chainId,
+        userAddress: chain.userAddress || "",
+      },
+    },
     data: chain,
   });
   return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
 };
 
+export const setFeaturedChain: AppRouteHandler<SetFeaturedChainRoute> = async (
+  c
+) => {
+  const { chainId, featured } = c.req.valid("json");
+  const updatedChain = await prisma.chain.update({
+    where: { chainId },
+    data: { featured },
+  });
+
+  return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
+};
+
 export const deleteChain: AppRouteHandler<DeleteChainRoute> = async (c) => {
-  const { id } = c.req.valid("param");
-  await prisma.chain.delete({ where: { id } });
-  return c.json(
-    ChainSchema.parse({ id, name: "Deleted Chain" }),
-    HttpStatusCodes.OK
-  );
+  const { chainId } = c.req.valid("param");
+  await prisma.chain.delete({
+    where: {
+      chainId,
+    },
+  });
+  return c.json({ message: "Chain deleted" }, HttpStatusCodes.OK);
 };

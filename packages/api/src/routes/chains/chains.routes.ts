@@ -12,12 +12,33 @@ import {
 const tags = ["Chains"];
 
 // Lists all chains
-export const getChains = createRoute({
+export const getAllPublicChains = createRoute({
   path: "/chains/list",
   method: "get",
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(z.array(ChainSchema), "A list of chains"),
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(ChainSchema),
+      "A list of public chains"
+    ),
+  },
+});
+
+export const getAllUserChains = createRoute({
+  path: "/chains/list/user",
+  method: "get",
+  request: {
+    query: z.object({
+      userAddress: z.string(),
+      name: z.string().optional(),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.array(ChainSchema),
+      "A list of user chains"
+    ),
   },
 });
 
@@ -26,7 +47,7 @@ export const getChain = createRoute({
   method: "get",
   request: {
     params: z.object({
-      id: z.string(),
+      id: z.string().transform((val) => parseInt(val, 10)),
     }),
   },
   tags,
@@ -57,11 +78,10 @@ export const createChain = createRoute({
 });
 
 export const updateChain = createRoute({
-  path: "/chains/update/:id",
+  path: "/chains/update",
   method: "put",
   request: {
     body: jsonContentRequired(UpdateChainSchema, "The chain to update"),
-    params: z.object({ id: z.string() }),
   },
   tags,
   responses: {
@@ -74,21 +94,50 @@ export const updateChain = createRoute({
   },
 });
 
-export const deleteChain = createRoute({
-  path: "/chains/delete/:id",
-  method: "delete",
+export const setFeaturedChain = createRoute({
+  path: "/chains/set-featured",
+  method: "put",
   request: {
-    params: z.object({ id: z.string() }),
+    body: jsonContentRequired(
+      z.object({
+        chainId: z.number(),
+        featured: z.boolean(),
+        userAddress: z.string(),
+      }),
+      "The chain to set featured"
+    ),
   },
   tags,
   responses: {
-    [HttpStatusCodes.OK]: jsonContent(ChainSchema, "The deleted chain"),
+    [HttpStatusCodes.OK]: jsonContent(ChainSchema, "The updated chain"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Chain not found"),
   },
 });
 
-export type GetChainsRoute = typeof getChains;
+export const deleteChain = createRoute({
+  path: "/chains/delete/:chainId",
+  method: "delete",
+  request: {
+    params: z.object({
+      chainId: z.string().transform((val) => parseInt(val, 10)),
+    }),
+  },
+  tags,
+  responses: {
+    [HttpStatusCodes.OK]: jsonContent(
+      z.object({
+        message: z.string(),
+      }),
+      "The deleted chain"
+    ),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Chain not found"),
+  },
+});
+
+export type GetAllPublicChainsRoute = typeof getAllPublicChains;
+export type GetAllUserChainsRoute = typeof getAllUserChains;
 export type GetChainRoute = typeof getChain;
 export type CreateChainRoute = typeof createChain;
 export type UpdateChainRoute = typeof updateChain;
+export type SetFeaturedChainRoute = typeof setFeaturedChain;
 export type DeleteChainRoute = typeof deleteChain;
