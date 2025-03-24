@@ -1,8 +1,48 @@
 import { hc } from "hono/client";
 import { AppType } from "../../../api/src/app";
-
+import { Transaction } from "@/lib/transactions";
+import { Address } from "viem";
+import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 const API_URL = import.meta.env.VITE_API_URL;
 const client = hc<AppType>(API_URL);
+
+// Define interface for API transaction response
+interface ApiTransaction {
+  bridgeHash: string;
+  amount: string;
+  claimStatus: string;
+  parentChainId: number;
+  childChainId: number;
+  account?: string;
+  delayedInboxHash?: string | null;
+  delayedInboxTimestamp?: number | null;
+}
+
+// Helper function to map API transaction to Transaction type
+const mapApiTransactionToTransaction = (item: ApiTransaction): Transaction => {
+  // Ensure claimStatus is a valid enum value
+  let claimStatus: ClaimStatus;
+  if (item.claimStatus === "PENDING") {
+    claimStatus = ClaimStatus.PENDING;
+  } else if (item.claimStatus === "CLAIMABLE") {
+    claimStatus = ClaimStatus.CLAIMABLE;
+  } else if (item.claimStatus === "CLAIMED") {
+    claimStatus = ClaimStatus.CLAIMED;
+  } else {
+    claimStatus = ClaimStatus.PENDING; // Default fallback
+  }
+
+  return {
+    ...item,
+    bridgeHash: item.bridgeHash as Address,
+    delayedInboxHash: item.delayedInboxHash
+      ? (item.delayedInboxHash as Address)
+      : undefined,
+    account: item.account as Address | undefined,
+    delayedInboxTimestamp: item.delayedInboxTimestamp ?? undefined,
+    claimStatus,
+  };
+};
 
 export const api = {
   users: {
@@ -95,9 +135,13 @@ export const api = {
       return data;
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setFeatured: async (chainId: number, featured: boolean) => {
+    setFeatured: async (
+      chainId: number,
+      featured: boolean,
+      userAddress: Address
+    ) => {
       const res = await client.api.chains.chains["set-featured"].$put({
-        json: { chainId, featured },
+        json: { chainId, featured, userAddress },
       });
 
       if (!res.ok) {
@@ -119,6 +163,74 @@ export const api = {
 
       const data = await res.json();
       return data;
+    },
+  },
+  transactions: {
+    getByAccount: async (account: string): Promise<Transaction[]> => {
+      const res = await client.api.transactions.transactions.account[
+        ":account"
+      ].$get({
+        param: { account },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to get transactions by account");
+      }
+
+      const data = await res.json();
+
+      // Map the API response to match the Transaction type
+      return data.map(mapApiTransactionToTransaction);
+    },
+    getByBridgeHash: async (
+      bridgeHash: string
+    ): Promise<Transaction | null> => {
+      const res = await client.api.transactions.transactions[
+        ":bridgeHash"
+      ].$get({
+        param: { bridgeHash },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to get transaction by bridge hash");
+      }
+
+      const data = await res.json();
+
+      return mapApiTransactionToTransaction(data);
+    },
+    create: async (transaction: Transaction): Promise<Transaction> => {
+      const res = await client.api.transactions.transactions.$post({
+        json: {
+          ...transaction,
+          userAddress: transaction.account as Address,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create transaction");
+      }
+
+      const data = await res.json();
+
+      return mapApiTransactionToTransaction(data);
+    },
+    update: async (transaction: Transaction): Promise<Transaction> => {
+      const res = await client.api.transactions.transactions[
+        ":bridgeHash"
+      ].$patch({
+        json: {
+          ...transaction,
+        },
+        param: { bridgeHash: transaction.bridgeHash },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update transaction");
+      }
+
+      const data = await res.json();
+
+      return mapApiTransactionToTransaction(data);
     },
   },
 };

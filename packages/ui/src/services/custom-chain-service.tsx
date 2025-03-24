@@ -1,5 +1,4 @@
 import { FILTERS } from "@/constants";
-import { db } from "@/db/db";
 import { CustomChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
 import { api } from "./api";
@@ -54,15 +53,12 @@ export default class CustomChainService {
     return chain;
   };
 
-  static addChain = async (chain: CustomChain, userAddress: Address) => {
-    const existingChain = await CustomChainService.getChainById(
-      chain.chainId,
-      userAddress
-    );
+  static addChain = async (chain: CustomChain) => {
+    const existingChain = await CustomChainService.getChainById(chain.chainId);
 
     if (existingChain) return existingChain;
 
-    await db.chains.add({ ...chain, id: undefined });
+    await api.chains.create({ ...chain, userAddress: chain.user });
 
     return chain;
   };
@@ -91,16 +87,6 @@ export default class CustomChainService {
     search: string = "",
     filter: FILTERS
   ) => {
-    //TODO: DELETE THIS
-    // const filteredChains = await db.chains
-    //   .where({ user: userAddress })
-    //   .and((c) =>
-    //     search ? c.name.toLowerCase().includes(search.toLowerCase()) : true
-    //   )
-    //   .and((c) => CustomChainService.filterChain(c, filter))
-    //   .and((c) => c.chainType !== "L1")
-    //   .toArray();
-
     const [publicChains, userChains] = await Promise.all([
       api.chains.getAllPublic(),
       api.chains.getAllUserChains(userAddress),
@@ -122,18 +108,7 @@ export default class CustomChainService {
     return apiChains;
   };
 
-  static getChainById = async (chainId: number, userAddress?: Address) => {
-    // TODO: DELETE THIS
-    console.log({ userAddress });
-    // let chain: CustomChain | undefined;
-
-    // if (userAddress)
-    //   chain = await db.chains
-    //     .where(["user", "chainId"])
-    //     .equals([userAddress, chainId])
-    //     .first();
-    // else chain = await db.chains.where("chainId").equals(chainId).first();
-
+  static getChainById = async (chainId: number) => {
     const chain = await api.chains.getByChainId(chainId);
 
     return chain;
@@ -149,17 +124,14 @@ export default class CustomChainService {
     return chain;
   };
 
-  static featureChain = async (userAddress: Address, chainId: number) => {
-    // TODO: DELETE THIS
-    console.log({ userAddress });
-    // const chain = await db.chains.where({ user: userAddress, chainId }).first();
+  static featureChain = async (chainId: number, userAddress: Address) => {
     const chain = await api.chains.getByChainId(chainId);
 
     if (!chain) throw new Error("Chain doesn't exist for the user");
 
     chain.featured = !chain.featured;
 
-    await api.chains.setFeatured(chain.chainId, chain.featured);
+    await api.chains.setFeatured(chain.chainId, chain.featured, userAddress);
 
     return chain;
   };

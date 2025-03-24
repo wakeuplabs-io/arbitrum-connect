@@ -1,5 +1,5 @@
-import { db } from "@/db/db";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
+import { api } from "@/services/api";
 import { Address } from "viem";
 
 export interface Transaction {
@@ -15,23 +15,21 @@ export interface Transaction {
 
 export class TransactionsStorageService {
   static async getByAccount(account: Address): Promise<Transaction[]> {
-    const transactions = await db.transactions.where("account")
-      .equals(account).toArray();
+    const transactions = await api.transactions.getByAccount(account);
 
     return transactions;
   }
 
   static async getByBridgeHash(hash: Address): Promise<Transaction | null> {
-    const transaction = await db.transactions.where("bridgeHash")
-      .equals(hash).first();
-    return transaction || null;
+    const transaction = await api.transactions.getByBridgeHash(hash);
+    return transaction;
   }
 
   static async create(tx: Transaction, account: Address): Promise<void> {
-    await db.transactions.add({ ...tx, account });
+    await api.transactions.create({ ...tx, account });
   }
 
   static async update(tx: Transaction): Promise<void> {
-    await db.transactions.update(tx.bridgeHash, { ...tx });
+    await api.transactions.update(tx);
   }
 }

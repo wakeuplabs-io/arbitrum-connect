@@ -24,12 +24,12 @@ model Transaction {
   claimStatus           String   @default("PENDING")
   parentChainId         Int
   childChainId          Int
-  account               String
+  account               String?
   userAddress           String
   user                  User     @relation(fields: [userAddress], references: [address])
   createdAt             DateTime @default(now())
   delayedInboxHash      String?
-  delayedInboxTimestamp Int?    
+  delayedInboxTimestamp BigInt?    
 
   @@map("transactions")
 }

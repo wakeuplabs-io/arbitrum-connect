@@ -83,6 +83,7 @@ export const setFeaturedChain: AppRouteHandler<SetFeaturedChainRoute> = async (
     where: { chainId },
     data: { featured },
   });
+
   return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
 };
 

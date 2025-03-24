@@ -102,6 +102,7 @@ export const setFeaturedChain = createRoute({
       z.object({
         chainId: z.number(),
         featured: z.boolean(),
+        userAddress: z.string(),
       }),
       "The chain to set featured"
     ),

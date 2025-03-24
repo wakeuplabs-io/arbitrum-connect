@@ -3,9 +3,12 @@ import * as handlers from "./transactions.handler";
 import * as routes from "./transactions.routes";
 
 const router = createRouter()
-  .openapi(routes.getTransactions, handlers.getTransactions)
-  .openapi(routes.getTransaction, handlers.getTransaction)
-  //.openapi(routes.createTransaction, handlers.createTransaction)
+  .openapi(routes.getTransactionByAccount, handlers.getTransactionByAccount)
+  .openapi(
+    routes.getTransactionByBridgeHash,
+    handlers.getTransactionByBridgeHash
+  )
+  .openapi(routes.createTransaction, handlers.createTransaction)
   .openapi(routes.updateTransaction, handlers.updateTransaction);
 
 export default router;

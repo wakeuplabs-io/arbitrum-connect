@@ -119,8 +119,7 @@ export const ChainForm = ({
 
     const validateChainId = async () => {
       const chainExists = await CustomChainService.getChainById(
-        Number(chainId),
-        address
+        Number(chainId)
       );
 
       if (chainExists) {

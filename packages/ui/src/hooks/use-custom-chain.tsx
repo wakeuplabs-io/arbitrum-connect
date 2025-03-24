@@ -74,7 +74,7 @@ export function useCustomChain() {
 
   const featureChain = async (userAddress: Address, chainId: number) => {
     setLoading(true);
-    const chain = await CustomChainService.featureChain(userAddress, chainId);
+    const chain = await CustomChainService.featureChain(chainId, userAddress);
 
     setCustomChains((currentChains) => {
       return currentChains.map((c) => {
