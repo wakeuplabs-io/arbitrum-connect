@@ -63,7 +63,7 @@ export const ExplorerSchema = z
 export const ChainSchema = z.object({
   id: z.number().int(),
   name: z.string(),
-  chainId: z.number().int(),
+  chainId: z.string(),
   parentChainId: z.number().int().nullable(),
 
   // Structured JSON data

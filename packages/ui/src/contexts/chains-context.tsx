@@ -24,6 +24,7 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
     const getAllChains = async () => {
       // All chains must be registered to wagmi & to the arb sdk
       const allChains = await CustomChainService.getAllChains();
+
       // So we de-duplicate since we use the same table for every user
       const dedupedChains = allChains.filter(
         (obj, index, self) =>

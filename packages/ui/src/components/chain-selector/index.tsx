@@ -73,18 +73,23 @@ export const ChainSelector = ({}: {}) => {
         </div>
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
           {address
-            ? customChains.map((chain) => {
-                return (
-                  <ListItem
-                    key={`listItem_chain_${chain.chainId}`}
-                    chain={chain}
-                    onSelect={handleSelectChain}
-                    onDeleteClick={handleDeleteChain}
-                    onFeaturedClick={handleFeatureChain}
-                    onEditClick={handleEditChain}
-                  />
-                );
-              })
+            ? customChains
+                .filter(
+                  (chain, index, self) =>
+                    self.findIndex((c) => c.chainId === chain.chainId) === index
+                )
+                .map((chain) => {
+                  return (
+                    <ListItem
+                      key={`listItem_chain_${chain.chainId}`}
+                      chain={chain}
+                      onSelect={handleSelectChain}
+                      onDeleteClick={handleDeleteChain}
+                      onFeaturedClick={handleFeatureChain}
+                      onEditClick={handleEditChain}
+                    />
+                  );
+                })
             : null}
         </div>
       </div>

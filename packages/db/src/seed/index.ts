@@ -1,13 +1,19 @@
 import { prisma } from "../index";
-import { defaultChains } from "./chains";
 import { Prisma } from "@prisma/client";
+import * as fs from "fs";
+import * as path from "path";
 
 async function seed() {
   console.log("🌱 Seeding default chains...");
 
+  // Read the JSON file
+  const chainsPath = path.join(__dirname, "chains.json");
+  const chainsData = JSON.parse(fs.readFileSync(chainsPath, "utf-8"));
+  const defaultChains = chainsData.defaultChains;
+
   for (const chain of defaultChains) {
     const exists = await prisma.chain.findFirst({
-      where: { chainId: chain.chainId, userAddress: null },
+      where: { chainId: chain.chainId.toString(), userAddress: null },
     });
 
     if (!exists) {
@@ -39,7 +45,9 @@ async function seed() {
           explorer: chain.explorer || Prisma.JsonNull,
         };
 
-        await prisma.chain.create({ data });
+        await prisma.chain.create({
+          data: { ...data, chainId: data.chainId.toString() },
+        });
         console.log(`✅ Created chain: ${chain.name}`);
       } catch (error) {
         console.error(`❌ Error creating chain ${chain.name}:`, error);

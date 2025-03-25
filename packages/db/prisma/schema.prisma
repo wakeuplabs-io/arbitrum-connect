@@ -37,7 +37,7 @@ model Transaction {
 model Chain {
   id                Int      @id @default(autoincrement())
   name              String
-  chainId           Int      @unique
+  chainId           String      @unique
   parentChainId     Int?
   
   // Structured data as JSON

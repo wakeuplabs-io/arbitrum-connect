@@ -47,7 +47,7 @@ export const getChain = createRoute({
   method: "get",
   request: {
     params: z.object({
-      id: z.string().transform((val) => parseInt(val, 10)),
+      id: z.string(),
     }),
   },
   tags,
@@ -100,7 +100,7 @@ export const setFeaturedChain = createRoute({
   request: {
     body: jsonContentRequired(
       z.object({
-        chainId: z.number(),
+        chainId: z.string(),
         featured: z.boolean(),
         userAddress: z.string(),
       }),
@@ -119,7 +119,7 @@ export const deleteChain = createRoute({
   method: "delete",
   request: {
     params: z.object({
-      chainId: z.string().transform((val) => parseInt(val, 10)),
+      chainId: z.string(),
     }),
   },
   tags,
