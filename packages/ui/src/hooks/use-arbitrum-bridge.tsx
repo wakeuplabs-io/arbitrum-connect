@@ -29,7 +29,6 @@ export default function useArbitrumBridge(props: {
   const { switchChainAsync } = useSwitchChain();
   const { address } = useAccount();
   const signer = useEthersSigner({ chainId: parentChainId });
-
   const childNetwork = getArbitrumNetwork(childChainId);
 
   async function ensureChainId(chainId: number) {
@@ -38,7 +37,7 @@ export default function useArbitrumBridge(props: {
 
   async function sendWithDelayedInbox(
     tx: ITxReq,
-    childSigner: ethers.providers.JsonRpcSigner,
+    childSigner: ethers.providers.JsonRpcSigner
   ) {
     if (!childChainId || !childNetwork) {
       throw new Error("No child network available");
@@ -53,7 +52,7 @@ export default function useArbitrumBridge(props: {
   }
 
   async function isForceIncludePossible(
-    parentSigner: ethers.providers.JsonRpcSigner,
+    parentSigner: ethers.providers.JsonRpcSigner
   ) {
     if (!childNetwork || !parentChainId) {
       throw new Error("No child network available");
@@ -85,7 +84,7 @@ export default function useArbitrumBridge(props: {
 
   async function assembleWithdraw(
     from: string,
-    amountInWei: string,
+    amountInWei: string
   ): Promise<ITxReq> {
     // Assemble a generic withdraw transaction
     const arbsysIface = ArbSys__factory.createInterface();
@@ -102,7 +101,7 @@ export default function useArbitrumBridge(props: {
 
   async function initiateWithdraw(
     amountInWei: string,
-    childSigner: ethers.providers.JsonRpcSigner,
+    childSigner: ethers.providers.JsonRpcSigner
   ) {
     if (!address) {
       throw new Error("No address available");
@@ -110,7 +109,7 @@ export default function useArbitrumBridge(props: {
 
     return await sendWithDelayedInbox(
       await assembleWithdraw(address, amountInWei),
-      childSigner,
+      childSigner
     );
   }
 
@@ -135,7 +134,7 @@ export default function useArbitrumBridge(props: {
   async function getL2toL1Msg(
     l2TxnHash: string,
     childProvider: ethers.providers.JsonRpcProvider,
-    parentSigner: ethers.providers.JsonRpcSigner,
+    parentSigner: ethers.providers.JsonRpcSigner
   ) {
     if (!l2TxnHash.startsWith("0x") || l2TxnHash.trim().length != 66)
       throw new Error(`Hmm, ${l2TxnHash} doesn't look like a txn hash...`);
@@ -154,11 +153,11 @@ export default function useArbitrumBridge(props: {
 
   async function getClaimStatus(
     childProvider: ethers.providers.JsonRpcProvider,
-    l2ToL1Msg: ChildToParentMessageWriter,
+    l2ToL1Msg: ChildToParentMessageWriter
   ): Promise<ClaimStatus> {
     if (!l2ToL1Msg) {
       throw new Error(
-        "Provide an L2 transaction that sends an L2 to L1 message or the message itself",
+        "Provide an L2 transaction that sends an L2 to L1 message or the message itself"
       );
     }
 
@@ -191,7 +190,7 @@ export default function useArbitrumBridge(props: {
     await ensureChainId(parentChainId);
     if (!props.l2ToL1Msg) {
       throw new Error(
-        "Provide an L2 transaction that sends an L2 to L1 message",
+        "Provide an L2 transaction that sends an L2 to L1 message"
       );
     }
 

@@ -109,7 +109,6 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
         ...selectedChain,
         isCustom: true,
       };
-
       registerCustomArbitrumNetwork(arbNetwork, {
         throwIfAlreadyRegistered: false,
       });

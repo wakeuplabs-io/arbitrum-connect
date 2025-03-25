@@ -41,15 +41,8 @@ export default class CustomChainService {
   }
 
   static createChain = async (payload: CustomChainPayload) => {
-    const chainExists = await api.chains.getByChainId(payload.chainId);
-
-    if (chainExists) throw new Error("Chain already exists");
-
     const chain = CustomChainService.formatChainPayload(payload);
-    await api.chains.create({
-      ...chain,
-      userAddress: chain.user,
-    });
+    await api.chains.create(chain);
     return chain;
   };
 
@@ -58,7 +51,7 @@ export default class CustomChainService {
 
     if (existingChain) return existingChain;
 
-    await api.chains.create({ ...chain, userAddress: chain.user });
+    await api.chains.create(chain);
 
     return chain;
   };

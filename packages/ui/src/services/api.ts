@@ -3,6 +3,7 @@ import { AppType } from "../../../api/src/app";
 import { Transaction } from "@/lib/transactions";
 import { Address } from "viem";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
+import { CustomChain } from "@/types";
 const API_URL = import.meta.env.VITE_API_URL;
 const client = hc<AppType>(API_URL);
 
@@ -75,7 +76,10 @@ export const api = {
 
       const data = await res.json();
 
-      return data;
+      return data.map((chain) => ({
+        ...chain,
+        chainId: parseInt(chain.chainId),
+      }));
     },
     getAllUserChains: async (userAddress: string) => {
       const res = await client.api.chains.chains.list.user.$get({
@@ -88,7 +92,10 @@ export const api = {
 
       const data = await res.json();
 
-      return data;
+      return data.map((chain) => ({
+        ...chain,
+        chainId: parseInt(chain.chainId),
+      }));
     },
     getByChainId: async (chainId: number) => {
       const res = await client.api.chains.chains.get[":id"].$get({
@@ -101,12 +108,19 @@ export const api = {
 
       const data = await res.json();
 
-      return data;
+      return {
+        ...data,
+        chainId: parseInt(data.chainId),
+      };
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    create: async (chain: any) => {
+    create: async (chain: CustomChain) => {
       const res = await client.api.chains.chains.create.$post({
-        json: chain,
+        json: {
+          ...chain,
+          userAddress: chain.user as string,
+          logoURI: chain.logoURI ?? null,
+          chainId: chain.chainId.toString(),
+        },
       });
 
       if (!res.ok) {
@@ -123,6 +137,7 @@ export const api = {
         json: {
           ...chain,
           userAddress: chain.user,
+          chainId: chain.chainId.toString(),
         },
       });
 
@@ -132,7 +147,10 @@ export const api = {
 
       const data = await res.json();
 
-      return data;
+      return {
+        ...data,
+        chainId: parseInt(data.chainId),
+      };
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFeatured: async (
@@ -141,7 +159,7 @@ export const api = {
       userAddress: Address
     ) => {
       const res = await client.api.chains.chains["set-featured"].$put({
-        json: { chainId, featured, userAddress },
+        json: { chainId: chainId.toString(), featured, userAddress },
       });
 
       if (!res.ok) {
@@ -150,7 +168,10 @@ export const api = {
 
       const data = await res.json();
 
-      return data;
+      return {
+        ...data,
+        chainId: parseInt(data.chainId),
+      };
     },
     delete: async (chainId: number) => {
       const res = await client.api.chains.chains.delete[":chainId"].$delete({
@@ -162,6 +183,7 @@ export const api = {
       }
 
       const data = await res.json();
+
       return data;
     },
   },
