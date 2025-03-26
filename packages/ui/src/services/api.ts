@@ -131,13 +131,13 @@ export const api = {
 
       return data;
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    edit: async (chain: any) => {
+    edit: async (chain: CustomChain) => {
       const res = await client.api.chains.chains.update.$put({
         json: {
           ...chain,
-          userAddress: chain.user,
+          userAddress: chain.user as string,
           chainId: chain.chainId.toString(),
+          logoURI: chain.logoURI ?? null,
         },
       });
 
@@ -152,7 +152,6 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setFeatured: async (
       chainId: number,
       featured: boolean,
