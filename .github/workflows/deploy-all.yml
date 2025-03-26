@@ -57,6 +57,7 @@ jobs:
         env:
           DATABASE_URL: "postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require"
         run: |
+          pnpm prisma generate
           pnpm prisma migrate deploy
           pnpm db:seed
 
