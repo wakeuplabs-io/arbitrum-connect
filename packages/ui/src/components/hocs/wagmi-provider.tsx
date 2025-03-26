@@ -9,7 +9,7 @@ import {
   customArbitrum,
   customArbitrumSepolia,
   customMainnet,
-  customSepolia
+  customSepolia,
 } from "@/lib/wagmi-config";
 import { useChains } from "@/hooks/use-chains";
 
@@ -48,7 +48,7 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
           defineChain({
             ...chain,
             id: chain.chainId,
-          }),
+          })
         );
     });
 
@@ -73,7 +73,7 @@ function WagmiSetup({ children }: { children: React.ReactNode }) {
     {
       appName: "Arbitrum PoC",
       projectId: "ARBITRUM_POC",
-    },
+    }
   );
 
   const config = createConfig({

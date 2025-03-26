@@ -122,7 +122,7 @@ export const ChainForm = ({
         Number(chainId)
       );
 
-      if (chainExists) {
+      if (!chainExists) {
         // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms
         setError("chainId", {
           type: "manual",

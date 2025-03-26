@@ -1,8 +1,6 @@
 import { Step, StepState, TransactionState } from "@/constants";
 
-const stepStatus = (
-  transactionState: TransactionState
-) => {
+const stepStatus = (transactionState: TransactionState) => {
   return {
     [Step.INITIATE_WITHDRAWAL]: {
       [StepState.ACTIVE]: false,
@@ -28,7 +26,7 @@ const stepStatus = (
 };
 export const useStepStatus = (
   step: Step,
-  transactionState: TransactionState,
+  transactionState: TransactionState
 ) => {
   const stepStatuses = stepStatus(transactionState)[step];
   return stepStatuses;

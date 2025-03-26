@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface AvatarProps {
   src?: string;
@@ -6,7 +6,11 @@ interface AvatarProps {
   size?: number; // Default size can be 48px
 }
 
-const ChainAvatar: React.FC<AvatarProps> = ({ src, alt = "Avatar", size = 48 }) => {
+const ChainAvatar: React.FC<AvatarProps> = ({
+  src,
+  alt = "Avatar",
+  size = 48,
+}) => {
   const [isImageValid, setIsImageValid] = useState<boolean>(!!src);
 
   useEffect(() => {

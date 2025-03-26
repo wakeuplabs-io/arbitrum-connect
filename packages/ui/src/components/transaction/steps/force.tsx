@@ -27,7 +27,6 @@ function ForceIncludeButton({
       enabled: !!signer,
     });
 
-
   if (!canForceInclude || fetchingForceIncludeStatus) {
     return null;
   }

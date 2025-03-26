@@ -191,11 +191,11 @@
       "featured": false
     },
     {
-      "name": "Sanko Testnet",
+      "name": "Sanko",
       "chainId": 1992,
       "parentChainId": 1,
       "nativeCurrency": {
-        "name": "Sanko testnet",
+        "name": "Sanko",
         "symbol": "tDMT",
         "decimals": 18
       },
@@ -222,51 +222,6 @@
       "testnet": true,
       "isCustom": false,
       "chainType": "L2",
-      "featured": false,
-      "logoURI": "https://sankodreammachine.net/favicon.ico",
-      "confirmPeriodBlocks": 0
-    },
-    {
-      "name": "Sanko Mainnet",
-      "chainId": 1996,
-      "parentChainId": 42161,
-      "nativeCurrency": {
-        "name": "Dream Machine Token",
-        "symbol": "DMT",
-        "decimals": 18
-      },
-      "rpcUrls": {
-        "default": {
-          "http": ["https://mainnet.sanko.xyz"]
-        }
-      },
-      "blockExplorers": {
-        "default": {
-          "name": "Sanko Explorer",
-          "url": "https://explorer.sanko.xyz"
-        }
-      },
-      "contracts": {
-        "multicall3": {
-          "address": "0xca11bde05977b3631167028862be2a173976ca11"
-        }
-      },
-      "ethBridge": {
-        "bridge": "0xbc54F85b1c025c59d8405E51f95aaF2A52533D8F",
-        "inbox": "0x34481fC5cB6b1907fbB53a4acDcE8a1693ff981F",
-        "sequencerInbox": "0xa9F2C89715A571f22bE2421d310978cc8B6bdc2F",
-        "outbox": "0x8BbF7d278069b1A7337d607906F31E7fac0d9cb7",
-        "rollup": "0x2E53e790ddA89a22E3c6eE330Ac059C05d62BEA6"
-      },
-      "explorer": {
-        "default": {
-          "url": "https://explorer.sanko.xyz"
-        }
-      },
-      "isTestnet": false,
-      "testnet": false,
-      "isCustom": false,
-      "chainType": "L3",
       "featured": false,
       "logoURI": "https://sankodreammachine.net/favicon.ico",
       "confirmPeriodBlocks": 0
