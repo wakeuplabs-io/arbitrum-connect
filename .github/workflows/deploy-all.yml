@@ -76,7 +76,7 @@ jobs:
         run: |
           pnpm zip
           aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-          aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --environment "Variables={DATABASE_URL=postgresql://arbitrumconnect_user:MpbkczXSiKRdaraeBUaLSxv7MGlaGg5o@dpg-cvi2m89c1ekc738hfb6g-a.oregon-postgres.render.com/arbitrumconnect,NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
+          aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}"
 
       # 3. Build and deploy UI
       - name: Generate UI env file
