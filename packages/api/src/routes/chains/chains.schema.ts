@@ -1,5 +1,4 @@
 import { z } from "@hono/zod-openapi";
-import { Prisma } from "db";
 
 export const NativeCurrencySchema = z.object({
   name: z.string(),
@@ -67,24 +66,24 @@ export const ChainSchema = z.object({
   parentChainId: z.number().int().nullable(),
 
   // Structured JSON data
-  nativeCurrency: NativeCurrencySchema.optional().nullable(),
-  rpcUrls: RpcUrlsSchema.optional().nullable(),
-  blockExplorers: BlockExplorersSchema.optional().nullable(),
-  contracts: ContractsSchema.optional().nullable(),
-  ethBridge: EthBridgeSchema.optional().nullable(),
-  explorer: ExplorerSchema.optional().nullable(),
+  nativeCurrency: NativeCurrencySchema.optional().nullish(),
+  rpcUrls: RpcUrlsSchema.optional().nullish(),
+  blockExplorers: BlockExplorersSchema.optional().nullish(),
+  contracts: ContractsSchema.optional().nullish(),
+  ethBridge: EthBridgeSchema.optional().nullish(),
+  explorer: ExplorerSchema.optional().nullish(),
 
   // Basic fields
   isTestnet: z.boolean().default(false),
-  testnet: z.boolean().optional().nullable(),
+  testnet: z.boolean().optional().nullish(),
   isCustom: z.boolean().default(false),
   chainType: z.string(),
   featured: z.boolean().default(false),
-  logoURI: z.string().url().nullable(),
-  confirmPeriodBlocks: z.number().int().nullable(),
+  logoURI: z.string().url().nullish(),
+  confirmPeriodBlocks: z.number().int().nullish(),
 
   // User relation
-  userAddress: z.string().nullable(),
+  userAddress: z.string().nullish(),
 
   // Timestamps
   createdAt: z.date(),
@@ -97,12 +96,12 @@ export const CreateChainSchema = ChainSchema.omit({
   updatedAt: true,
 }).transform((data) => ({
   ...data,
-  nativeCurrency: data.nativeCurrency || Prisma.JsonNull,
-  rpcUrls: data.rpcUrls || Prisma.JsonNull,
-  blockExplorers: data.blockExplorers || Prisma.JsonNull,
-  contracts: data.contracts || Prisma.JsonNull,
-  ethBridge: data.ethBridge || Prisma.JsonNull,
-  explorer: data.explorer || Prisma.JsonNull,
+  nativeCurrency: data.nativeCurrency || null || undefined,
+  rpcUrls: data.rpcUrls || null || undefined,
+  blockExplorers: data.blockExplorers || null || undefined,
+  contracts: data.contracts || null || undefined,
+  ethBridge: data.ethBridge || null || undefined,
+  explorer: data.explorer || null || undefined,
 }));
 
 export const UpdateChainSchema = ChainSchema.omit({
@@ -111,12 +110,12 @@ export const UpdateChainSchema = ChainSchema.omit({
   updatedAt: true,
 }).transform((data) => ({
   ...data,
-  nativeCurrency: data.nativeCurrency || Prisma.JsonNull,
-  rpcUrls: data.rpcUrls || Prisma.JsonNull,
-  blockExplorers: data.blockExplorers || Prisma.JsonNull,
-  contracts: data.contracts || Prisma.JsonNull,
-  ethBridge: data.ethBridge || Prisma.JsonNull,
-  explorer: data.explorer || Prisma.JsonNull,
+  nativeCurrency: data.nativeCurrency || null || undefined,
+  rpcUrls: data.rpcUrls || null || undefined,
+  blockExplorers: data.blockExplorers || null || undefined,
+  contracts: data.contracts || null || undefined,
+  ethBridge: data.ethBridge || null || undefined,
+  explorer: data.explorer || null || undefined,
 }));
 
 export type Chain = z.infer<typeof ChainSchema>;
