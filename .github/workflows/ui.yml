@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - develop
+      - alan-miranda/fix-ui-deploy
     paths:
       - "packages/ui/**"
       - "!packages/ui/template.yml"
@@ -25,6 +26,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
+
+      - name: Build DB package
+        working-directory: ./packages/db
+        run: pnpm build
 
       - name: Generate .env file
         working-directory: ./packages/ui

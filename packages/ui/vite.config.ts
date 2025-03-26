@@ -17,9 +17,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      db: path.resolve(__dirname, "../db/src"),
     },
   },
   server: {
     port: 3000,
+  },
+  build: {
+    commonjsOptions: {
+      include: [/db/, /node_modules/],
+    },
   },
 });
