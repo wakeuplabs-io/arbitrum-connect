@@ -75,9 +75,29 @@ jobs:
         working-directory: ./packages/api
         run: |
           pnpm zip
-          # Using hardcoded name for Lambda function
-          aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-          aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --environment "Variables={DATABASE_URL=${{ vars.DATABASE_URL }},NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
+          
+          # Check if function exists
+          if ! aws lambda get-function --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} &>/dev/null; then
+            # Function doesn't exist, create it
+            echo "Lambda function does not exist. Creating it..."
+            aws lambda create-function \
+              --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} \
+              --runtime nodejs20.x \
+              --role arn:aws:iam::447655722442:role/lambda-execution-role \
+              --handler index.handler \
+              --zip-file fileb://lambda.zip
+          else
+            # Function exists, update it
+            echo "Lambda function exists. Updating it..."
+            aws lambda update-function-code \
+              --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} \
+              --zip-file fileb://lambda.zip
+          fi
+          
+          # Update environment variables in any case
+          aws lambda update-function-configuration \
+            --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} \
+            --environment "Variables={DATABASE_URL=postgresql://arbitrumconnect_user:MpbkczXSiKRdaraeBUaLSxv7MGlaGg5o@dpg-cvi2m89c1ekc738hfb6g-a.oregon-postgres.render.com/arbitrumconnect,NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
 
       # 3. Build and deploy UI
       - name: Generate UI env file
