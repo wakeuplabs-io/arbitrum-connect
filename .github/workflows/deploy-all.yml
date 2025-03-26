@@ -1,0 +1,97 @@
+name: Deploy Arbitrum Connect
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "packages/**"
+      - ".github/workflows/deploy-all.yml"
+      - "!packages/**/README.md"
+      - "!packages/ui/template.yml"
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || github.ref == 'refs/heads/develop' && 'Staging'}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      # Configure AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # Deploy infrastructure (optional if it already exists)
+      - name: SAM Build
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+        run: sam build
+
+      - name: SAM Deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+        run: sam deploy --stack-name ${{ vars.STACK_NAME }} --parameter-overrides StackName='${{ vars.STACK_NAME }}' DomainName='${{vars.UI_DOMAIN}}' Subdomain='${{vars.SUBDOMAIN}}' HostedZoneId='${{vars.AWS_HOSTED_ZONE_ID}}' CertificateId='${{vars.AWS_CERTIFICATE_ID}}'
+
+      # 1. Build and DB migration
+      - name: Build DB package
+        working-directory: ./packages/db
+        run: pnpm build
+
+      - name: Run database migrations
+        working-directory: ./packages/db
+        env:
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
+        run: |
+          pnpm prisma migrate deploy
+          pnpm db:seed
+
+      # 2. Build and deploy API
+      - name: Generate API env
+        working-directory: ./packages/api
+        run: |
+          echo "DATABASE_URL=${{ vars.DATABASE_URL }}" > .env
+          echo "NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}" >> .env
+
+      - name: Build API package
+        working-directory: ./packages/api
+        run: pnpm build
+
+      - name: Deploy API to Lambda
+        working-directory: ./packages/api
+        run: |
+          pnpm zip
+          # Using hardcoded name for Lambda function
+          aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+          aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --environment "Variables={DATABASE_URL=${{ vars.DATABASE_URL }},NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}"
+
+      # 3. Build and deploy UI
+      - name: Generate UI env file
+        working-directory: ./packages/ui
+        env:
+          NETWORK: ${{ github.ref == 'refs/heads/main' && 'mainnet' || 'sepolia'}}
+        run: |
+          echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
+          echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
+          echo "VITE_API_URL=${{ vars.API_URL }}" >> .env
+
+      - name: Build UI
+        working-directory: ./packages/ui
+        run: pnpm build
+
+      - name: Deploy UI to S3
+        working-directory: ./packages/ui
+        run: |
+          aws s3 sync dist s3://${{vars.SUBDOMAIN}}.${{vars.UI_DOMAIN}}/ --delete 
