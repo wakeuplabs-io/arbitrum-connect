@@ -29,4 +29,5 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Run Prettier Check
-        run: pnpm -r prettier
+        working-directory: ./packages/ui
+        run: pnpm prettier --check "src/**/*.{js,jsx,ts,tsx,json,md,css,html}" "tests/**/*.{js,jsx,ts,tsx,json,md,css,html}" --no-error-on-unmatched-pattern

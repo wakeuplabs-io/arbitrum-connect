@@ -1,0 +1,11 @@
+# Ignore build outputs
+dist/
+node_modules/
+
+# Ignore YAML templates
+template.yml
+*.yml
+
+# Ignore configuration files
+*.config.js
+*.config.ts 

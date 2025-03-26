@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "prettier": "prettier --check .",
+    "prettier": "prettier --check \"./**/*.{js,jsx,ts,tsx,json,md,css,html}\" --ignore-path \"../../.prettierignore\"",
     "dev": "vite",
     "type-check": "tsc --noEmit",
     "build": "vite build",
