@@ -9,7 +9,7 @@ import {
   GetChainRoute,
   SetFeaturedChainRoute,
 } from "./chains.routes";
-import { prisma } from "db";
+import { prisma } from "../../db";
 import { ChainSchema } from "./chains.schema";
 
 export const getAllPublicChains: AppRouteHandler<

@@ -60,12 +60,12 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.4.3
         version: 0.4.3(hono@4.7.4)(zod@3.23.8)
+      '@prisma/client':
+        specifier: ^5.10.0
+        version: 5.22.0(prisma@5.22.0)
       '@scalar/hono-api-reference':
         specifier: ^0.7.1
         version: 0.7.1(hono@4.7.4)
-      db:
-        specifier: workspace:*
-        version: link:../db
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -106,8 +106,11 @@ importers:
       npm-run-all2:
         specifier: ^6.2.0
         version: 6.2.6
+      prisma:
+        specifier: ^5.10.0
+        version: 5.22.0
       ts-node:
-        specifier: ^10.9.0
+        specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.6.13)(@types/node@20.17.24)(typescript@5.5.3)
       tsx:
         specifier: ^4.7.1
@@ -2215,6 +2218,7 @@ packages:
 
   '@paulmillr/qr@0.2.1':
     resolution: {integrity: sha512-IHnV6A+zxU7XwmKFinmYjUcwlyK9+xkG3/s9KcQhI9BjQKycrJ1JRO+FbNYPwZiPKW3je/DR0k7w8/gLa5eaxQ==}
+    deprecated: 'The package is now available as "qr": npm install qr'
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}

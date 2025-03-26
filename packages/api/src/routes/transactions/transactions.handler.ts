@@ -7,7 +7,7 @@ import {
   GetTransactionByAccountRoute,
   GetTransactionByBridgeHashRoute,
 } from "./transactions.routes";
-import { prisma, Transaction } from "db";
+import { prisma, Transaction } from "../../db";
 import { TransactionSchema } from "./transactions.schema";
 
 // Helper function to convert BigInt to number in transaction data

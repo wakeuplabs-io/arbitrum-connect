@@ -4,7 +4,7 @@
 //   GetUserFavoriteChainsRoute,
 //   ToggleFavoriteChainRoute,
 // } from "./favorite-chains.routes";
-// import { prisma } from "db";
+// import { prisma } from "../../db";
 // import { UserFavoriteChainSchema } from "./favorite-chains.schema";
 
 // export const getUserFavoriteChains: AppRouteHandler<

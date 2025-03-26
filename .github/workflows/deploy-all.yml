@@ -46,14 +46,14 @@ jobs:
         run: sam deploy --stack-name ${{ vars.STACK_NAME }} --parameter-overrides StackName='${{ vars.STACK_NAME }}' DomainName='${{vars.UI_DOMAIN}}' Subdomain='${{vars.SUBDOMAIN}}' HostedZoneId='${{vars.AWS_HOSTED_ZONE_ID}}' CertificateId='${{vars.AWS_CERTIFICATE_ID}}'
 
       # 1. Build and DB migration
-      - name: Build DB package
-        working-directory: ./packages/db
-        run: |
-          pnpm db:generate
-          pnpm build
+      # - name: Build DB package
+      #   working-directory: ./packages/db
+      #   run: |
+      #     pnpm db:generate
+      #     pnpm build
 
       - name: Run database migrations
-        working-directory: ./packages/db
+        working-directory: ./packages/api
         env:
           DATABASE_URL: "postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require"
         run: |
@@ -85,7 +85,7 @@ jobs:
         run: |
           echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
           echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
-          echo "VITE_API_URL=${{ vars.API_URL }}" >> .env
+          echo "VITE_API_URL=https://sviehk2dk3wbl5venhnbq24n2i0ubjuf.lambda-url.us-east-1.on.aws" >> .env
 
       - name: Build UI
         working-directory: ./packages/ui

@@ -25,6 +25,7 @@ const EnvSchema = z.object({
     "silent",
   ]),
   CORS_ORIGINS: z.string().default("http://localhost:3000"),
+  DATABASE_URL: z.string(),
 });
 
 export type env = z.infer<typeof EnvSchema>;

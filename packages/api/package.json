@@ -7,13 +7,18 @@
     "build": "esbuild --bundle --outfile=./dist/index.js --platform=node --target=node20 ./src/index.ts",
     "zip": "zip -j lambda.zip dist/index.js",
     "update": "aws lambda update-function-code --zip-file fileb://lambda.zip --function-name hello",
-    "deploy": "run-s build zip update"
+    "deploy": "run-s build zip update",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx src/db/seed/index.ts"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "esbuild": "^0.21.4",
     "npm-run-all2": "^6.2.0",
-    "ts-node": "^10.9.0",
+    "prisma": "^5.10.0",
+    "ts-node": "^10.9.2",
     "tsx": "^4.7.1"
   },
   "dependencies": {
@@ -21,8 +26,8 @@
     "@hono/swagger-ui": "^0.5.1",
     "@hono/zod-openapi": "^0.19.2",
     "@hono/zod-validator": "^0.4.3",
+    "@prisma/client": "^5.10.0",
     "@scalar/hono-api-reference": "^0.7.1",
-    "db": "workspace:*",
     "dotenv": "^16.4.5",
     "dotenv-expand": "^12.0.1",
     "hono": "^4.7.4",
