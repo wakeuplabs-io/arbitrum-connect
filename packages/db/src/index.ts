@@ -8,6 +8,13 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
  * PrismaClient instance in a global variable, which persists across invocations in the same warm container.
  */
 export const prisma = globalForPrisma.prisma || new PrismaClient();
+export type {
+    PrismaClient,
+    Prisma,
+    Transaction,
+    Chain,
+    User,
+  } from "@prisma/client";
 
 /**
  * In development mode, this setup also ensures that the PrismaClient instance persists across hot reloads,
