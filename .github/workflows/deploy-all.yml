@@ -55,7 +55,7 @@ jobs:
       - name: Run database migrations
         working-directory: ./packages/db
         env:
-          DATABASE_URL: "postgresql://arbitrumconnect_user:MpbkczXSiKRdaraeBUaLSxv7MGlaGg5o@dpg-cvi2m89c1ekc738hfb6g-a.oregon-postgres.render.com/arbitrumconnect"
+          DATABASE_URL: "postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require"
         run: |
           pnpm prisma migrate deploy
           pnpm db:seed
@@ -64,7 +64,7 @@ jobs:
       - name: Generate API env
         working-directory: ./packages/api
         run: |
-          echo "DATABASE_URL=postgresql://arbitrumconnect_user:MpbkczXSiKRdaraeBUaLSxv7MGlaGg5o@dpg-cvi2m89c1ekc738hfb6g-a.oregon-postgres.render.com/arbitrumconnect" > .env
+          echo "DATABASE_URL=postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require" > .env
           echo "NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}" >> .env
 
       - name: Build API package
