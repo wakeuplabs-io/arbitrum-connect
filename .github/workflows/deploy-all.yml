@@ -55,7 +55,7 @@ jobs:
       - name: Run database migrations
         working-directory: ./packages/api
         env:
-          DATABASE_URL: "postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require"
+          DATABASE_URL: ${{ vars.DATABASE_URL }}
         run: |
           pnpm prisma generate
           pnpm prisma migrate deploy
@@ -65,7 +65,7 @@ jobs:
       - name: Generate API env
         working-directory: ./packages/api
         run: |
-          echo "DATABASE_URL=postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require" > .env
+          echo "DATABASE_URL=${{ vars.DATABASE_URL }}" > .env
           echo "NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}" >> .env
 
       - name: Build API package
@@ -78,7 +78,7 @@ jobs:
               pnpm zip
               aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
               aws lambda wait function-updated --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
-              aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --handler dist/index.handler --environment "Variables={DATABASE_URL=postgresql://arbitrum-connect_owner:npg_V0wOpkj2IWFM@ep-super-dawn-a4i8vqf4-pooler.us-east-1.aws.neon.tech/arbitrum-connect?sslmode=require,NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }},PRISMA_QUERY_ENGINE_LIBRARY=/var/task/dist/libquery_engine-rhel-openssl-3.0.x.so.node,CORS_ORIGINS=,LOG_LEVEL=debug,PORT=9999,PRISMA_CLI_BINARY_TARGETS=rhel-openssl-3.0.x}"
+              aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --handler dist/index.handler --environment "Variables={DATABASE_URL=${{ vars.DATABASE_URL }},NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }},PRISMA_QUERY_ENGINE_LIBRARY=/var/task/dist/libquery_engine-rhel-openssl-3.0.x.so.node,CORS_ORIGINS=,LOG_LEVEL=debug,PORT=9999,PRISMA_CLI_BINARY_TARGETS=rhel-openssl-3.0.x}"
 
       # 3. Build and deploy UI
       - name: Generate UI env file
