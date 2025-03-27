@@ -11,6 +11,7 @@ import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
 import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useChains } from "@/hooks/use-chains";
 
 export const ChainSelector = ({}: {}) => {
   const { address } = useAccount();
@@ -22,6 +23,7 @@ export const ChainSelector = ({}: {}) => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { openConnectModal } = useConnectModal();
+  const { chains: allPublicChains } = useChains();
 
   const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
@@ -90,7 +92,24 @@ export const ChainSelector = ({}: {}) => {
                     />
                   );
                 })
-            : null}
+            : allPublicChains
+                .filter((chain) => chain.chainType !== "L1")
+                .filter(
+                  (chain, index, self) =>
+                    self.findIndex((c) => c.chainId === chain.chainId) === index
+                )
+                .map((chain) => {
+                  return (
+                    <ListItem
+                      key={`listItem_chain_${chain.chainId}`}
+                      chain={chain}
+                      onSelect={handleSelectChain}
+                      onDeleteClick={() => {}}
+                      onFeaturedClick={() => {}}
+                      onEditClick={() => {}}
+                    />
+                  );
+                })}
         </div>
       </div>
       <div className="w-full my-6">
