@@ -12,7 +12,7 @@ async function seed() {
   console.log("🌱 Seeding default chains...");
 
   // Read the JSON file
-  const chainsPath = path.join(__dirname, "chains.json");
+  const chainsPath = path.join(__dirname, "../../featured-chains/chains.json");
   const chainsData = JSON.parse(fs.readFileSync(chainsPath, "utf-8"));
   const defaultChains = chainsData.defaultChains;
 
