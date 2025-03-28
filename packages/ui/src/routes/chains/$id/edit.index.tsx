@@ -1,5 +1,6 @@
 import { ChainForm } from "@/components/chain-form";
 import CustomChainService from "@/services/custom-chain-service";
+import { CustomChain } from "@/types";
 import {
   createFileRoute,
   ErrorComponent,
@@ -7,9 +8,9 @@ import {
 } from "@tanstack/react-router";
 
 const EditChain = () => {
-  const { chain } = useLoaderData({ from: "/chains/$id/edit/" }); // Especifica el tipo aquí
+  const { chain } = useLoaderData({ from: "/chains/$id/edit/" });
 
-  return <ChainForm chain={chain} editing />;
+  return <ChainForm chain={chain as CustomChain} editing />;
 };
 
 export const Route = createFileRoute("/chains/$id/edit/")({

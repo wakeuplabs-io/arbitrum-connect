@@ -12,7 +12,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
 
   useEffect(() => {
     CustomChainService.getChainById(props.tx.childChainId).then((x) => {
-      setTxChildChain(x);
+      setTxChildChain(x as CustomChain);
     });
   }, []);
 

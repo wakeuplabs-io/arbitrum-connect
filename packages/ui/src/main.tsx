@@ -51,5 +51,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </SelectedChainProvider>
       </WagmiSetup>
     </ChainsProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

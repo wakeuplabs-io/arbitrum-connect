@@ -50,7 +50,6 @@ export default function ErrorAlert() {
         <button className="cursor-default backdrop-opacity-35">close</button>
       </form>
     </dialog>
-
   );
 }
 
@@ -63,4 +62,3 @@ function parseErrorReason(serializedCause: any) {
   }
   return reason;
 }
-

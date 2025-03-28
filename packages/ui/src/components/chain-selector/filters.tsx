@@ -17,7 +17,7 @@ export const AssetFilters = ({
           {
             "text-white bg-black": isActive,
             "text-black neutral-100": !isActive,
-          },
+          }
         );
         return (
           <div

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CustomChainPayload } from "@/types";
+import { CustomChain, CustomChainPayload } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
@@ -28,24 +28,24 @@ export function useCustomChain() {
     setLoading(true);
     const newChains = await CustomChainService.deleteChain(
       userAddress,
-      chainId,
+      chainId
     );
-    setChains(newChains);
-    setCustomChains(newChains);
+    setChains(newChains as CustomChain[]);
+    setCustomChains(newChains as CustomChain[]);
   };
 
   const getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS,
+    filter: FILTERS
   ) => {
     setLoading(true);
     const filteredChains = await CustomChainService.getUserChains(
       userAddress,
       search,
-      filter,
+      filter
     );
-    setCustomChains(filteredChains);
+    setCustomChains(filteredChains as CustomChain[]);
     setLoading(false);
   };
 
@@ -74,12 +74,12 @@ export function useCustomChain() {
 
   const featureChain = async (userAddress: Address, chainId: number) => {
     setLoading(true);
-    let chain = await CustomChainService.featureChain(userAddress, chainId);
+    const chain = await CustomChainService.featureChain(chainId, userAddress);
 
     setCustomChains((currentChains) => {
       return currentChains.map((c) => {
         if (c.chainId === chain.chainId && c.user === userAddress) {
-          return chain;
+          return chain as CustomChain;
         }
         return c;
       });

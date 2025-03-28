@@ -33,7 +33,7 @@ export const Route = createFileRoute("/withdraw")({
       return {
         amount:
           BigNumber.from(
-            (search.amount as string).replace(/"/g, ""),
+            (search.amount as string).replace(/"/g, "")
           ).toString() ?? "0",
       };
     } catch (e) {
@@ -94,7 +94,7 @@ function WithdrawScreen() {
             childChainId: selectedChain.chainId,
           };
           TransactionsStorageService.create(tx, address).then(() =>
-            navigate({ to: `/activity/${tx.bridgeHash}` }),
+            navigate({ to: `/activity/${tx.bridgeHash}` })
           );
         })
         .catch((e) => {
@@ -290,7 +290,7 @@ function WithdrawScreen() {
       <button
         type="button"
         className={cn(
-          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
+          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200"
         )}
         disabled={!canContinue || loading || !address || !signer}
         onClick={() => address && onContinue(address)}

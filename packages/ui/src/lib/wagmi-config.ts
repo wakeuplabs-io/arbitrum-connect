@@ -22,9 +22,9 @@ export const customMainnet: CustomChain = {
   explorer: {
     default: {
       url: mainnet.blockExplorers.default.url,
-    }
+    },
   },
-  chainType: "L1"
+  chainType: "L1",
 };
 export const customSepolia: CustomChain = {
   ...sepolia,
@@ -38,17 +38,19 @@ export const customSepolia: CustomChain = {
   explorer: {
     default: {
       url: sepolia.blockExplorers.default.url,
-    }
+    },
   },
   rpcUrls: {
     default: {
       http: ["https://ethereum-sepolia-rpc.publicnode.com"],
     },
   },
-  chainType: "L1"
+  chainType: "L1",
 };
 
-export const defaultCustomMainnet = envParsed().IS_TESTNET ? customSepolia : customMainnet;
+export const defaultCustomMainnet = envParsed().IS_TESTNET
+  ? customSepolia
+  : customMainnet;
 
 const arbitrumNetwork = getArbitrumNetwork(arbitrum.id);
 export const customArbitrum: CustomChain = {
@@ -63,14 +65,14 @@ export const customArbitrum: CustomChain = {
   explorer: {
     default: {
       url: arbitrum.blockExplorers.default.url,
-    }
+    },
   },
   rpcUrls: {
     default: {
       http: [arbitrum.rpcUrls.default.http[0]],
     },
   },
-  chainType: ChainType.L2
+  chainType: ChainType.L2,
 };
 const arbitrumSepoliaNetwork = getArbitrumNetwork(arbitrumSepolia.id);
 export const customArbitrumSepolia: CustomChain = {
@@ -85,14 +87,16 @@ export const customArbitrumSepolia: CustomChain = {
   explorer: {
     default: {
       url: arbitrumSepolia.blockExplorers.default.url,
-    }
+    },
   },
   rpcUrls: {
     default: {
       http: [arbitrumSepolia.rpcUrls.default.http[0]],
     },
   },
-  chainType: ChainType.L2
+  chainType: ChainType.L2,
 };
 
-export const defaultCustomChild = envParsed().IS_TESTNET ? customArbitrumSepolia : customArbitrum;
+export const defaultCustomChild = envParsed().IS_TESTNET
+  ? customArbitrumSepolia
+  : customArbitrum;
