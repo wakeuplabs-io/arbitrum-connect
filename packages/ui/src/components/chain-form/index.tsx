@@ -39,7 +39,20 @@ const schema = z.object({
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
   localRpcUrl: z.string().url().min(1),
-  logoURI: z.string().url().optional(),
+  logoURI: z
+    .string()
+    .refine(
+      (val) => {
+        // Accepts absolute URLs or paths that start with /
+        return (
+          val.startsWith("/") ||
+          val.startsWith("http://") ||
+          val.startsWith("https://")
+        );
+      },
+      { message: "Must be a URL or a path starting with /" }
+    )
+    .optional(),
   chainType: z.nativeEnum(ChainType, {
     required_error: "Chain type is required",
   }),
