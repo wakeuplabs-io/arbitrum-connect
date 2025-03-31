@@ -79,7 +79,20 @@ export const ChainSchema = z.object({
   isCustom: z.boolean().default(false),
   chainType: z.string(),
   featured: z.boolean().default(false),
-  logoURI: z.string().url().nullish(),
+  logoURI: z
+    .string()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        return (
+          val.startsWith("/") ||
+          val.startsWith("http://") ||
+          val.startsWith("https://")
+        );
+      },
+      { message: "logoURI must be a URL or a path starting with /" }
+    )
+    .nullish(),
   confirmPeriodBlocks: z.number().int().nullish(),
 
   // User relation
