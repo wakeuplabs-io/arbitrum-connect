@@ -25,7 +25,7 @@
           "blockCreated": 7654707
         }
       },
-      "logoURI": "http://localhost:3000/src/assets/arbitrum-icon.svg",
+      "logoURI": "/arbitrum-icon.svg",
       "isTestnet": false,
       "isCustom": false,
       "chainId": 42161,
@@ -82,7 +82,7 @@
           "blockCreated": 14353601
         }
       },
-      "logoURI": "http://localhost:3000/src/assets/ethereum-icon.svg",
+      "logoURI": "/ethereum-icon.svg",
       "isTestnet": false,
       "isCustom": false,
       "chainId": 1,
@@ -129,7 +129,7 @@
         }
       },
       "testnet": true,
-      "logoURI": "http://localhost:3000/src/assets/ethereum-icon.svg",
+      "logoURI": "/ethereum-icon.svg",
       "isTestnet": true,
       "isCustom": false,
       "chainId": 11155111,
@@ -169,7 +169,7 @@
         }
       },
       "testnet": true,
-      "logoURI": "http://localhost:3000/src/assets/arbitrum-icon.svg",
+      "logoURI": "/arbitrum-icon.svg",
       "isTestnet": true,
       "isCustom": false,
       "chainId": 421614,
