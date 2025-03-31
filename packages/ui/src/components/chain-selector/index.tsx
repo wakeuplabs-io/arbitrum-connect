@@ -13,7 +13,7 @@ import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useChains } from "@/hooks/use-chains";
 
-export const ChainSelector = ({}: {}) => {
+export const ChainSelector = () => {
   const { address } = useAccount();
   const { customChains, getUserChains, deleteChain, featureChain } =
     useCustomChain();
@@ -112,10 +112,34 @@ export const ChainSelector = ({}: {}) => {
                 })}
         </div>
       </div>
-      <div className="w-full my-6">
-        {
+      <div className="w-full my-6 flex gap-1">
+        <div className="w-14">
+          <Button
+            position="left"
+            className="bg-primary-600 hover:bg-primary-500 flex items-center justify-center"
+            onClick={() => navigate({ to: "/" })}
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M13 8H3M3 8L8 3M3 8L8 13"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Button>
+        </div>
+        <div className="flex-grow">
           <Button
             id="continue-btn"
+            position="right"
             onClick={(e) => {
               e.preventDefault();
               if (!address && openConnectModal) openConnectModal();
@@ -124,7 +148,7 @@ export const ChainSelector = ({}: {}) => {
           >
             {address ? "Add Chain" : "Connect your wallet to get started"}
           </Button>
-        }
+        </div>
       </div>
     </section>
   );
