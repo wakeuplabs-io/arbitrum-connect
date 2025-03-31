@@ -130,7 +130,7 @@
       },
       "testnet": true,
       "logoURI": "/ethereum-icon.svg",
-      "isTestnet": true,
+      "isTestnet": false,
       "isCustom": false,
       "chainId": 11155111,
       "parentChainId": 0,
@@ -170,7 +170,7 @@
       },
       "testnet": true,
       "logoURI": "/arbitrum-icon.svg",
-      "isTestnet": true,
+      "isTestnet": false,
       "isCustom": false,
       "chainId": 421614,
       "parentChainId": 11155111,
@@ -191,7 +191,7 @@
       "featured": false
     },
     {
-      "name": "Sanko",
+      "name": "Sanko Testnet",
       "chainId": 1992,
       "parentChainId": 1,
       "nativeCurrency": {
