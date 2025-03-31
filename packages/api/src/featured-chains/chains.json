@@ -25,7 +25,7 @@
           "blockCreated": 7654707
         }
       },
-      "logoURI": "http://localhost:3000/src/assets/arbitrum-icon.svg",
+      "logoURI": "https://firebasestorage.googleapis.com/v0/b/arbitrum-connect-v2.firebasestorage.app/o/Arbitrum%20(1).svg?alt=media&token=a5e58f84-b12a-4d98-904e-888c7fd52511",
       "isTestnet": false,
       "isCustom": false,
       "chainId": 42161,
@@ -82,7 +82,7 @@
           "blockCreated": 14353601
         }
       },
-      "logoURI": "http://localhost:3000/src/assets/ethereum-icon.svg",
+      "logoURI": "https://firebasestorage.googleapis.com/v0/b/arbitrum-connect-v2.firebasestorage.app/o/Ethereum.svg?alt=media&token=0257e7bd-5a6d-47d2-8ce2-ba0904c2334c",
       "isTestnet": false,
       "isCustom": false,
       "chainId": 1,
@@ -129,7 +129,7 @@
         }
       },
       "testnet": true,
-      "logoURI": "http://localhost:3000/src/assets/ethereum-icon.svg",
+      "logoURI": "https://firebasestorage.googleapis.com/v0/b/arbitrum-connect-v2.firebasestorage.app/o/Ethereum.svg?alt=media&token=0257e7bd-5a6d-47d2-8ce2-ba0904c2334c",
       "isTestnet": true,
       "isCustom": false,
       "chainId": 11155111,
@@ -169,7 +169,7 @@
         }
       },
       "testnet": true,
-      "logoURI": "http://localhost:3000/src/assets/arbitrum-icon.svg",
+      "logoURI": "https://firebasestorage.googleapis.com/v0/b/arbitrum-connect-v2.firebasestorage.app/o/Arbitrum%20(1).svg?alt=media&token=a5e58f84-b12a-4d98-904e-888c7fd52511",
       "isTestnet": true,
       "isCustom": false,
       "chainId": 421614,
