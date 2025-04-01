@@ -110,7 +110,6 @@ export const ChainSelector = () => {
                       chain={chain}
                       onSelect={handleSelectChain}
                       onDeleteClick={() => {}}
-                      onFeaturedClick={() => {}}
                       onEditClick={() => {}}
                     />
                   );
