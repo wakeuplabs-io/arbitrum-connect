@@ -9,5 +9,6 @@ export function useSelectedChain() {
       "useSelectedChain must be used within a CustomChainProvider"
     );
   }
+
   return context;
 }
