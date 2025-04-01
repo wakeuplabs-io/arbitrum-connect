@@ -193,7 +193,7 @@
     {
       "name": "Sanko Testnet",
       "chainId": 1992,
-      "parentChainId": 1,
+      "parentChainId": 42161,
       "nativeCurrency": {
         "name": "Sanko",
         "symbol": "tDMT",
