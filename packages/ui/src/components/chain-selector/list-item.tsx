@@ -15,7 +15,6 @@ export const ListItem = ({
   onDeleteClick,
   onEditClick,
 }: IListItemProps) => {
-  console.log(chain);
   return (
     <ul
       key={chain.chainId}
