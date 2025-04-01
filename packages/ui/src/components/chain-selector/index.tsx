@@ -11,6 +11,7 @@ import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
 import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { SkeletonList } from "./loading";
 
 export const ChainSelector = () => {
   const { address } = useAccount();
@@ -21,6 +22,7 @@ export const ChainSelector = () => {
     getFilteredPublicChains,
     deleteChain,
     featureChain,
+    loading,
   } = useCustomChain();
 
   const { selectedChain, setSelectedChain } = useSelectedChain();
@@ -84,7 +86,9 @@ export const ChainSelector = () => {
         </div>
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
           {address
-            ? customChains
+            ? loading ? 
+              <SkeletonList count={5} />
+             : address ? customChains
                 .filter(
                   (chain, index, self) =>
                     self.findIndex((c) => c.chainId === chain.chainId) === index
@@ -117,7 +121,8 @@ export const ChainSelector = () => {
                       onEditClick={() => {}}
                     />
                   );
-                })}
+                })
+            : null}
         </div>
       </div>
       <div className="w-full my-6 flex gap-1">
