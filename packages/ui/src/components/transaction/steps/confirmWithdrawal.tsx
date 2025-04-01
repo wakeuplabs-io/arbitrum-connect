@@ -61,6 +61,13 @@ export default function ConfirmWithdrawal({
             ...updatedTx,
             delayedInboxTimestamp: Date.now(),
           });
+          CustomChainService.getChainById(transaction.parentChainId).then(
+            (x) => {
+              const txUrl = `${x?.explorer?.default.url}/tx/${inboxTx.hash}`;
+
+              setParentTxUrl(txUrl);
+            }
+          );
         },
       }
     );
@@ -72,6 +79,7 @@ export default function ConfirmWithdrawal({
       setParentTxUrl(txUrl);
     });
   }, []);
+
   return (
     <StatusStep
       done={DONE}
