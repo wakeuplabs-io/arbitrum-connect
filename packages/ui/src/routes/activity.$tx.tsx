@@ -1,5 +1,6 @@
 import HomeButton from "@/components/layout/home-button";
 import { TransactionStatus } from "@/components/transaction/status-refactor";
+import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { TransactionsStorageService } from "@/lib/transactions";
 import {
   ErrorComponent,
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/activity/$tx")({
 function PostComponent() {
   const tx = Route.useLoaderData();
   const navigate = useNavigate();
+  const { selectedChain, selectedParentChain } = useSelectedChain();
 
   return (
     <div className="flex flex-col gap-6 max-w-xl mx-auto">
@@ -37,10 +39,13 @@ function PostComponent() {
         <div className="text-4xl font-semibold mb-6">Hey! Great Job!</div>
         <div className="md:text-xl">
           Your withdrawal request for{" "}
-          <b className="font-semibold">{formatEther(BigInt(tx.amount))}</b> ETH
-          from <b className="font-semibold">Arbitrum</b> to{" "}
-          <b className="font-semibold">Ethereum</b> has been successfully
-          initiated
+          <b className="font-semibold">
+            {formatEther(BigInt(tx.amount))}{" "}
+            {selectedParentChain.nativeCurrency.symbol}{" "}
+          </b>
+          from <b className="font-semibold">{selectedChain.name}</b> to{" "}
+          <b className="font-semibold">{selectedParentChain.name}</b> has been
+          successfully initiated
         </div>
       </div>
 

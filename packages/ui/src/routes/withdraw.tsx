@@ -148,9 +148,14 @@ function WithdrawScreen() {
       {/* summary */}
       <div className="flex grow justify-between items-center flex-col bg-neutral-50 border border-neutral-200 rounded-2xl p-4 md:p-6 gap-6">
         <div className="text-sm rounded-2xl p-4 bg-primary-100">
-          You are about to withdraw funds from Arbitrum to Ethereum. This
-          process requires 2 transactions and gas fees in ETH. Any doubts?{" "}
-          <a href={LEARN_MORE_URI} className="link" target="_blank">
+          {`You are about to withdraw funds from ${selectedChain.name} to ${selectedParentChain.name}. This`}
+          {`process requires 2 transactions and gas fees in ${selectedParentChain.nativeCurrency.symbol}. Any doubts?`}
+          <a
+            href={LEARN_MORE_URI}
+            className="link"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn More
           </a>
         </div>
