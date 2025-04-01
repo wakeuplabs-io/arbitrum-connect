@@ -11,26 +11,35 @@ import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
 import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useChains } from "@/hooks/use-chains";
 
 export const ChainSelector = () => {
   const { address } = useAccount();
-  const { customChains, getUserChains, deleteChain, featureChain } =
-    useCustomChain();
+  const {
+    customChains,
+    publicChains,
+    getUserChains,
+    getFilteredPublicChains,
+    deleteChain,
+    featureChain,
+  } = useCustomChain();
+
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { openConnectModal } = useConnectModal();
-  const { chains: allPublicChains } = useChains();
 
   const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
   };
 
   useEffect(() => {
-    if (address) getUserChains(address, searchTerm, filter);
+    if (address) {
+      getUserChains(address, searchTerm, filter);
+    } else {
+      getFilteredPublicChains(searchTerm, filter);
+    }
   }, [address, searchTerm, filter]);
 
   const handleSelectChain = (chain: CustomChain) => {
@@ -92,8 +101,7 @@ export const ChainSelector = () => {
                     />
                   );
                 })
-            : allPublicChains
-                .filter((chain) => chain.chainType !== "L1")
+            : publicChains
                 .filter(
                   (chain, index, self) =>
                     self.findIndex((c) => c.chainId === chain.chainId) === index

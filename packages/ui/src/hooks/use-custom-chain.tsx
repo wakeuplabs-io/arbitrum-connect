@@ -10,6 +10,7 @@ export function useCustomChain() {
   const { setChains } = useChains();
   const { customChains, setCustomChains } = useSelectedChain();
   const [loading, setLoading] = useState(false);
+  const [publicChains, setPublicChains] = useState<CustomChain[]>([]);
 
   const createChain = async (chain: CustomChainPayload) => {
     setLoading(true);
@@ -46,6 +47,25 @@ export function useCustomChain() {
       filter
     );
     setCustomChains(filteredChains as CustomChain[]);
+    setLoading(false);
+  };
+
+  const getFilteredPublicChains = async (
+    search: string = "",
+    filter: FILTERS
+  ) => {
+    setLoading(true);
+    const allChains = await CustomChainService.getAllChains();
+    const filteredChains = allChains
+      .filter((chain) =>
+        search ? chain.name.toLowerCase().includes(search.toLowerCase()) : true
+      )
+      .filter((chain) =>
+        CustomChainService.filterChain(chain as CustomChain, filter)
+      )
+      .filter((chain) => chain.chainType !== "L1");
+
+    setPublicChains(filteredChains as CustomChain[]);
     setLoading(false);
   };
 
@@ -89,10 +109,12 @@ export function useCustomChain() {
 
   return {
     customChains,
+    publicChains,
     loading,
     createChain,
     deleteChain,
     getUserChains,
+    getFilteredPublicChains,
     editChain,
     setCustomChains,
     featureChain,
