@@ -21,7 +21,6 @@ export const ChainSelector = () => {
     getUserChains,
     getFilteredPublicChains,
     deleteChain,
-    featureChain,
     loading,
   } = useCustomChain();
 
@@ -54,11 +53,6 @@ export const ChainSelector = () => {
       if (!address) return;
       deleteChain(address, chain.chainId);
     });
-  };
-
-  const handleFeatureChain = (chain: CustomChain) => {
-    if (!address) return;
-    featureChain(address, chain.chainId);
   };
 
   const handleEditChain = (chain: CustomChain) => {
@@ -100,7 +94,6 @@ export const ChainSelector = () => {
                       chain={chain}
                       onSelect={handleSelectChain}
                       onDeleteClick={handleDeleteChain}
-                      onFeaturedClick={handleFeatureChain}
                       onEditClick={handleEditChain}
                     />
                   );

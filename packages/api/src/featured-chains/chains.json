@@ -48,7 +48,7 @@
         }
       },
       "chainType": "L2",
-      "featured": false
+      "featured": true
     },
     {
       "name": "Ethereum",
@@ -188,7 +188,7 @@
         }
       },
       "chainType": "L2",
-      "featured": false
+      "featured": true
     },
     {
       "name": "Sanko Testnet",
@@ -222,7 +222,7 @@
       "testnet": true,
       "isCustom": false,
       "chainType": "L2",
-      "featured": false,
+      "featured": true,
       "logoURI": "https://sankodreammachine.net/favicon.ico",
       "confirmPeriodBlocks": 0
     }
