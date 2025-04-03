@@ -170,7 +170,7 @@
       },
       "testnet": true,
       "logoURI": "/arbitrum-icon.svg",
-      "isTestnet": false,
+      "isTestnet": true,
       "isCustom": false,
       "chainId": 421614,
       "parentChainId": 11155111,

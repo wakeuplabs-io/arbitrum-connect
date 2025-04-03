@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CustomChain, CustomChainPayload } from "@/types";
+import { CustomChain, CustomChainPayload, NetworkFilter } from "@/types";
 import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
@@ -38,13 +38,15 @@ export function useCustomChain() {
   const getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS
+    filter: FILTERS,
+    testnetFilter?: NetworkFilter
   ) => {
     setLoading(true);
     const filteredChains = await CustomChainService.getUserChains(
       userAddress,
       search,
-      filter
+      filter,
+      testnetFilter
     );
     setCustomChains(filteredChains as CustomChain[]);
     setLoading(false);
@@ -52,19 +54,16 @@ export function useCustomChain() {
 
   const getFilteredPublicChains = async (
     search: string = "",
-    filter: FILTERS
+    filter: FILTERS,
+    testnetFilter?: NetworkFilter
   ) => {
     setLoading(true);
+  
     const allChains = await CustomChainService.getAllChains();
-    const filteredChains = allChains
-      .filter((chain) =>
-        search ? chain.name.toLowerCase().includes(search.toLowerCase()) : true
-      )
-      .filter((chain) =>
-        CustomChainService.filterChain(chain as CustomChain, filter)
-      )
-      .filter((chain) => chain.chainType !== "L1");
-
+  
+    const filteredChains = allChains.filter((chain) =>
+      CustomChainService.filterChain(chain as CustomChain, filter, search, testnetFilter)
+    );
     setPublicChains(filteredChains as CustomChain[]);
     setLoading(false);
   };

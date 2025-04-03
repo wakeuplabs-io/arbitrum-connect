@@ -37,4 +37,11 @@ export enum FILTERS {
   FEATURED = "Featured",
   OWN = "Own",
 }
+
+export enum TESTNET_FILTER {
+  MAINNET = "mainnet",
+  TESTNET = "testnet",
+  ALL = "all",
+}
+
 export const FILTERS_ARRAY = [FILTERS.ALL, FILTERS.FEATURED, FILTERS.OWN];
