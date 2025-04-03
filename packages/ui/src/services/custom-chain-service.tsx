@@ -1,5 +1,5 @@
-import { FILTERS } from "@/constants";
-import { CustomChainPayload, CustomChain } from "@/types";
+import { FILTERS, TESTNET_FILTER } from "@/constants";
+import { CustomChainPayload, CustomChain, NetworkFilter } from "@/types";
 import { Address } from "viem";
 import { api } from "./api";
 
@@ -65,35 +65,60 @@ export default class CustomChainService {
     ]).then(([userChains, allChains]) => [...userChains, ...allChains]);
   };
 
-  static filterChain(chain: CustomChain, filter: FILTERS) {
-    switch (filter) {
-      case FILTERS.ALL:
-        return true;
-      case FILTERS.FEATURED:
-        return !!chain.featured;
-      case FILTERS.OWN:
-        return chain.isCustom;
-    }
+  static filterChain(
+    chain: CustomChain,
+    filter: FILTERS,
+    search?: string,
+    testnetFilter?: NetworkFilter
+  ) {
+    const matchesSearch = search
+      ? chain.name.toLowerCase().includes(search.toLowerCase())
+      : true;
+
+    const matchesFilter = (() => {
+      switch (filter) {
+        case FILTERS.ALL:
+          return true;
+        case FILTERS.FEATURED:
+          return !!chain.featured;
+        case FILTERS.OWN:
+          return chain.isCustom;
+        default:
+          return true;
+      }
+    })();
+
+    const isNotL1 = chain.chainType !== "L1";
+
+    const matchesNetwork =
+      testnetFilter === TESTNET_FILTER.TESTNET
+        ? chain.isTestnet
+        : testnetFilter === TESTNET_FILTER.MAINNET
+          ? !chain.isTestnet
+          : true;
+
+    return matchesSearch && matchesFilter && isNotL1 && matchesNetwork;
   }
+
   static getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS
+    filter: FILTERS,
+    testnetFilter?: NetworkFilter
   ) => {
     const [publicChains, userChains] = await Promise.all([
       api.chains.getAllPublic(),
       api.chains.getAllUserChains(userAddress),
     ]);
-    const filteredChains = [...publicChains, ...userChains]
-      .filter((chain) =>
-        search ? chain.name.toLowerCase().includes(search.toLowerCase()) : true
-      )
-      .filter((chain) =>
-        CustomChainService.filterChain(chain as CustomChain, filter)
-      )
-      .filter((chain) => chain.chainType !== "L1");
 
-    return filteredChains;
+    return [...publicChains, ...userChains].filter((chain) =>
+      CustomChainService.filterChain(
+        chain as CustomChain,
+        filter,
+        search,
+        testnetFilter
+      )
+    );
   };
 
   static getAllChains = async () => {

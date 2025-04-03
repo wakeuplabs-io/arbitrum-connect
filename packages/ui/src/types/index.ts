@@ -55,3 +55,5 @@ export type CustomChainPayload = {
   user: Address;
   chainType: ChainType | "L1";
 };
+
+export type NetworkFilter = "mainnet" | "testnet" | "all";
