@@ -34,7 +34,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <QueryClientProvider client={queryClient}>
             <RainbowKitProvider
               showRecentTransactions
-              coolMode
               theme={lightTheme({ borderRadius: "medium" })}
             >
               <Web3ClientProvider>
