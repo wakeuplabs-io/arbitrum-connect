@@ -10,15 +10,46 @@ export const Route = createFileRoute("/activity/")({
   component: ActivityScreen,
 });
 
+export const ActivityLoading = ({ count = 3 }: { count?: number }) => {
+  return (
+    <div className="w-full flex flex-col text-left justify-between items-center rounded-2xl animate-pulse">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={`activity-skeleton-${i}`}
+          className="w-full h-[90px] px-4 py-3 border-b border-neutral-200"
+        >
+          <div className="flex h-full items-center justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-neutral-200" />{" "}
+              {/* Avatar */}
+              <div className="flex flex-col gap-1">
+                <div className="w-24 h-4 rounded-md bg-neutral-200" />{" "}
+                {/* Name */}
+                <div className="w-16 h-3 rounded-md bg-neutral-200" />{" "}
+                {/* Desc */}
+              </div>
+            </div>
+
+            <div className="w-20 h-4 bg-neutral-200 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 function ActivityScreen() {
+  const [loading, setLoading] = useState(false);
   const { address } = useAccount();
   const [txHistory, setTxHistory] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    if (address)
-      TransactionsStorageService.getByAccount(address).then((x) =>
-        setTxHistory(x)
-      );
+    if (address) {
+      setLoading(true);
+      TransactionsStorageService.getByAccount(address)
+        .then((x) => setTxHistory(x))
+        .finally(() => setLoading(false));
+    }
   }, [address]);
 
   return (
@@ -28,17 +59,21 @@ function ActivityScreen() {
       </div>
       <div className="overflow-y-auto bg-neutral-50 h-[66vh]">
         <div className="join join-vertical flex flex-col text-left justify-between items-center border border-neutral-200 rounded-2xl">
-          {txHistory.map((x, i) => (
-            <div
-              className="collapse collapse-arrow join-item"
-              key={`collapsable-${i}`}
-            >
-              <TransactionStatusHeader tx={x} />
-              <div className="collapse-content">
-                <TransactionStatus tx={x} /* isActive={false} */ />
+          {loading ? (
+            <ActivityLoading count={3} />
+          ) : (
+            txHistory.map((x, i) => (
+              <div
+                className="collapse collapse-arrow join-item"
+                key={`collapsable-${i}`}
+              >
+                <TransactionStatusHeader tx={x} />
+                <div className="collapse-content">
+                  <TransactionStatus tx={x} />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
       <HomeButton className="mt-6" />
