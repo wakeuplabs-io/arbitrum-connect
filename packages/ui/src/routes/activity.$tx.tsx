@@ -58,8 +58,6 @@ function PostComponent() {
   const navigate = useNavigate();
   const { parentChain, childChain, isLoading } = useGetTransactionChains(tx);
 
-  //todo: de ejemplo esta url: https://staging-arbitrumconnect.wakeuplabs.link/activity/0x2964c4010b0c1971f6e1e2d02712334897352e35e5d043c52cef1c9b6dc4047d hacer redirect a /activity
-
   // Show skeleton while loading
   if (isLoading) {
     return <TransactionSkeleton />;

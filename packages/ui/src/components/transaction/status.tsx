@@ -14,7 +14,7 @@ import { AddToCalendarButton } from "../add-to-calendar";
 import { StatusStep } from "./status-step";
 import { LEARN_MORE_URI } from "@/constants";
 import { Countdown } from "./countdown";
-import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { useGetTransactionChains } from "@/hooks/queries/useGetTransactionChains";
 
 //TODO: refactor this code : make it more readable and clean
 
@@ -38,7 +38,7 @@ export function TransactionStatus(props: {
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useOnScreen(ref);
   const { publicParentClient, childProvider } = useWeb3ClientContext();
-  const { selectedParentChain, selectedChain } = useSelectedChain();
+  const { parentChain, childChain } = useGetTransactionChains(props.tx);
   const [triggered, setTriggered] = useState(false);
   const remainingHours = transaction.delayedInboxTimestamp
     ? calculateRemainingHours(transaction.delayedInboxTimestamp)
@@ -231,7 +231,7 @@ export function TransactionStatus(props: {
           done
           number={1}
           title="Initiate Withdraw"
-          description={`Your withdraw transaction in ${selectedChain.name}`}
+          description={`Your withdraw transaction in ${childChain?.name}`}
           className="pt-2 md:flex md:space-x-4 mb-4"
         >
           <a
@@ -240,7 +240,7 @@ export function TransactionStatus(props: {
             className="link text-sm flex space-x-1 items-center"
             rel="noreferrer"
           >
-            <span>{selectedChain.name} tx </span>
+            <span>{childChain?.name} tx </span>
             <ArrowUpRight className="h-3 w-3" />
           </a>
         </StatusStep>
@@ -254,7 +254,7 @@ export function TransactionStatus(props: {
           }
           number={2}
           title="Confirm Withdraw"
-          description={`Send the ${selectedChain.name} withdraw transaction through the delayed inbox`}
+          description={`Send the ${childChain?.name} withdraw transaction through the delayed inbox`}
           className="pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 flex items-start flex-col md:flex-row md:items-center"
         >
           {!transaction.delayedInboxHash &&
@@ -277,7 +277,7 @@ export function TransactionStatus(props: {
               className="link text-sm flex space-x-1 items-center "
               rel="noreferrer"
             >
-              <span>{selectedParentChain.name} delayed inbox tx </span>
+              <span>{parentChain?.name} delayed inbox tx </span>
               <ArrowUpRight className="h-3 w-3" />
             </a>
           )}
@@ -288,7 +288,7 @@ export function TransactionStatus(props: {
           running={forceStepRunning}
           number={3}
           title="Force transaction"
-          description={`If after 24 hours your ${selectedChain.name} transaction hasn't been mined, you can push it forward manually with some extra fee in ${selectedParentChain.name}`}
+          description={`If after 24 hours your ${childChain?.name} transaction hasn't been mined, you can push it forward manually with some extra fee in ${parentChain?.name}`}
           className="flex flex-col items-start pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 md:flex-row md:items-center"
         >
           {canForceInclude && (
@@ -326,8 +326,8 @@ export function TransactionStatus(props: {
           }
           number={4}
           className="flex flex-col items-start pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 md:flex-row md:items-center"
-          title={`Claim funds on ${selectedParentChain.name}`}
-          description={`After your transaction has been validated, you can track its status. Once the 7-day canonical bridge period on ${selectedParentChain.name} has elapsed, you will be able to claim your funds here.`}
+          title={`Claim funds on ${parentChain?.name}`}
+          description={`After your transaction has been validated, you can track its status. Once the 7-day canonical bridge period on ${parentChain?.name} has elapsed, you will be able to claim your funds here.`}
           lastStep
         >
           {claimTimeRemainingActive && (
