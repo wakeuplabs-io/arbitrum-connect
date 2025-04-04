@@ -1,6 +1,5 @@
 import { CustomChain } from "@/types";
-import { Trash2Icon, Star } from "lucide-react";
-import PencilIcon from "../../assets/pencil-icon.svg";
+import { Trash2Icon, Star, PencilIcon } from "lucide-react";
 import ChainAvatar from "../chain-avatar";
 
 interface IListItemProps {
@@ -30,8 +29,7 @@ export const ListItem = ({
       <div className="flex gap-4 items-center z-10">
         {chain.isCustom && (
           <>
-            <img
-              src={PencilIcon}
+            <PencilIcon
               onClick={() => onEditClick(chain)}
               className="w-[18px] fill-[#E4E4E7] group-hover:fill-gray-dark"
             />
