@@ -27,7 +27,9 @@ export const ChainSelector = () => {
 
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
-  const [testnetFilter, setTestnetFilter] = useState<NetworkFilter>(TESTNET_FILTER.ALL);
+  const [testnetFilter, setTestnetFilter] = useState<NetworkFilter>(
+    TESTNET_FILTER.ALL
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { openModal } = useModal();

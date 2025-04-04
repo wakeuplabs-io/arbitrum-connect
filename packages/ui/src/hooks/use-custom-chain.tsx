@@ -58,11 +58,16 @@ export function useCustomChain() {
     testnetFilter?: NetworkFilter
   ) => {
     setLoading(true);
-  
+
     const allChains = await CustomChainService.getAllChains();
-  
+
     const filteredChains = allChains.filter((chain) =>
-      CustomChainService.filterChain(chain as CustomChain, filter, search, testnetFilter)
+      CustomChainService.filterChain(
+        chain as CustomChain,
+        filter,
+        search,
+        testnetFilter
+      )
     );
     setPublicChains(filteredChains as CustomChain[]);
     setLoading(false);
