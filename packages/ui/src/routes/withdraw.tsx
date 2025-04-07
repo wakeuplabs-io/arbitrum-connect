@@ -1,4 +1,3 @@
-import EthIcon from "@/assets/ethereum-icon.svg";
 import { LEARN_MORE_URI } from "@/constants";
 import { useAlertContext } from "@/contexts/alert/alert-context";
 import { useWeb3ClientContext } from "@/contexts/web3-client-context";
@@ -48,8 +47,7 @@ function WithdrawScreen() {
   const { parentProvider, childProvider } = useWeb3ClientContext();
   const { amount: amountInWei } = Route.useSearch();
   const { ethPrice } = useEthPrice();
-
-  const { selectedParentChain, selectedChain } = useSelectedChain();
+  const { selectedChain, selectedParentChain } = useSelectedChain();
 
   const [approvedAproxFees, setApprovedAproxFees] = useState<boolean>(false);
   const [approvedSequencerMaySpeedUp, setApprovedSequencerMaySpeedUp] =
@@ -133,13 +131,15 @@ function WithdrawScreen() {
       {/* amount */}
       <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-2xl md:p-6 p-4">
         <div className="flex items-center gap-3">
-          <img src={EthIcon} alt="ethereum icon" />
+          <img src={selectedChain.logoURI} alt={selectedChain.name} />
           <div className="flex items-end space-x-2">
             <div
               data-test-id="withdraw-amount"
               className="text-2xl md:text-4xl font-bold"
             >{`${formatEther(amountInWei).slice(0, 15)}`}</div>
-            <div className="ml-0.5 font-bold">ETH</div>
+            <div className="ml-0.5 font-bold">
+              {selectedChain.nativeCurrency.symbol}
+            </div>
           </div>
         </div>
         <div className="text-neutral-400">~ ${amountUSD} USD</div>
@@ -175,7 +175,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(withdrawPrice)?.slice(0, 10) ?? "-"} ETH
+                  {formatEther(withdrawPrice)?.slice(0, 10) ?? "-"}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${withdrawUSD}
                   </span>
@@ -200,7 +201,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(confirmPrice)?.slice(0, 10) ?? "-"} ETH
+                  {formatEther(confirmPrice)?.slice(0, 10) ?? "-"}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${confirmUSD}
                   </span>
@@ -225,7 +227,7 @@ function WithdrawScreen() {
             <span className="text-xs">4</span>
           </div>
           <div className="flex flex-col md:flex-row md:justify-between w-full">
-            <p className="text-left">Claim funds on Ethereum</p>
+            <p className="text-left">{`Claim funds on ${selectedParentChain.name}`}</p>
 
             <div className="flex items-center flex-row just gap-3">
               {claimPriceFetching ? (
@@ -236,7 +238,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(claimPrice)?.slice(0, 10)} ETH
+                  {formatEther(claimPrice)?.slice(0, 10)}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${claimUSD}
                   </span>
@@ -258,8 +261,8 @@ function WithdrawScreen() {
             onChange={() => setApprovedTime((v) => !v)}
           />
           <label className="text-sm">
-            I understand the entire process will take approximately 24 hours
-            before I can claim my funds on Ethereum.
+            {`I understand the entire process will take approximately 24 hours
+            before I can claim my funds on ${selectedParentChain.name}.`}
           </label>
         </div>
         <div className="flex gap-4 md:gap-6">
