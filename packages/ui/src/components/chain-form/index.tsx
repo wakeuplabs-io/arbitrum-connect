@@ -151,9 +151,32 @@ export const ChainForm = ({
 
   return (
     <section className="max-w-xl mx-auto">
-      <h1 className="text-2xl text-black text-left">
-        {editing ? "Edit" : "Add"} Chain
-      </h1>
+      <div className="flex flex-col items-start mb-4">
+        <button
+          onClick={() => navigate({ to: "/" })}
+          className="text-sm text-neutral-500 hover:text-neutral-700 flex items-center gap-1 mr-4 mb-2"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 12L6 8L10 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          Back
+        </button>
+        <h1 className="text-2xl text-black text-left">
+          {editing ? "Edit" : "Add"} Chain
+        </h1>
+      </div>
       {!address && (
         <Button
           id="continue-btn"

@@ -39,11 +39,13 @@ export const ListItem = ({
             />
           </>
         )}
-        <Star
-          className="w-[18px] hover:animate-pulse"
-          color={chain.featured ? "#c2be05" : "#E4E4E7"}
-          fill={chain.featured ? "#ddd906" : "#E4E4E7"}
-        />
+        {chain.featured && (
+          <Star
+            className="w-[18px] hover:animate-pulse"
+            color={chain.featured ? "#c2be05" : "#E4E4E7"}
+            fill={chain.featured ? "#ddd906" : "#E4E4E7"}
+          />
+        )}
       </div>
     </ul>
   );
