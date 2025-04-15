@@ -9,11 +9,11 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(uuid()) @db.Uuid
-  address     String        @unique
+  id           String              @id @default(uuid()) @db.Uuid
+  address      String              @unique
   transactions Transaction[]
-  chains      Chain[]       // Custom chains created by user
-  favorites   UserFavoriteChain[]
+  chains       Chain[] // Custom chains created by user
+  favorites    UserFavoriteChain[]
 
   @@map("users")
 }
@@ -30,55 +30,54 @@ model Transaction {
   user                  User     @relation(fields: [userAddress], references: [address])
   createdAt             DateTime @default(now())
   delayedInboxHash      String?
-  delayedInboxTimestamp BigInt?    
+  delayedInboxTimestamp BigInt?
 
   @@map("transactions")
 }
 
 model Chain {
-  id                Int      @id @default(autoincrement())
-  name              String
-  chainId           String      @unique
-  parentChainId     Int?
-  
-  // Structured data as JSON
-  nativeCurrency    Json?    
-  rpcUrls          Json?    
-  blockExplorers   Json?    
-  contracts        Json?    
-  ethBridge        Json?    
-  explorer         Json?    
-  
-  // Basic fields
-  isTestnet         Boolean  @default(false)
-  testnet          Boolean? @default(false)
-  isCustom          Boolean  @default(false)
-  chainType         String   
-  featured          Boolean  @default(false)
-  logoURI           String?
-  confirmPeriodBlocks Int?
-  
-  // User relation (only for custom chains)
-  userAddress      String?
-  user             User?    @relation(fields: [userAddress], references: [address])
-  userFavorites    UserFavoriteChain[]
+  id            Int    @id @default(autoincrement())
+  name          String
+  chainId       String
+  parentChainId Int?
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  // Structured data as JSON
+  nativeCurrency Json?
+  rpcUrls        Json?
+  blockExplorers Json?
+  contracts      Json?
+  ethBridge      Json?
+  explorer       Json?
+
+  // Basic fields
+  isTestnet           Boolean  @default(false)
+  testnet             Boolean? @default(false)
+  isCustom            Boolean  @default(false)
+  chainType           String
+  featured            Boolean  @default(false)
+  logoURI             String?
+  confirmPeriodBlocks Int?
+
+  // User relation (only for custom chains)
+  userAddress   String?
+  user          User?               @relation(fields: [userAddress], references: [address])
+  userFavorites UserFavoriteChain[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([chainId, userAddress])
   @@map("chains")
 }
 
 model UserFavoriteChain {
-  id        String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid()) @db.Uuid
   userAddress String
-  chainId   Int
-  user      User     @relation(fields: [userAddress], references: [address])
-  chain     Chain    @relation(fields: [chainId], references: [id])
-  createdAt DateTime @default(now())
+  chainId     Int
+  user        User     @relation(fields: [userAddress], references: [address])
+  chain       Chain    @relation(fields: [chainId], references: [id])
+  createdAt   DateTime @default(now())
 
   @@unique([userAddress, chainId])
   @@map("user_favorite_chains")
 }
-
