@@ -75,24 +75,42 @@ export const updateChain: AppRouteHandler<UpdateChainRoute> = async (c) => {
   return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
 };
 
-export const setFeaturedChain: AppRouteHandler<SetFeaturedChainRoute> = async (
-  c
-) => {
-  const { chainId, featured } = c.req.valid("json");
-  const updatedChain = await prisma.chain.update({
-    where: { chainId },
-    data: { featured },
-  });
+export const setFeaturedChain: AppRouteHandler<SetFeaturedChainRoute> = async (c) => {
+  const { chainId, featured, userAddress } = c.req.valid("json");
 
-  return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
+  try {
+    const updatedChain = await prisma.chain.update({
+      where: {
+        chainId_userAddress: {
+          chainId,
+          userAddress,
+        },
+      },
+      data: { featured },
+    });
+
+    return c.json(ChainSchema.parse(updatedChain), HttpStatusCodes.OK);
+  } catch (error) {
+    return c.json({ message: "Chain not found" }, HttpStatusCodes.NOT_FOUND);
+  }
 };
 
 export const deleteChain: AppRouteHandler<DeleteChainRoute> = async (c) => {
-  const { chainId } = c.req.valid("param");
-  await prisma.chain.delete({
-    where: {
-      chainId,
-    },
-  });
-  return c.json({ message: "Chain deleted" }, HttpStatusCodes.OK);
+  const { chainId, userAddress } = await c.req.valid("json");
+
+  try {
+    await prisma.chain.delete({
+      where: {
+        chainId_userAddress: {
+          chainId,
+          userAddress,
+        },
+      },
+    });
+
+    return c.json({ message: "Chain deleted" }, HttpStatusCodes.OK);
+  } catch (error) {
+    return c.json({ message: "Chain not found" }, HttpStatusCodes.NOT_FOUND);
+  }
 };
+

@@ -172,9 +172,12 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    delete: async (chainId: number) => {
-      const res = await client.api.chains.chains.delete[":chainId"].$delete({
-        param: { chainId: chainId.toString() },
+    delete: async (userAddress: Address, chainId: number) => {
+      const res = await client.api.chains.chains.delete.$delete({
+        json: {
+          chainId: chainId.toString(),
+          userAddress,
+        },
       });
 
       if (!res.ok) {
@@ -182,7 +185,6 @@ export const api = {
       }
 
       const data = await res.json();
-
       return data;
     },
   },
