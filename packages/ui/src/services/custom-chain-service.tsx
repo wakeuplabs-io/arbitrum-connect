@@ -57,7 +57,7 @@ export default class CustomChainService {
   };
 
   static deleteChain = async (userAddress: Address, chainId: number) => {
-    await api.chains.delete(chainId);
+    await api.chains.delete(userAddress, chainId);
 
     return await Promise.all([
       api.chains.getAllUserChains(userAddress),

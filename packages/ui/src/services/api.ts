@@ -172,19 +172,21 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    delete: async (chainId: number) => {
-      const res = await client.api.chains.chains.delete[":chainId"].$delete({
-        param: { chainId: chainId.toString() },
+    delete: async (userAddress: Address, chainId: number) => {
+      const res = await client.api.chains.chains.delete.$delete({
+        json: {
+          chainId: chainId.toString(),
+          userAddress,
+        },
       });
-
+    
       if (!res.ok) {
         throw new Error("Failed to delete chain");
       }
-
+    
       const data = await res.json();
-
       return data;
-    },
+    }
   },
   transactions: {
     getByAccount: async (account: string): Promise<Transaction[]> => {

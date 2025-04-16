@@ -115,24 +115,31 @@ export const setFeaturedChain = createRoute({
 });
 
 export const deleteChain = createRoute({
-  path: "/chains/delete/:chainId",
+  path: "/chains/delete",
   method: "delete",
   request: {
-    params: z.object({
-      chainId: z.string(),
-    }),
+    body: jsonContentRequired(
+      z.object({
+        chainId: z.string(),
+        userAddress: z.string(),
+      }),
+      "Request body to identify which chain to delete"
+    ),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(
-      z.object({
-        message: z.string(),
-      }),
+      z.object({ message: z.string() }),
       "The deleted chain"
     ),
-    [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Chain not found"),
+    [HttpStatusCodes.NOT_FOUND]: jsonContent(
+      notFoundSchema,
+      "Chain not found"
+    ),
   },
 });
+
+
 
 export type GetAllPublicChainsRoute = typeof getAllPublicChains;
 export type GetAllUserChainsRoute = typeof getAllUserChains;
