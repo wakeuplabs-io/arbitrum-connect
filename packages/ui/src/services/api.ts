@@ -179,14 +179,14 @@ export const api = {
           userAddress,
         },
       });
-    
+
       if (!res.ok) {
         throw new Error("Failed to delete chain");
       }
-    
+
       const data = await res.json();
       return data;
-    }
+    },
   },
   transactions: {
     getByAccount: async (account: string): Promise<Transaction[]> => {
