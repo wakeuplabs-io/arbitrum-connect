@@ -111,6 +111,7 @@ export const api = {
       return {
         ...data,
         chainId: parseInt(data.chainId),
+        tokenBridge: data.tokenBridge
       };
     },
     create: async (chain: CustomChain) => {
@@ -120,6 +121,7 @@ export const api = {
           userAddress: chain.user as string,
           logoURI: chain.logoURI ?? null,
           chainId: chain.chainId.toString(),
+          tokenBridge: chain.tokenBridge,
         },
       });
 
@@ -138,6 +140,7 @@ export const api = {
           userAddress: chain.user as string,
           chainId: chain.chainId.toString(),
           logoURI: chain.logoURI ?? null,
+          tokenBridge: chain.tokenBridge
         },
       });
 

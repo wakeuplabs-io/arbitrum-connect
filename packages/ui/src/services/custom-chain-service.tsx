@@ -37,6 +37,7 @@ export default class CustomChainService {
       isCustom: true,
       confirmPeriodBlocks: 0,
       chainType: data.chainType,
+      tokenBridge: data.tokenBridge,
     };
   }
 
