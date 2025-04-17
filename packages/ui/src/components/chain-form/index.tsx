@@ -20,6 +20,24 @@ import CustomChainService from "@/services/custom-chain-service";
 import { useEffect } from "react";
 import { Checkbox } from "../checkbox";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { TokenBridge } from "@arbitrum/sdk/dist/lib/dataEntities/networks";
+
+const tokenBridgeObjectSchema: z.ZodType<TokenBridge> = z.object({
+  parentGatewayRouter: z.string(),
+  childGatewayRouter: z.string(),
+  parentErc20Gateway: z.string(),
+  childErc20Gateway: z.string(),
+  parentCustomGateway: z.string(),
+  childCustomGateway: z.string(),
+  parentWethGateway: z.string(),
+  childWethGateway: z.string(),
+  parentWeth: z.string(),
+  childWeth: z.string(),
+  parentProxyAdmin: z.string(),
+  childProxyAdmin: z.string(),
+  parentMultiCall: z.string(),
+  childMultiCall: z.string(),
+});
 
 const schema = z.object({
   chainId: z.preprocess((val) => Number(val), z.number().min(1)),
@@ -32,6 +50,30 @@ const schema = z.object({
   outbox: requiredAddress,
   rollup: requiredAddress,
 
+  tokenBridge: z
+    .string()
+    .min(2, { message: "Token bridge config is required" })
+    .transform((val, ctx) => {
+      try {
+        const parsed = JSON.parse(val);
+        const result = tokenBridgeObjectSchema.safeParse(parsed);
+        if (!result.success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Invalid tokenBridge structure",
+          });
+          return z.NEVER;
+        }
+        return result.data;
+      } catch {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON format",
+        });
+        return z.NEVER;
+      }
+    }),
+
   // Separated NetworkConfig fields
   nativeCurrencyName: z.string().min(1, { message: "Required" }),
   nativeCurrencySymbol: z.string().min(1, { message: "Required" }),
@@ -39,6 +81,7 @@ const schema = z.object({
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
   localRpcUrl: z.string().url().min(1),
+
   logoURI: z
     .string()
     .refine(
@@ -53,9 +96,11 @@ const schema = z.object({
       { message: "Must be a URL or a path starting with /" }
     )
     .optional(),
+
   chainType: z.nativeEnum(ChainType, {
     required_error: "Chain type is required",
   }),
+
   isTestnet: z.boolean(),
 });
 
@@ -78,7 +123,7 @@ export const ChainForm = ({
     control,
     setError,
     clearErrors,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(schema),
     values: {
@@ -89,17 +134,21 @@ export const ChainForm = ({
       sequencerInbox: chain?.ethBridge?.sequencerInbox,
       outbox: chain?.ethBridge?.outbox,
       rollup: chain?.ethBridge?.rollup,
-      explorerUrl: chain?.explorer.default.url,
-      nativeCurrencyName: chain?.nativeCurrency.name,
-      nativeCurrencySymbol: chain?.nativeCurrency.symbol,
-      nativeCurrencyDecimals: chain?.nativeCurrency.decimals,
-      publicRpcUrl: chain?.rpcUrls.default.http[0],
-      localRpcUrl: chain?.rpcUrls.default.http[0],
+      explorerUrl: chain?.explorer?.default?.url,
+      nativeCurrencyName: chain?.nativeCurrency?.name,
+      nativeCurrencySymbol: chain?.nativeCurrency?.symbol,
+      nativeCurrencyDecimals: chain?.nativeCurrency?.decimals,
+      publicRpcUrl: chain?.rpcUrls?.default?.http?.[0],
+      localRpcUrl: chain?.rpcUrls?.default?.http?.[0],
       logoURI: chain?.logoURI,
       chainType: chain?.chainType,
       isTestnet: chain?.isTestnet,
+      tokenBridge: chain?.tokenBridge
+        ? JSON.stringify(chain.tokenBridge, null, 2)
+        : "",
     },
   });
+
   const chainId = useWatch({ control, name: "chainId" });
 
   const onSubmit = async (data: any) => {
@@ -114,11 +163,13 @@ export const ChainForm = ({
         : customMainnet.chainId;
 
     if (!parentChainId) throw new Error("invalid chainType");
+
     const payload: CustomChainPayload = {
       ...data,
       user: address,
       parentChainId,
     };
+
     if (address) {
       if (editing) setSelectedChain(await editChain(payload));
       else setSelectedChain(await createChain(payload));
@@ -130,23 +181,25 @@ export const ChainForm = ({
   useEffect(() => {
     if (!chainId || editing) return;
 
-    const validateChainId = async () => {
-      const chainExists = await CustomChainService.getChainById(
-        Number(chainId)
-      );
+    const timeout = setTimeout(() => {
+      const validateChainId = async () => {
+        const chainExists = await CustomChainService.getChainById(
+          Number(chainId)
+        );
 
-      if (!chainExists) {
-        // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms
-        setError("chainId", {
-          type: "manual",
-          message: "Chain already exists",
-        });
-      } else {
-        clearErrors("chainId");
-      }
-    };
+        if (chainExists) {
+          setError("chainId", {
+            type: "manual",
+            message: "Chain already exists",
+          });
+        } else {
+          clearErrors("chainId");
+        }
+      };
 
-    validateChainId();
+      validateChainId();
+    }, 400);
+    return () => clearTimeout(timeout);
   }, [chainId, address, editing, setError, clearErrors]);
 
   return (
@@ -156,13 +209,7 @@ export const ChainForm = ({
           onClick={() => navigate({ to: "/" })}
           className="text-sm text-neutral-500 hover:text-neutral-700 flex items-center gap-1 mr-4 mb-2"
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
             <path
               d="M10 12L6 8L10 4"
               stroke="currentColor"
@@ -177,6 +224,7 @@ export const ChainForm = ({
           {editing ? "Edit" : "Add"} Chain
         </h1>
       </div>
+
       {!address && (
         <Button
           id="continue-btn"
@@ -192,6 +240,7 @@ export const ChainForm = ({
           {address ? "Continue" : "Connect your wallet to get started"}
         </Button>
       )}
+
       {address && (
         <form
           className="mt-8 w-full flex flex-col gap-4"
@@ -345,11 +394,57 @@ export const ChainForm = ({
                 register={register}
               />
             </div>
+            <div className="mb-6 flex flex-col sm:flex-row w-full gap-4">
+              <div className="w-full">
+                <label
+                  htmlFor="tokenBridge"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Token Bridge (JSON)
+                </label>
+                <textarea
+                  id="tokenBridge"
+                  {...register("tokenBridge")}
+                  className="w-full rounded-md border border-gray-300 p-2 text-sm font-mono min-h-52 resize-y box-border mt-2"
+                />
+                {errors.tokenBridge && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.tokenBridge.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="w-full max-w-sm flex flex-col gap-2 h-full">
+                <p className="text-sm text-gray-600">
+                  Below is the expected structure.
+                  <br />
+                  All fields are required.
+                </p>
+                <div className="rounded-lg bg-neutral-900 text-white text-xs max-h-52 overflow-y-auto p-3">
+                  <pre className="whitespace-pre-wrap leading-relaxed text-left">
+                    {`{
+  "parentCustomGateway": string,
+  "parentErc20Gateway": string,
+  "parentGatewayRouter": string,
+  "parentMultiCall": string,
+  "parentProxyAdmin": string,
+  "parentWeth": string,
+  "parentWethGateway": string,
+  "childCustomGateway": string,
+  "childErc20Gateway": string,
+  "childGatewayRouter": string,
+  "childMultiCall": string,
+  "childProxyAdmin": string,
+  "childWeth": string,
+  "childWethGateway": string
+}`}
+                  </pre>
+                </div>
+              </div>
+            </div>
           </div>
-          <Button
-            type="submit"
-            disabled={isSubmitting || !!errors.chainId || !isValid}
-          >
+
+          <Button type="submit" disabled={isSubmitting || !!errors.chainId}>
             {isSubmitting ? "Submitting..." : "Submit"}
           </Button>
         </form>

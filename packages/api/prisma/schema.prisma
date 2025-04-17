@@ -1,5 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
+  provider = "prisma-client-js"
   binaryTargets = ["rhel-openssl-3.0.x", "debian-openssl-3.0.x"]
 }
 
@@ -11,8 +11,8 @@ datasource db {
 model User {
   id           String              @id @default(uuid()) @db.Uuid
   address      String              @unique
+  chains       Chain[]
   transactions Transaction[]
-  chains       Chain[] // Custom chains created by user
   favorites    UserFavoriteChain[]
 
   @@map("users")
@@ -26,45 +26,39 @@ model Transaction {
   parentChainId         Int
   childChainId          Int
   account               String?
-  userAddress           String
-  user                  User     @relation(fields: [userAddress], references: [address])
   createdAt             DateTime @default(now())
   delayedInboxHash      String?
+  userAddress           String
   delayedInboxTimestamp BigInt?
+  user                  User     @relation(fields: [userAddress], references: [address])
 
   @@map("transactions")
 }
 
 model Chain {
-  id            Int    @id @default(autoincrement())
-  name          String
-  chainId       String
-  parentChainId Int?
-
-  // Structured data as JSON
-  nativeCurrency Json?
-  rpcUrls        Json?
-  blockExplorers Json?
-  contracts      Json?
-  ethBridge      Json?
-  explorer       Json?
-
-  // Basic fields
-  isTestnet           Boolean  @default(false)
-  testnet             Boolean? @default(false)
-  isCustom            Boolean  @default(false)
+  name                String
+  chainId             String
+  parentChainId       Int?
+  isTestnet           Boolean             @default(false)
+  isCustom            Boolean             @default(false)
   chainType           String
-  featured            Boolean  @default(false)
+  featured            Boolean             @default(false)
   logoURI             String?
   confirmPeriodBlocks Int?
-
-  // User relation (only for custom chains)
-  userAddress   String?
-  user          User?               @relation(fields: [userAddress], references: [address])
-  userFavorites UserFavoriteChain[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  blockExplorers      Json?
+  contracts           Json?
+  ethBridge           Json?
+  explorer            Json?
+  nativeCurrency      Json?
+  rpcUrls             Json?
+  testnet             Boolean?            @default(false)
+  userAddress         String?
+  id                  Int                 @id @default(autoincrement())
+  user                User?               @relation(fields: [userAddress], references: [address])
+  userFavorites       UserFavoriteChain[]
+  tokenBridge         Json?
 
   @@unique([chainId, userAddress])
   @@map("chains")
@@ -72,11 +66,11 @@ model Chain {
 
 model UserFavoriteChain {
   id          String   @id @default(uuid()) @db.Uuid
+  createdAt   DateTime @default(now())
   userAddress String
   chainId     Int
-  user        User     @relation(fields: [userAddress], references: [address])
   chain       Chain    @relation(fields: [chainId], references: [id])
-  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userAddress], references: [address])
 
   @@unique([userAddress, chainId])
   @@map("user_favorite_chains")

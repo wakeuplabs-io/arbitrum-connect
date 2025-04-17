@@ -59,6 +59,23 @@ export const ExplorerSchema = z
   })
   .nullable();
 
+const TokenBridgeSchema = z.object({
+  parentGatewayRouter: z.string(),
+  childGatewayRouter: z.string(),
+  parentErc20Gateway: z.string(),
+  childErc20Gateway: z.string(),
+  parentCustomGateway: z.string(),
+  childCustomGateway: z.string(),
+  parentWethGateway: z.string(),
+  childWethGateway: z.string(),
+  parentWeth: z.string(),
+  childWeth: z.string(),
+  parentProxyAdmin: z.string(),
+  childProxyAdmin: z.string(),
+  parentMultiCall: z.string(),
+  childMultiCall: z.string(),
+});
+
 export const ChainSchema = z.object({
   id: z.number().int(),
   name: z.string(),
@@ -72,6 +89,7 @@ export const ChainSchema = z.object({
   contracts: ContractsSchema.optional().nullish(),
   ethBridge: EthBridgeSchema.optional().nullish(),
   explorer: ExplorerSchema.optional().nullish(),
+  tokenBridge: TokenBridgeSchema.nullable().optional(),
 
   // Basic fields
   isTestnet: z.boolean().default(false),
@@ -115,6 +133,7 @@ export const CreateChainSchema = ChainSchema.omit({
   contracts: data.contracts || null || undefined,
   ethBridge: data.ethBridge || null || undefined,
   explorer: data.explorer || null || undefined,
+  tokenBridge: data.tokenBridge || null || undefined,
 }));
 
 export const UpdateChainSchema = ChainSchema.omit({
@@ -129,6 +148,7 @@ export const UpdateChainSchema = ChainSchema.omit({
   contracts: data.contracts || null || undefined,
   ethBridge: data.ethBridge || null || undefined,
   explorer: data.explorer || null || undefined,
+  tokenBridge: data.tokenBridge || null || undefined,
 }));
 
 export type Chain = z.infer<typeof ChainSchema>;

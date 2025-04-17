@@ -1,4 +1,5 @@
 import { ArbitrumNetwork } from "@arbitrum/sdk";
+import { TokenBridge } from "@arbitrum/sdk/dist/lib/dataEntities/networks";
 import { Address } from "viem";
 
 type NativeCurrency = {
@@ -54,6 +55,7 @@ export type CustomChainPayload = {
   logoURI: string;
   user: Address;
   chainType: ChainType | "L1";
+  tokenBridge: TokenBridge;
 };
 
 export type NetworkFilter = "mainnet" | "testnet" | "all";
