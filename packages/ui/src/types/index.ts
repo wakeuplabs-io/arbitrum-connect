@@ -27,15 +27,10 @@ type NetworkConfig = {
   logoURI?: string;
   user?: Address;
   featured?: boolean;
-  chainType: ChainType | "L1";
+  isOrbit: boolean;
 };
 
 export type CustomChain = ArbitrumNetwork & NetworkConfig;
-
-export enum ChainType {
-  L2 = "L2",
-  L3 = "L3",
-}
 
 export type CustomChainPayload = {
   isTestnet: boolean;
@@ -54,7 +49,6 @@ export type CustomChainPayload = {
   publicRpcUrl: string;
   logoURI: string;
   user: Address;
-  chainType: ChainType | "L1";
   tokenBridge: TokenBridge;
 };
 
