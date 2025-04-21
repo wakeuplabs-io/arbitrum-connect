@@ -21,6 +21,9 @@ export const Route = createFileRoute("/chains/$id/edit/")({
   loader: async ({ params }) => {
     const { id } = params;
     const chain = await CustomChainService.getChainById(Number(id));
+
+    if (!chain.isCustom) throw new Error("Chain is not custom");
+
     return { chain };
   },
   component: EditChain,

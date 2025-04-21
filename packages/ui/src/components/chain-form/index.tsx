@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Input } from "../input";
 import { requiredAddress } from "@/lib/validations";
-import { ChainType, CustomChainPayload, CustomChain } from "@/types";
+import { CustomChainPayload, CustomChain } from "@/types";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useCustomChain } from "@/hooks/use-custom-chain";
@@ -9,13 +9,6 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useNavigate } from "@tanstack/react-router";
 import Button from "../button";
-import {
-  customSepolia,
-  customArbitrumSepolia,
-  customArbitrum,
-  customMainnet,
-} from "@/lib/wagmi-config";
-import { EnumSelect } from "../enum-select";
 import CustomChainService from "@/services/custom-chain-service";
 import { useEffect } from "react";
 import { Checkbox } from "../checkbox";
@@ -96,12 +89,8 @@ const schema = z.object({
       { message: "Must be a URL or a path starting with /" }
     )
     .optional(),
-
-  chainType: z.nativeEnum(ChainType, {
-    required_error: "Chain type is required",
-  }),
-
   isTestnet: z.boolean(),
+  parentChainId: z.preprocess((val) => Number(val), z.number().min(1)),
 });
 
 export const ChainForm = ({
@@ -141,33 +130,20 @@ export const ChainForm = ({
       publicRpcUrl: chain?.rpcUrls?.default?.http?.[0],
       localRpcUrl: chain?.rpcUrls?.default?.http?.[0],
       logoURI: chain?.logoURI,
-      chainType: chain?.chainType,
       isTestnet: chain?.isTestnet,
       tokenBridge: chain?.tokenBridge
         ? JSON.stringify(chain.tokenBridge, null, 2)
         : "",
+      parentChainId: chain?.parentChainId,
     },
   });
 
   const chainId = useWatch({ control, name: "chainId" });
 
   const onSubmit = async (data: any) => {
-    let parentChainId;
-    if (data.chainType === ChainType.L3)
-      parentChainId = data.isTestnet
-        ? customArbitrumSepolia.chainId
-        : customArbitrum.chainId;
-    if (data.chainType === ChainType.L2)
-      parentChainId = data.isTestnet
-        ? customSepolia.chainId
-        : customMainnet.chainId;
-
-    if (!parentChainId) throw new Error("invalid chainType");
-
     const payload: CustomChainPayload = {
       ...data,
       user: address,
-      parentChainId,
     };
 
     if (address) {
@@ -183,9 +159,15 @@ export const ChainForm = ({
 
     const timeout = setTimeout(() => {
       const validateChainId = async () => {
-        const chainExists = await CustomChainService.getChainById(
-          Number(chainId)
-        );
+        let chainExists = false;
+        try {
+          chainExists = !!(await CustomChainService.getChainById(
+            Number(chainId)
+          ));
+        } catch (err) {
+          console.log("error: ", err);
+          // we catch it if no chain exist
+        }
 
         if (chainExists) {
           setError("chainId", {
@@ -387,11 +369,13 @@ export const ChainForm = ({
               />
             </div>
             <div className="mb-6">
-              <EnumSelect
-                name="chainType"
-                label="Chain Type"
-                enumValues={ChainType}
+              <Input
+                name="parentChainId"
+                label="Parent chain id"
+                placeholder="Parent chain id"
+                type="number"
                 register={register}
+                error={errors.name?.message}
               />
             </div>
             <div className="mb-6 flex flex-col sm:flex-row w-full gap-4">

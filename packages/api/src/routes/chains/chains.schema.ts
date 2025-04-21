@@ -95,7 +95,7 @@ export const ChainSchema = z.object({
   isTestnet: z.boolean().default(false),
   testnet: z.boolean().optional().nullish(),
   isCustom: z.boolean().default(false),
-  chainType: z.string(),
+  isOrbit: z.boolean().default(true),
   featured: z.boolean().default(false),
   logoURI: z
     .string()

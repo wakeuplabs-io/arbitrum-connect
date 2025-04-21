@@ -1,5 +1,5 @@
 import envParsed from "@/envParsed";
-import { ChainType, CustomChain } from "@/types";
+import { CustomChain } from "@/types";
 import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia, mainnet, sepolia } from "wagmi/chains";
 
@@ -10,6 +10,7 @@ export const customMainnet: CustomChain = {
   logoURI: new URL("@/assets/ethereum-icon.svg", import.meta.url).href,
   isTestnet: false,
   isCustom: false,
+  isOrbit: false,
   chainId: mainnet.id,
   parentChainId: 0,
   ethBridge: "0x" as any,
@@ -24,13 +25,13 @@ export const customMainnet: CustomChain = {
       url: mainnet.blockExplorers.default.url,
     },
   },
-  chainType: "L1",
 };
 export const customSepolia: CustomChain = {
   ...sepolia,
   logoURI: new URL("@/assets/ethereum-icon.svg", import.meta.url).href,
-  isTestnet: envParsed().IS_TESTNET,
+  isTestnet: true,
   isCustom: false,
+  isOrbit: true,
   chainId: sepolia.id,
   parentChainId: 0,
   ethBridge: "0x" as any,
@@ -44,8 +45,7 @@ export const customSepolia: CustomChain = {
     default: {
       http: ["https://ethereum-sepolia-rpc.publicnode.com"],
     },
-  },
-  chainType: "L1",
+  }
 };
 
 export const defaultCustomMainnet = envParsed().IS_TESTNET
@@ -56,8 +56,9 @@ const arbitrumNetwork = getArbitrumNetwork(arbitrum.id);
 export const customArbitrum: CustomChain = {
   ...arbitrum,
   logoURI: new URL("@/assets/arbitrum-icon.svg", import.meta.url).href,
-  isTestnet: envParsed().IS_TESTNET,
+  isTestnet: false,
   isCustom: false,
+  isOrbit: true,
   chainId: arbitrumNetwork.chainId,
   parentChainId: arbitrumNetwork.parentChainId,
   ethBridge: arbitrumNetwork.ethBridge,
@@ -71,15 +72,15 @@ export const customArbitrum: CustomChain = {
     default: {
       http: [arbitrum.rpcUrls.default.http[0]],
     },
-  },
-  chainType: ChainType.L2,
+  }
 };
 const arbitrumSepoliaNetwork = getArbitrumNetwork(arbitrumSepolia.id);
 export const customArbitrumSepolia: CustomChain = {
   ...arbitrumSepolia,
   logoURI: new URL("@/assets/arbitrum-icon.svg", import.meta.url).href,
-  isTestnet: envParsed().IS_TESTNET,
+  isTestnet: true,
   isCustom: false,
+  isOrbit: true,
   chainId: arbitrumSepoliaNetwork.chainId,
   parentChainId: arbitrumSepoliaNetwork.parentChainId,
   ethBridge: arbitrumSepoliaNetwork.ethBridge,
@@ -93,8 +94,7 @@ export const customArbitrumSepolia: CustomChain = {
     default: {
       http: [arbitrumSepolia.rpcUrls.default.http[0]],
     },
-  },
-  chainType: ChainType.L2,
+  }
 };
 
 export const defaultCustomChild = envParsed().IS_TESTNET

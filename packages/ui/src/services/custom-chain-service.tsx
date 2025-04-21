@@ -35,8 +35,8 @@ export default class CustomChainService {
       },
       logoURI: data.logoURI,
       isCustom: true,
+      isOrbit: true,
       confirmPeriodBlocks: 0,
-      chainType: data.chainType,
       tokenBridge: data.tokenBridge,
     };
   }
@@ -89,7 +89,7 @@ export default class CustomChainService {
       }
     })();
 
-    const isNotL1 = chain.chainType !== "L1";
+    const isOrbitChain = chain.isOrbit;
 
     const matchesNetwork =
       testnetFilter === TESTNET_FILTER.TESTNET
@@ -98,7 +98,7 @@ export default class CustomChainService {
           ? !chain.isTestnet
           : true;
 
-    return matchesSearch && matchesFilter && isNotL1 && matchesNetwork;
+    return matchesSearch && matchesFilter && isOrbitChain && matchesNetwork;
   }
 
   static getUserChains = async (

@@ -41,7 +41,7 @@ model Chain {
   parentChainId       Int?
   isTestnet           Boolean             @default(false)
   isCustom            Boolean             @default(false)
-  chainType           String
+  isOrbit             Boolean             @default(false)
   featured            Boolean             @default(false)
   logoURI             String?
   confirmPeriodBlocks Int?
