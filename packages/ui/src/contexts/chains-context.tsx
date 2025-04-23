@@ -7,6 +7,7 @@ import {
   registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
+import { FILTERS } from "@/constants";
 
 type ChainsContextType = {
   chains: CustomChain[];
@@ -23,16 +24,17 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const getAllChains = async () => {
       // All chains must be registered to wagmi & to the arb sdk
-      const allChains = await CustomChainService.getAllChains();
-
-      // So we de-duplicate since we use the same table for every user
-      const dedupedChains = allChains.filter(
-        (obj, index, self) =>
-          self.findIndex((o) => o.chainId === obj.chainId) === index
+      const lastAddress = localStorage.getItem("last-wallet-address");
+      const userChains = await CustomChainService.getUserChains(
+        (lastAddress ?? "0x") as `0x${string}`,
+        "",
+        FILTERS.ALL
       );
+
       const arbNetworks = getArbitrumNetworks();
-      dedupedChains
+      userChains
         .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
+        .filter((x) => x.isOrbit)
         .forEach((chain) => {
           if (
             chain.chainId !== arbitrumSepolia.id &&
@@ -48,7 +50,7 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
           }
         });
 
-      setChains(dedupedChains as unknown as CustomChain[]);
+      setChains(userChains as unknown as CustomChain[]);
     };
     getAllChains();
   }, []);
