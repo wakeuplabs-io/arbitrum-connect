@@ -1,6 +1,5 @@
 import { LEARN_MORE_URI } from "@/constants";
 import { useAlertContext } from "@/contexts/alert/alert-context";
-import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import { useEthPrice } from "@/hooks/use-eth-price";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import {
@@ -19,6 +18,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { useWeb3Client } from "@/contexts/web3-client-context";
 
 interface SearchParams {
   amount: string;
@@ -44,10 +44,11 @@ export const Route = createFileRoute("/withdraw")({
 function WithdrawScreen() {
   const navigate = useNavigate();
   const { address } = useAccount();
-  const { parentProvider, childProvider } = useWeb3ClientContext();
   const { amount: amountInWei } = Route.useSearch();
   const { ethPrice } = useEthPrice();
   const { selectedChain, selectedParentChain } = useSelectedChain();
+  const { provider: childProvider } = useWeb3Client(selectedChain);
+  const { provider: parentProvider } = useWeb3Client(selectedParentChain);
 
   const [approvedAproxFees, setApprovedAproxFees] = useState<boolean>(false);
   const [approvedSequencerMaySpeedUp, setApprovedSequencerMaySpeedUp] =
@@ -62,20 +63,23 @@ function WithdrawScreen() {
   const { setError } = useAlertContext();
   const { data: withdrawPrice, isFetching: withdrawPriceFetching } = useQuery({
     queryKey: ["withdrawPrice"],
-    queryFn: () => getMockedL2WithdrawPrice(childProvider),
+    queryFn: () => getMockedL2WithdrawPrice(childProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
   const { data: confirmPrice, isFetching: confirmPriceFetching } = useQuery({
     queryKey: ["confirmPrice"],
-    queryFn: () => getMockedSendL1MsgPrice(parentProvider),
+    queryFn: () => getMockedSendL1MsgPrice(parentProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
   const { data: claimPrice, isFetching: claimPriceFetching } = useQuery({
     queryKey: ["claimPrice"],
-    queryFn: () => getMockedL1ClaimTxGasLimit(parentProvider),
+    queryFn: () => getMockedL1ClaimTxGasLimit(parentProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
 

@@ -2,6 +2,7 @@ import HomeButton from "@/components/layout/home-button";
 import { TransactionStatusHeader } from "@/components/transaction/status-header";
 import { TransactionStatus } from "@/components/transaction/status-refactor";
 import { Transaction, TransactionsStorageService } from "@/lib/transactions";
+import { getArbitrumNetwork } from "@arbitrum/sdk";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
@@ -42,6 +43,38 @@ function ActivityScreen() {
   const [loading, setLoading] = useState(false);
   const { address } = useAccount();
   const [txHistory, setTxHistory] = useState<Transaction[]>([]);
+  const [statuses, setStatuses] = useState<Record<string, boolean>>({});
+
+  // Ensures arbitrum netork exists on Arbitrum SDK
+  useEffect(() => {
+    let cancelled = false;
+
+    function checkWithRetry(txId: string, chainId: number, attempt = 1) {
+      try {
+        getArbitrumNetwork(chainId); // throws if not registered
+        if (!cancelled) {
+          setStatuses((s) => ({ ...s, [txId]: true }));
+        }
+      } catch (err) {
+        console.error(`Tx ${txId} attempt ${attempt} failed`, err);
+        if (!cancelled) {
+          if (attempt < 5)
+            setTimeout(() => checkWithRetry(txId, chainId, attempt + 1), 1000);
+        }
+      }
+    }
+
+    txHistory.forEach((tx) => {
+      setStatuses((s) => ({ ...s, [tx.bridgeHash]: false }));
+      if (tx.childChainId != null) {
+        checkWithRetry(tx.bridgeHash, tx.childChainId);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [txHistory]);
 
   useEffect(() => {
     if (address) {
@@ -69,7 +102,7 @@ function ActivityScreen() {
               >
                 <TransactionStatusHeader tx={x} />
                 <div className="collapse-content">
-                  <TransactionStatus tx={x} />
+                  {statuses[x.bridgeHash] && <TransactionStatus tx={x} />}
                 </div>
               </div>
             ))

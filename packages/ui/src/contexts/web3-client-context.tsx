@@ -1,97 +1,49 @@
-import { useSelectedChain } from "@/hooks/use-selected-chain";
+// src/contexts/Web3ClientContext.tsx
+import React, { createContext, useContext, useRef } from "react";
+import { CustomChain } from "@/types";
+import { defineChain, createPublicClient, PublicClient, http } from "viem";
 import { ethers } from "ethers";
-import React, { createContext, useContext, useMemo } from "react";
-import { createPublicClient, defineChain, http, PublicClient } from "viem";
 
-type Web3ClientContextValue = {
-  publicParentClient: PublicClient;
-  publicChildClient: PublicClient;
-  parentProvider: ethers.providers.JsonRpcProvider;
-  childProvider: ethers.providers.JsonRpcProvider;
+type ClientPair = {
+  client: PublicClient;
+  provider: ethers.providers.JsonRpcProvider;
 };
 
-const Web3ClientContext = createContext<Web3ClientContextValue | undefined>(
-  undefined
-);
+type Web3ClientContextValue = {
+  getClient: (chain: CustomChain) => ClientPair;
+};
 
-interface Web3ClientProviderProps {
-  children: React.ReactNode;
-}
+const Web3ClientContext = createContext<Web3ClientContextValue | undefined>(undefined);
 
-export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
-  children,
-}) => {
-  const { selectedChain, selectedParentChain } = useSelectedChain();
-  const parentChainSelected = useMemo(
-    () =>
-      defineChain({
-        ...selectedParentChain,
-        id: selectedParentChain.chainId,
-      }),
-    [selectedParentChain]
-  );
+export function Web3ClientProvider({ children }: { children: React.ReactNode }) {
+  // cacheRef.current[chainId] = { client, provider }
+  const cacheRef = useRef<Record<number, ClientPair>>({});
 
-  const childChainSelected = useMemo(
-    () =>
-      defineChain({
-        ...selectedChain,
-        id: selectedChain.chainId,
-      }),
-    [selectedChain]
-  );
-  const publicParentClient = useMemo(
-    () =>
-      createPublicClient({
-        chain: parentChainSelected,
-        transport: http(parentChainSelected.rpcUrls.default.http[0]),
-      }),
-    [parentChainSelected]
-  );
-
-  const publicChildClient = useMemo(
-    () =>
-      createPublicClient({
-        chain: childChainSelected,
-        transport: http(childChainSelected.rpcUrls.default.http[0]),
-      }),
-    [childChainSelected]
-  );
-
-  const parentProvider = useMemo(
-    () =>
-      new ethers.providers.JsonRpcProvider(
-        parentChainSelected.rpcUrls.default.http[0]
-      ),
-    [parentChainSelected]
-  );
-  const childProvider = useMemo(
-    () =>
-      new ethers.providers.JsonRpcProvider(
-        childChainSelected.rpcUrls.default.http[0]
-      ),
-    [childChainSelected]
-  );
-
-  const values = {
-    publicParentClient,
-    publicChildClient,
-    parentProvider,
-    childProvider,
+  const getClient = (chain: CustomChain): ClientPair => {
+    const { chainId, rpcUrls } = chain;
+    if (!cacheRef.current[chainId]) {
+      const viemChain = defineChain({ ...chain, id: chainId,  });
+      const client = createPublicClient({
+        chain: viemChain,
+        transport: http(rpcUrls.default.http[0]),
+      });
+      const provider = new ethers.providers.JsonRpcProvider(rpcUrls.default.http[0]);
+      cacheRef.current[chainId] = { client, provider };
+    }
+    return cacheRef.current[chainId];
   };
 
   return (
-    <Web3ClientContext.Provider value={values}>
+    <Web3ClientContext.Provider value={{ getClient }}>
       {children}
     </Web3ClientContext.Provider>
   );
-};
+}
 
-export const useWeb3ClientContext = (): Web3ClientContextValue => {
-  const context = useContext(Web3ClientContext);
-
-  if (!context) {
-    throw new Error("Web3ClientContext failed to initialize");
+export function useWeb3Client(chain?: CustomChain) {
+  const ctx = useContext(Web3ClientContext);
+  if (!ctx) {
+    throw new Error("`useWeb3Client` must be used within a `<Web3ClientProvider>`");
   }
-
-  return context;
-};
+  return chain ? ctx.getClient(chain) : { client: undefined, provider: undefined };
+}

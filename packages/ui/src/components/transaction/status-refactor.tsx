@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Transaction } from "@/lib/transactions";
 import { useAlertContext } from "@/contexts/alert/alert-context";
 import useOnScreen from "@/hooks/use-on-screen";
@@ -27,7 +27,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
     fetchingL2ToL1Msg,
     l2ToL1Msg,
     canClaim,
-  } = useTransaction({ tx: tx, enabled: triggered });
+  } = useTransaction({ tx: tx, enabled: triggered, childChain, parentChain });
 
   const transactionState = useTransactionStatus(transaction);
   useEffect(() => {
@@ -76,6 +76,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
               fetchingL2ToL1Msg={fetchingL2ToL1Msg}
               canClaim={canClaim}
               parentChain={parentChain as Chain}
+              childChain={childChain}
             />
           </>
         )}
