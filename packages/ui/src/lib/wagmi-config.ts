@@ -45,7 +45,7 @@ export const customSepolia: CustomChain = {
     default: {
       http: ["https://ethereum-sepolia-rpc.publicnode.com"],
     },
-  }
+  },
 };
 
 export const defaultCustomMainnet = envParsed().IS_TESTNET
@@ -72,7 +72,7 @@ export const customArbitrum: CustomChain = {
     default: {
       http: [arbitrum.rpcUrls.default.http[0]],
     },
-  }
+  },
 };
 const arbitrumSepoliaNetwork = getArbitrumNetwork(arbitrumSepolia.id);
 export const customArbitrumSepolia: CustomChain = {
@@ -94,7 +94,7 @@ export const customArbitrumSepolia: CustomChain = {
     default: {
       http: [arbitrumSepolia.rpcUrls.default.http[0]],
     },
-  }
+  },
 };
 
 export const defaultCustomChild = envParsed().IS_TESTNET

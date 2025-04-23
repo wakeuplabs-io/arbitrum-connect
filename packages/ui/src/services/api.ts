@@ -97,7 +97,7 @@ export const api = {
         chainId: parseInt(chain.chainId),
       }));
     },
-    getByChainId: async (chainId: number) => {
+    getByChainId: async (chainId: number): Promise<CustomChain> => {
       const res = await client.api.chains.chains.get[":id"].$get({
         param: { id: chainId.toString() },
       });
@@ -110,8 +110,8 @@ export const api = {
 
       return {
         ...data,
-        chainId: parseInt(data.chainId)
-      };
+        chainId: parseInt(data.chainId),
+      } as CustomChain;
     },
     create: async (chain: CustomChain) => {
       const res = await client.api.chains.chains.create.$post({
@@ -139,7 +139,7 @@ export const api = {
           userAddress: chain.user as string,
           chainId: chain.chainId.toString(),
           logoURI: chain.logoURI ?? null,
-          tokenBridge: chain.tokenBridge
+          tokenBridge: chain.tokenBridge,
         },
       });
 

@@ -9,7 +9,7 @@ import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
 import CustomChainService from "@/services/custom-chain-service";
 import { useEffect, useState } from "react";
-import { Chain } from "wagmi/chains";
+import { CustomChain } from "@/types";
 
 export default function ConfirmWithdrawal({
   transaction,
@@ -24,7 +24,7 @@ export default function ConfirmWithdrawal({
   fetchingInboxTxTimestamp: boolean;
   updateTx: (tx: Transaction) => Promise<void>;
   state: TransactionState;
-  parentChain: Chain;
+  parentChain?: CustomChain;
 }) {
   const [parentTxUrl, setParentTxUrl] = useState("");
   const { signer, pushChildTxToParent } = useArbitrumBridge({
@@ -90,7 +90,7 @@ export default function ConfirmWithdrawal({
       running={isRunning}
       number={2}
       title="Confirm Withdraw"
-      description={`Send the ${parentChain.name} withdraw transaction through the delayed inbox`}
+      description={`Send the ${parentChain?.name} withdraw transaction through the delayed inbox`}
       className="pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 flex items-start flex-col md:flex-row md:items-center"
     >
       {ACTIVE && (

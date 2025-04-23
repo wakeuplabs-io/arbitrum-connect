@@ -1,13 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
-import {
-  customArbitrum,
-  customArbitrumSepolia,
-  customMainnet,
-  customSepolia,
-  defaultCustomChild,
-  defaultCustomMainnet,
-} from "@/lib/wagmi-config";
+import { defaultCustomChild, defaultCustomMainnet } from "@/lib/wagmi-config";
 import {
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,
@@ -42,39 +35,28 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   const [customChains, setCustomChains] = useState<CustomChain[]>([]);
   const { chains } = useChains();
 
-  const initializeCustomChains = async (address: Address) => {
-    const userChains = await CustomChainService.getUserChains(
-      address,
-      "",
-      FILTERS.ALL
-    );
-    if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
-      const defaultChain = { ...customArbitrum, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customMainnet.chainId)) {
-      const defaultChain = { ...customMainnet, user: address };
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customSepolia.chainId)) {
-      const defaultChain = { ...customSepolia, user: address };
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customArbitrumSepolia.chainId)) {
-      const defaultChain = { ...customArbitrumSepolia, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
-    }
-
-    if (!userChains.some((x) => x.chainId === selectedChain.chainId))
-      setSelectedChain(defaultCustomChild);
-
-    setCustomChains(userChains as CustomChain[]);
-  };
-
   useEffect(() => {
     if (!address) return;
+    const initializeCustomChains = async (address: Address) => {
+      const userChains = await CustomChainService.getUserChains(
+        address,
+        "",
+        FILTERS.ALL
+      );
+
+      if (!userChains.some((x) => x.chainId === selectedChain.chainId))
+        setSelectedChain(defaultCustomChild);
+
+      setCustomChains(userChains as CustomChain[]);
+    };
+
+    const lastAddress = localStorage.getItem("last-wallet-address");
+
+    if (address !== lastAddress) {
+      localStorage.setItem("last-wallet-address", address);
+      window.location.reload();
+    }
+
     initializeCustomChains(address);
   }, [address]);
 

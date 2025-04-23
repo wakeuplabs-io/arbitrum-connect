@@ -107,10 +107,11 @@ export default class CustomChainService {
     filter: FILTERS,
     testnetFilter?: NetworkFilter
   ) => {
-    const [publicChains, userChains] = await Promise.all([
-      api.chains.getAllPublic(),
-      api.chains.getAllUserChains(userAddress),
-    ]);
+    const promises = [api.chains.getAllPublic()];
+    if (userAddress !== "0x")
+      promises.push(api.chains.getAllUserChains(userAddress));
+
+    const [publicChains, userChains] = await Promise.all(promises);
 
     return [...publicChains, ...userChains].filter((chain) =>
       CustomChainService.filterChain(
