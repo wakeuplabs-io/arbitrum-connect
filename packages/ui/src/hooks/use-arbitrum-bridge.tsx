@@ -136,11 +136,15 @@ export default function useArbitrumBridge(props: {
     childProvider: ethers.providers.JsonRpcProvider,
     parentSigner: ethers.providers.JsonRpcSigner
   ) {
+    console.log("getting l2tol1msg");
+    console.log("l2TxnHash: ", l2TxnHash);
     if (!l2TxnHash.startsWith("0x") || l2TxnHash.trim().length != 66)
       throw new Error(`Hmm, ${l2TxnHash} doesn't look like a txn hash...`);
-
+    
+    console.log("childProvider: ", childProvider);
     // First, let's find the Arbitrum txn from the txn hash provided
     const receipt = await childProvider.getTransactionReceipt(l2TxnHash);
+    console.log("receipt: ", receipt);
     if (receipt === null) return receipt;
 
     const l2Receipt = new ChildTransactionReceipt(receipt);
@@ -155,6 +159,7 @@ export default function useArbitrumBridge(props: {
     childProvider: ethers.providers.JsonRpcProvider,
     l2ToL1Msg: ChildToParentMessageWriter
   ): Promise<ClaimStatus> {
+    console.log("getting claim status");
     if (!l2ToL1Msg) {
       throw new Error(
         "Provide an L2 transaction that sends an L2 to L1 message or the message itself"

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Transaction } from "@/lib/transactions";
 import { useAlertContext } from "@/contexts/alert/alert-context";
 import useOnScreen from "@/hooks/use-on-screen";
@@ -46,7 +46,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
           <>
             <InitiateWithdrawal
               transaction={transaction}
-              childChain={childChain as Chain}
+              childChain={childChain}
             />
             <ConfirmWithdrawal
               transaction={transaction}
@@ -54,7 +54,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
               fetchingInboxTxTimestamp={fetchingInboxTxTimestamp}
               updateTx={updateTx}
               state={transactionState}
-              parentChain={parentChain as Chain}
+              parentChain={parentChain}
             />
             <ForceStep
               transaction={transaction}
@@ -63,7 +63,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
               fetchingClaimStatus={fetchingClaimStatus}
               fetchingL2ToL1Msg={fetchingL2ToL1Msg}
               state={transactionState}
-              parentChain={parentChain as Chain}
+              parentChain={parentChain}
             />
             <ClaimStep
               transaction={transaction}
