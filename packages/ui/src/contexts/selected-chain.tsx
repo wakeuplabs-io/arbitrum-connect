@@ -1,9 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
-import {
-  defaultCustomChild,
-  defaultCustomMainnet,
-} from "@/lib/wagmi-config";
+import { defaultCustomChild, defaultCustomMainnet } from "@/lib/wagmi-config";
 import {
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,

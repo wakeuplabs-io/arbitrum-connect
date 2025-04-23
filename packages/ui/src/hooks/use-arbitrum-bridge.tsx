@@ -140,7 +140,7 @@ export default function useArbitrumBridge(props: {
     console.log("l2TxnHash: ", l2TxnHash);
     if (!l2TxnHash.startsWith("0x") || l2TxnHash.trim().length != 66)
       throw new Error(`Hmm, ${l2TxnHash} doesn't look like a txn hash...`);
-    
+
     console.log("childProvider: ", childProvider);
     // First, let's find the Arbitrum txn from the txn hash provided
     const receipt = await childProvider.getTransactionReceipt(l2TxnHash);

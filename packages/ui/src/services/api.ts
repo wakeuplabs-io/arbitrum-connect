@@ -110,7 +110,7 @@ export const api = {
 
       return {
         ...data,
-        chainId: parseInt(data.chainId)
+        chainId: parseInt(data.chainId),
       } as CustomChain;
     },
     create: async (chain: CustomChain) => {
@@ -139,7 +139,7 @@ export const api = {
           userAddress: chain.user as string,
           chainId: chain.chainId.toString(),
           logoURI: chain.logoURI ?? null,
-          tokenBridge: chain.tokenBridge
+          tokenBridge: chain.tokenBridge,
         },
       });
 

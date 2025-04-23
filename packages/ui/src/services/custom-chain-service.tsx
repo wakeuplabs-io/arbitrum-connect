@@ -109,8 +109,8 @@ export default class CustomChainService {
   ) => {
     const promises = [api.chains.getAllPublic()];
     if (userAddress !== "0x")
-      promises.push(api.chains.getAllUserChains(userAddress))
-    
+      promises.push(api.chains.getAllUserChains(userAddress));
+
     const [publicChains, userChains] = await Promise.all(promises);
 
     return [...publicChains, ...userChains].filter((chain) =>
