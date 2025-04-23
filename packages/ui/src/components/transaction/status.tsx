@@ -43,8 +43,8 @@ export function TransactionStatus(props: {
     ? calculateRemainingHours(transaction.delayedInboxTimestamp)
     : undefined;
   const { setError } = useAlertContext();
-    const { provider: childProvider } = useWeb3Client(childChain);
-    const { client: parentClient } = useWeb3Client(parentChain);
+  const { provider: childProvider } = useWeb3Client(childChain);
+  const { client: parentClient } = useWeb3Client(parentChain);
 
   const forceIncludeTx = useMutation({
     mutationFn: forceInclude,
@@ -63,7 +63,8 @@ export function TransactionStatus(props: {
 
   const { data: l2ToL1Msg, isFetching: fetchingL2ToL1Msg } = useQuery({
     queryKey: ["l2ToL1Msg", transaction.bridgeHash],
-    queryFn: () => getL2toL1Msg(transaction.bridgeHash, childProvider!, signer!),
+    queryFn: () =>
+      getL2toL1Msg(transaction.bridgeHash, childProvider!, signer!),
     enabled:
       triggered &&
       !!signer &&
