@@ -3,7 +3,7 @@ import WalletIcon from "@/assets/wallet.svg";
 import CustomConnectButton from "@/components/connect-wallet";
 import ErrorMessage from "@/components/error-message";
 import { useEthPrice } from "@/hooks/use-eth-price";
-import useArbitrumBalance from "@/hooks/use-arbitrum-balance";
+import useBalance from "@/hooks/use-arbitrum-balance";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
@@ -27,12 +27,12 @@ interface FormError {
 function HomeScreen() {
   const navigate = useNavigate();
   const { address } = useAccount();
-  const arbBalance = useArbitrumBalance();
   const { openConnectModal } = useConnectModal();
   const [amountEth, setAmountEth] = useState<string>("");
   const [error, setError] = useState<FormError>();
   const { ethPrice } = useEthPrice();
   const { selectedChain, selectedParentChain } = useSelectedChain();
+  const balance = useBalance(selectedChain);
   function handleSubmit() {
     const amount = parseUnits(amountEth, 18);
     if (amount.lte("0")) {
@@ -40,7 +40,7 @@ function HomeScreen() {
       return;
     }
 
-    if (amount.gt(parseUnits(arbBalance, 18))) {
+    if (amount.gt(parseUnits(balance, 18))) {
       triggerError({ ...error, balance: true });
       return;
     }
@@ -108,7 +108,7 @@ function HomeScreen() {
                     { "text-red-600": error?.balance }
                   )}
                 >
-                  ETH
+                  {selectedChain.nativeCurrency.symbol}
                 </div>
                 <span
                   className={cn("text-neutral-500 duration-200 ease-in-out", {
@@ -116,7 +116,7 @@ function HomeScreen() {
                   })}
                   id="balance"
                 >
-                  Balance {arbBalance.slice(0, 10)}
+                  Balance {balance.slice(0, 10)}
                 </span>
               </div>
             </div>
@@ -124,7 +124,7 @@ function HomeScreen() {
               <button
                 type="button"
                 className="btn btn-neutral rounded-3xl px-5 font-normal"
-                onClick={() => setAmountEth(arbBalance)}
+                onClick={() => setAmountEth(balance)}
               >
                 Max
               </button>
@@ -168,10 +168,10 @@ function HomeScreen() {
             } else handleSubmit();
           }}
           type="submit"
-          disabled={!address || !arbBalance}
+          disabled={!address || !balance}
         >
           {address
-            ? arbBalance
+            ? balance
               ? "Continue"
               : "Loading balance..."
             : "Connect your wallet to withdraw"}

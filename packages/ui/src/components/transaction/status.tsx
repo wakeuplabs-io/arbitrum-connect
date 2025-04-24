@@ -1,5 +1,4 @@
 import { useAlertContext } from "@/contexts/alert/alert-context";
-import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import useOnScreen from "@/hooks/use-on-screen";
 import { Transaction, TransactionsStorageService } from "@/lib/transactions";
@@ -15,6 +14,7 @@ import { StatusStep } from "./status-step";
 import { LEARN_MORE_URI } from "@/constants";
 import { Countdown } from "./countdown";
 import { useGetTransactionChains } from "@/hooks/queries/useGetTransactionChains";
+import { useWeb3Client } from "@/contexts/web3-client-context";
 
 //TODO: refactor this code : make it more readable and clean
 
@@ -37,13 +37,14 @@ export function TransactionStatus(props: {
   const [transaction, setTransaction] = useState<Transaction>(props.tx);
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useOnScreen(ref);
-  const { publicParentClient, childProvider } = useWeb3ClientContext();
   const { parentChain, childChain } = useGetTransactionChains(props.tx);
   const [triggered, setTriggered] = useState(false);
   const remainingHours = transaction.delayedInboxTimestamp
     ? calculateRemainingHours(transaction.delayedInboxTimestamp)
     : undefined;
   const { setError } = useAlertContext();
+  const { provider: childProvider } = useWeb3Client(childChain);
+  const { client: parentClient } = useWeb3Client(parentChain);
 
   const forceIncludeTx = useMutation({
     mutationFn: forceInclude,
@@ -62,10 +63,12 @@ export function TransactionStatus(props: {
 
   const { data: l2ToL1Msg, isFetching: fetchingL2ToL1Msg } = useQuery({
     queryKey: ["l2ToL1Msg", transaction.bridgeHash],
-    queryFn: () => getL2toL1Msg(transaction.bridgeHash, childProvider, signer!),
+    queryFn: () =>
+      getL2toL1Msg(transaction.bridgeHash, childProvider!, signer!),
     enabled:
       triggered &&
       !!signer &&
+      !!childProvider &&
       !!transaction.delayedInboxTimestamp &&
       transaction.claimStatus !== ClaimStatus.CLAIMED,
     staleTime: Infinity,
@@ -73,7 +76,7 @@ export function TransactionStatus(props: {
 
   const { data: claimStatusData, isFetching: fetchingClaimStatus } = useQuery({
     queryKey: ["claimStatus", transaction.bridgeHash],
-    queryFn: () => getClaimStatus(childProvider, l2ToL1Msg!),
+    queryFn: () => getClaimStatus(childProvider!, l2ToL1Msg!),
     enabled: !!l2ToL1Msg && !!childProvider && !!transaction.bridgeHash,
     staleTime: 60000,
     refetchOnMount: false,
@@ -96,9 +99,10 @@ export function TransactionStatus(props: {
   } = useQuery({
     queryKey: ["delayedInboxTimestamp", transaction.delayedInboxHash],
     queryFn: () =>
-      getTimestampFromTxHash(transaction.delayedInboxHash!, publicParentClient),
+      getTimestampFromTxHash(transaction.delayedInboxHash!, parentClient!),
     enabled:
       triggered &&
+      !!parentClient &&
       transaction.delayedInboxHash !== undefined &&
       !transaction.delayedInboxTimestamp,
   });
@@ -151,7 +155,7 @@ export function TransactionStatus(props: {
   }
 
   function onClaim() {
-    if (!signer) return;
+    if (!signer || !childProvider) return;
 
     claimFundsTx.mutate(
       {

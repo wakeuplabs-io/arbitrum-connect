@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { useMutation } from "@tanstack/react-query";
 import { ChildToParentMessageWriter } from "@arbitrum/sdk";
-import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { Transaction } from "@/lib/transactions";
 import { StatusStep } from "../status-step";
@@ -9,6 +8,8 @@ import { Countdown } from "../countdown";
 import { useStepStatus } from "@/hooks/use-step-status";
 import { Step, TransactionState } from "@/constants";
 import { Chain } from "wagmi/chains";
+import { CustomChain } from "@/types";
+import { useWeb3Client } from "@/contexts/web3-client-context";
 
 export default function ClaimStep({
   transaction,
@@ -20,6 +21,7 @@ export default function ClaimStep({
   state,
   canClaim,
   parentChain,
+  childChain,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
@@ -31,12 +33,13 @@ export default function ClaimStep({
   fetchingL2ToL1Msg: boolean;
   canClaim: boolean;
   parentChain: Chain;
+  childChain?: CustomChain;
 }) {
   const { signer, claimFunds } = useArbitrumBridge({
     parentChainId: transaction.parentChainId,
     childChainId: transaction.childChainId,
   });
-  const { childProvider } = useWeb3ClientContext();
+  const { provider: childProvider } = useWeb3Client(childChain);
   const { ACTIVE, DONE } = useStepStatus(Step.CLAIM, state);
 
   const claimFundsTx = useMutation({
@@ -50,7 +53,7 @@ export default function ClaimStep({
     !fetchingQueries;
 
   function onClaim() {
-    if (!signer) return;
+    if (!signer || !childProvider) return;
 
     claimFundsTx.mutate(
       {
