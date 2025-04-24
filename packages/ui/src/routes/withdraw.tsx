@@ -135,7 +135,9 @@ function WithdrawScreen() {
       {/* amount */}
       <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-2xl md:p-6 p-4">
         <div className="flex items-center gap-3">
-          <img src={selectedChain.logoURI} alt={selectedChain.name} />
+          <div className="w-11 h-11">
+            <img src={selectedChain.logoURI} alt={selectedChain.name} />
+          </div>
           <div className="flex items-end space-x-2">
             <div
               data-test-id="withdraw-amount"

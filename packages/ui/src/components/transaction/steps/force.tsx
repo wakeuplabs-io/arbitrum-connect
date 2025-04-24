@@ -94,7 +94,7 @@ export default function ForceStep({
         <ForceIncludeButton onForce={onForce} transaction={transaction} />
       ) : null}
 
-      {isWating24 && !isLoading ? (
+      {state !== TransactionState.CLAIMABLE && isWating24 && !isLoading ? (
         <>
           <a className="text-sm font-semibold">
             ~ {remainingHours} hours remaining
