@@ -107,7 +107,9 @@ function HomeScreen() {
                     ? selectedChain.logoURI
                     : EthereumIcon
                 }
-                alt={selectedChain.nativeToken ? selectedChain.name : "Ethereum"}
+                alt={
+                  selectedChain.nativeToken ? selectedChain.name : "Ethereum"
+                }
                 size={44}
               />
               <div className="flex flex-col text-left">

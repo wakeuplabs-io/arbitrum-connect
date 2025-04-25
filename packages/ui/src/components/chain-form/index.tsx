@@ -162,7 +162,9 @@ export const ChainForm = ({
       const validateChainId = async () => {
         let chainExists = false;
         try {
-          chainExists = !!chains.filter(x => x.chainId === Number(chainId))[0]
+          chainExists = !!chains.filter(
+            (x) => x.chainId === Number(chainId)
+          )[0];
         } catch (err) {
           console.log("error: ", err);
           // we catch it if no chain exist
