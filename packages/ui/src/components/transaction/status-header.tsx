@@ -1,6 +1,5 @@
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { Transaction } from "@/lib/transactions";
-import EthereumIconCheck from "@/assets/ethereum-icon-check.svg";
 import CustomChainService from "@/services/custom-chain-service";
 import { formatEther } from "ethers/lib/utils";
 import { useEffect, useState } from "react";
@@ -17,7 +16,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
       setTxChildChain(x as CustomChain);
       setChainLoading(false);
     });
-  }, []);
+  }, [props.tx.childChainId]);
 
   if (txChildChain === null)
     return <>Missing configuration for chain id: {props.tx.childChainId}</>;
@@ -30,12 +29,9 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
         <div className="flex gap-3 items-center sm:gap-3">
           <div className="w-11 h-11 rounded">
             <ChainAvatar
-              src={
-                props.tx.claimStatus === ClaimStatus.CLAIMED
-                  ? (txChildChain?.logoURI ?? EthereumIconCheck)
-                  : txChildChain?.logoURI
-              }
-              alt={txChildChain?.name ?? "Ethereum"}
+              src={txChildChain?.logoURI}
+              checked={props.tx.claimStatus === ClaimStatus.CLAIMED}
+              alt={txChildChain?.name}
               size={44}
             />
           </div>

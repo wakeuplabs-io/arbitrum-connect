@@ -28,7 +28,7 @@ export default function ChainItem({
     >
       <ChainAvatar
         src={chain.logoURI}
-        alt={chain?.name ?? "Ethereum"}
+        alt={chain?.name}
         size={44}
       />
       <div>
