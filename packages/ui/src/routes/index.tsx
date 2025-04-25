@@ -14,6 +14,7 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import ChainItem from "@/components/chain-item";
 import Button from "@/components/button";
+import ChainAvatar from "@/components/chain-avatar";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
@@ -100,7 +101,15 @@ function HomeScreen() {
           <hr className="w-full pb-6" />
           <div className="flex justify-between items-center w-full">
             <div className="flex items-center gap-4">
-              <img src={EthereumIcon} alt="ethereum icon" />
+              <ChainAvatar
+                src={
+                  selectedChain.nativeCurrency.symbol !== "ETH"
+                    ? selectedChain.logoURI
+                    : EthereumIcon
+                }
+                alt={selectedChain.nativeToken ? selectedChain.name : "Ethereum"}
+                size={44}
+              />
               <div className="flex flex-col text-left">
                 <div
                   className={cn(

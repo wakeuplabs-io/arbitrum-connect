@@ -2,6 +2,7 @@ import { useUser } from "@/hooks/use-user";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import cn from "classnames";
 import { ConnectButtonProps } from "node_modules/@rainbow-me/rainbowkit/dist/components/ConnectButton/ConnectButton";
+import ChainAvatar from "./chain-avatar";
 
 interface ICustomConnectButton
   extends React.ComponentProps<"button">,
@@ -53,7 +54,11 @@ export default function CustomConnectButton({
               >
                 <button onClick={openAccountModal} type="button" {...btnProps}>
                   {chainStatus === "icon" && chain.hasIcon && (
-                    <img src={chain.iconUrl} width={20} alt="chain icon" />
+                    <ChainAvatar
+                      src={chain.iconUrl}
+                      size={20}
+                      alt={chain.name}
+                    />
                   )}
                   {account.displayName}
                 </button>
