@@ -35,6 +35,10 @@ function HomeScreen() {
   const { selectedChain, selectedParentChain } = useSelectedChain();
   const balance = useBalance(selectedChain);
   function handleSubmit() {
+    if (amountEth === "") {
+      triggerError({ ...error, amount: true });
+      return;
+    }
     const amount = parseUnits(amountEth, 18);
     if (amount.lte("0")) {
       triggerError({ ...error, amount: true });
