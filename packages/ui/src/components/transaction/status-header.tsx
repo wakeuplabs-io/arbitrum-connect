@@ -21,8 +21,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
 
   if (txChildChain === null)
     return <>Missing configuration for chain id: {props.tx.childChainId}</>;
-  if (chainLoading)
-    return undefined;
+  if (chainLoading) return undefined;
 
   return (
     <>
@@ -34,7 +33,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
               src={
                 props.tx.claimStatus === ClaimStatus.CLAIMED
                   ? (txChildChain?.logoURI ?? EthereumIconCheck)
-                  : (txChildChain?.logoURI)
+                  : txChildChain?.logoURI
               }
               alt={txChildChain?.name ?? "Ethereum"}
               size={44}
