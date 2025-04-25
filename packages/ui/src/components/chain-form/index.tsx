@@ -9,11 +9,11 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useNavigate } from "@tanstack/react-router";
 import Button from "../button";
-import CustomChainService from "@/services/custom-chain-service";
 import { useEffect } from "react";
 import { Checkbox } from "../checkbox";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { TokenBridge } from "@arbitrum/sdk/dist/lib/dataEntities/networks";
+import { useChains } from "@/hooks/use-chains";
 
 const tokenBridgeObjectSchema: z.ZodType<TokenBridge> = z.object({
   parentGatewayRouter: z.string(),
@@ -102,6 +102,7 @@ export const ChainForm = ({
 }) => {
   const { address } = useAccount();
   const { createChain, editChain } = useCustomChain();
+  const { chains } = useChains();
   const { setSelectedChain } = useSelectedChain();
   const navigate = useNavigate();
   const { openConnectModal } = useConnectModal();
@@ -161,9 +162,7 @@ export const ChainForm = ({
       const validateChainId = async () => {
         let chainExists = false;
         try {
-          chainExists = !!(await CustomChainService.getChainById(
-            Number(chainId)
-          ));
+          chainExists = !!chains.filter(x => x.chainId === Number(chainId))[0]
         } catch (err) {
           console.log("error: ", err);
           // we catch it if no chain exist
