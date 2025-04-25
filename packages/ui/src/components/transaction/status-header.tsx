@@ -27,7 +27,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
   return (
     <>
       <input type="radio" name="accordion" />
-      <div className="collapse-title flex justify-center items-cenetr justify-between text-lg h-10 pl-3 p-0 mt-5 mb-2.5 pr-8 gap-2 sm:pl-3">
+      <div className="collapse-title flex justify-between text-lg h-10 pl-3 p-0 mt-5 mb-2.5 pr-8 gap-2 sm:pl-3">
         <div className="flex gap-3 items-center sm:gap-3">
           <div className="w-11 h-11 rounded">
             <ChainAvatar
@@ -45,7 +45,7 @@ export function TransactionStatusHeader(props: { tx: Transaction }) {
             <div className="text-sm">Withdrawal</div>
           </div>
         </div>
-        <div className="text-base sm:text-lg truncate">
+        <div className="text-base sm:text-lg truncate content-center">
           {formatEther(BigInt(props.tx.amount)).slice(0, 8)}{" "}
           {txChildChain?.nativeCurrency.symbol ?? "ETH"}
         </div>
