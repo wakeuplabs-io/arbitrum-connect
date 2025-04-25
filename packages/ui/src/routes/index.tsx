@@ -3,7 +3,7 @@ import WalletIcon from "@/assets/wallet.svg";
 import CustomConnectButton from "@/components/connect-wallet";
 import ErrorMessage from "@/components/error-message";
 import { useEthPrice } from "@/hooks/use-eth-price";
-import useBalance from "@/hooks/use-arbitrum-balance";
+import useBalance from "@/hooks/use-balance";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
