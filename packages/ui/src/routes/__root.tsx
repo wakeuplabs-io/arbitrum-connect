@@ -7,7 +7,7 @@ export const Route = createRootRoute({
   component: () => (
     <div className="flex flex-col min-h-screen overflow-y-auto bg-[url('@/assets/background.svg')] bg-cover">
       <Topbar />
-      <main className="py-8 px-4 flex-1">
+      <main className="py-6 sm:py-8 px-4 flex-1">
         <Outlet />
       </main>
       <TestnetIndicator />

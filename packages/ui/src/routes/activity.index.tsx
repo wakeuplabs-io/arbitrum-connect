@@ -87,10 +87,10 @@ function ActivityScreen() {
 
   return (
     <div className="flex flex-col max-w-xl mx-auto">
-      <div className="flex space-x-3 items-center mb-8">
+      <div className="flex space-x-3 items-center mb-4 sm:mb-8">
         <h1 className="text-xl text-primary font-semibold">My activity</h1>
       </div>
-      <div className="overflow-y-auto bg-neutral-50 h-[66vh]">
+      <div className="overflow-y-auto bg-neutral-50 h-[calc(90vh-220px)] sm:h-[calc(90vh-284px)]">
         <div className="join join-vertical flex flex-col text-left justify-between items-center border border-neutral-200 rounded-2xl">
           {loading ? (
             <ActivityLoading count={3} />

@@ -8,7 +8,7 @@ export default function Topbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="flex justify-between items-center | sticky top-0 sm:px-8 | h-[6rem] card--blur z-10 px-4">
+    <header className="flex justify-between items-center | sticky top-0 sm:px-8 | h-[5rem] sm:h-[6rem] card--blur z-10 px-4">
       <div className="flex gap-3 items-center | w-full">
         <div
           className="flex items-center gap-3 cursor-pointer"

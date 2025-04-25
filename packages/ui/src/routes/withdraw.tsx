@@ -19,6 +19,7 @@ import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { useWeb3Client } from "@/contexts/web3-client-context";
+import ChainAvatar from "@/components/chain-avatar";
 
 interface SearchParams {
   amount: string;
@@ -135,9 +136,11 @@ function WithdrawScreen() {
       {/* amount */}
       <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-2xl md:p-6 p-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11">
-            <img src={selectedChain.logoURI} alt={selectedChain.name} />
-          </div>
+          <ChainAvatar
+            src={selectedChain.logoURI}
+            alt={selectedChain.name}
+            size={44}
+          />
           <div className="flex items-end space-x-2">
             <div
               data-test-id="withdraw-amount"
