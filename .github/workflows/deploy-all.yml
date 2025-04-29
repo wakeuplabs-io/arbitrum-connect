@@ -38,9 +38,11 @@ jobs:
 
       # Deploy infrastructure (optional if it already exists)
       - name: SAM Build
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
         run: sam build
 
       - name: SAM Deploy
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
         run: sam deploy --stack-name ${{ vars.STACK_NAME }} --parameter-overrides StackName='${{ vars.STACK_NAME }}' DomainName='${{vars.UI_DOMAIN}}' Subdomain='${{vars.SUBDOMAIN}}' HostedZoneId='${{vars.AWS_HOSTED_ZONE_ID}}' CertificateId='${{vars.AWS_CERTIFICATE_ID}}'
 
       # 1. Build and DB migration
