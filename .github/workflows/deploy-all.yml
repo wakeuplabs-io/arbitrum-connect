@@ -86,7 +86,7 @@ jobs:
         run: |
           echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
           echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
-          echo "VITE_API_URL=${{ vars.API_URL }}" >> .env
+          echo "VITE_API_URL=https://sviehk2dk3wbl5venhnbq24n2i0ubjuf.lambda-url.us-east-1.on.aws" >> .env
 
       - name: Build UI
         working-directory: ./packages/ui
