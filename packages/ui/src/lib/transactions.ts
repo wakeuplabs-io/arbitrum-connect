@@ -1,4 +1,3 @@
-import { db } from "@/db/db";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { Address } from "viem";
 
@@ -9,33 +8,44 @@ export interface Transaction {
   delayedInboxHash?: Address;
   claimStatus: ClaimStatus;
   account?: Address;
-  parentChainId: number;
-  childChainId: number;
 }
 
 export class TransactionsStorageService {
-  static async getByAccount(account: Address): Promise<Transaction[]> {
-    const transactions = await db.transactions
-      .where("account")
-      .equals(account)
-      .toArray();
+  constructor(private readonly storageKey: string) {}
 
-    return transactions;
+  getAll(): Transaction[] {
+    return JSON.parse(localStorage.getItem(this.storageKey) ?? "[]");
   }
 
-  static async getByBridgeHash(hash: Address): Promise<Transaction | null> {
-    const transaction = await db.transactions
-      .where("bridgeHash")
-      .equals(hash)
-      .first();
-    return transaction || null;
+  getByAccount(account: Address): Transaction[] {
+    return JSON.parse(localStorage.getItem(this.storageKey) ?? "[]").filter(
+      (tx: Transaction) => tx.account === account
+    );
   }
 
-  static async create(tx: Transaction, account: Address): Promise<void> {
-    await db.transactions.add({ ...tx, account });
+  getByBridgeHash(hash: Address): Transaction | null {
+    return (
+      this.getAll().find(
+        (t) => t.bridgeHash.toLowerCase() === hash.toLowerCase()
+      ) ?? null
+    );
   }
 
-  static async update(tx: Transaction): Promise<void> {
-    await db.transactions.update(tx.bridgeHash, { ...tx });
+  //TODO: improve this, could we split by account ?
+  create(tx: Transaction, account: Address): void {
+    const txs = this.getAll();
+    txs.push({ ...tx, account: account });
+    localStorage.setItem(this.storageKey, JSON.stringify(txs));
+  }
+
+  update(tx: Transaction): void {
+    const txs = this.getAll();
+    const txToUpdateIndex = txs.findIndex((x) => x.bridgeHash == tx.bridgeHash);
+    txs[txToUpdateIndex] = { ...txs[txToUpdateIndex], ...tx };
+    localStorage.setItem(this.storageKey, JSON.stringify([...txs]));
   }
 }
+
+export const transactionsStorageService = new TransactionsStorageService(
+  "transactions"
+);

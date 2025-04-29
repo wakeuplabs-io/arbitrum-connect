@@ -86,7 +86,7 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2021
         DefaultCacheBehavior:
           TargetOriginId: !Sub "${StackName}S3Origin"
-          ViewerProtocolPolicy: redirect-to-https
+          ViewerProtocolPolicy: redirect-to-https # Check what happens if there's no certificate, switch for allow-all
           AllowedMethods:
             - HEAD
             - GET

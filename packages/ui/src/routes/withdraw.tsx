@@ -9,7 +9,7 @@ import {
   getMockedL2WithdrawPrice,
   getMockedSendL1MsgPrice,
 } from "@/lib/get-tx-price";
-import { Transaction, TransactionsStorageService } from "@/lib/transactions";
+import { Transaction, transactionsStorageService } from "@/lib/transactions";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
@@ -19,7 +19,6 @@ import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
-import { useSelectedChain } from "@/hooks/use-selected-chain";
 
 interface SearchParams {
   amount: string;
@@ -44,23 +43,17 @@ export const Route = createFileRoute("/withdraw")({
 
 function WithdrawScreen() {
   const navigate = useNavigate();
-  const { address } = useAccount();
+  const { address } = useAccount()
   const { parentProvider, childProvider } = useWeb3ClientContext();
   const { amount: amountInWei } = Route.useSearch();
   const { ethPrice } = useEthPrice();
-
-  const { selectedParentChain, selectedChain } = useSelectedChain();
 
   const [approvedAproxFees, setApprovedAproxFees] = useState<boolean>(false);
   const [approvedSequencerMaySpeedUp, setApprovedSequencerMaySpeedUp] =
     useState<boolean>(false);
   const [approvedTime, setApprovedTime] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
-  //Confirm withdraw seems to have stopped working
-  const { initiateWithdraw, signer } = useArbitrumBridge({
-    parentChainId: selectedParentChain.chainId,
-    childChainId: selectedChain.chainId,
-  });
+  const { initiateWithdraw, signer } = useArbitrumBridge();
   const { setError } = useAlertContext();
   const { data: withdrawPrice, isFetching: withdrawPriceFetching } = useQuery({
     queryKey: ["withdrawPrice"],
@@ -90,12 +83,9 @@ function WithdrawScreen() {
             bridgeHash: l2Txhash,
             amount: amountInWei,
             claimStatus: ClaimStatus.PENDING,
-            parentChainId: selectedParentChain.chainId,
-            childChainId: selectedChain.chainId,
           };
-          TransactionsStorageService.create(tx, address).then(() =>
-            navigate({ to: `/activity/${tx.bridgeHash}` })
-          );
+          transactionsStorageService.create(tx, address);
+          navigate({ to: `/activity/${tx.bridgeHash}` });
         })
         .catch((e) => {
           setError(e);
@@ -125,9 +115,7 @@ function WithdrawScreen() {
         onClick={() => navigate({ to: "/" })}
       >
         <ChevronLeft size={20} />
-        <div className="font-semibold text-xl text-primary-700">
-          Review and confirm
-        </div>
+        <div className="font-semibold text-xl text-primary-700">Review and confirm</div>
       </button>
 
       {/* amount */}
@@ -289,13 +277,11 @@ function WithdrawScreen() {
       {/* confirm */}
       <button
         type="button"
-        className={cn(
-          "btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200"
-        )}
-        disabled={!canContinue || loading || !address || !signer}
+        className={cn("btn btn-primary rounded-2xl font-normal text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200")}
+        disabled={!canContinue || loading || !address}
         onClick={() => address && onContinue(address)}
       >
-        {loading || signer === undefined ? "Loading..." : "Confirm Withdrawal"}
+        {loading ? "Loading..." : "Confirm Withdrawal"}
       </button>
     </div>
   );

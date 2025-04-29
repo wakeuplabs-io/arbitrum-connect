@@ -28,7 +28,3 @@ body div#root div[data-rk] {
 .remove-arrow {
   -moz-appearance: textfield;
 }
-
-.collapse-title::after {
-  inset-inline-end: 1rem !important;
-}
