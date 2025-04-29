@@ -6,9 +6,9 @@ const config: HardhatUserConfig = {
   networks: {
     arb: {
       url: "...",
-      accounts: ["..."]
-    }
-  }
+      accounts: ["..."],
+    },
+  },
 };
 
 export default config;

@@ -39,20 +39,7 @@ const schema = z.object({
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
   localRpcUrl: z.string().url().min(1),
-  logoURI: z
-    .string()
-    .refine(
-      (val) => {
-        // Accepts absolute URLs or paths that start with /
-        return (
-          val.startsWith("/") ||
-          val.startsWith("http://") ||
-          val.startsWith("https://")
-        );
-      },
-      { message: "Must be a URL or a path starting with /" }
-    )
-    .optional(),
+  logoURI: z.string().url().optional(),
   chainType: z.nativeEnum(ChainType, {
     required_error: "Chain type is required",
   }),
@@ -132,10 +119,10 @@ export const ChainForm = ({
 
     const validateChainId = async () => {
       const chainExists = await CustomChainService.getChainById(
-        Number(chainId)
+        Number(chainId),
+        address
       );
-
-      if (!chainExists) {
+      if (chainExists) {
         // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms
         setError("chainId", {
           type: "manual",
@@ -175,153 +162,117 @@ export const ChainForm = ({
           onSubmit={handleSubmit(onSubmit)}
         >
           <div className=" bg-neutral-50 border border-neutral-200 rounded-2xl p-5">
-            <div className="mb-6">
-              <Input
-                disabled={editing}
-                name="chainId"
-                type="number"
-                label="Chain id"
-                placeholder="Chain ID"
-                register={register}
-                error={errors.chainId?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="name"
-                label="Chain name"
-                placeholder="Chain name"
-                register={register}
-                error={errors.name?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="bridge"
-                label="Bridge"
-                placeholder="Bridge"
-                register={register}
-                error={errors.bridge?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="inbox"
-                label="Inbox"
-                placeholder="Inbox"
-                register={register}
-                error={errors.inbox?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="sequencerInbox"
-                label="Sequencer Inbox"
-                placeholder="Sequencer Inbox"
-                register={register}
-                error={errors.sequencerInbox?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="outbox"
-                label="Outbox"
-                placeholder="Outbox"
-                register={register}
-                error={errors.outbox?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="rollup"
-                label="Rollup"
-                placeholder="Rollup"
-                register={register}
-                error={errors.rollup?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="explorerUrl"
-                label="Explorer URL"
-                placeholder="Explorer URL"
-                register={register}
-                error={errors.explorerUrl?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="nativeCurrencyName"
-                label="Native Currency Name"
-                placeholder="Native Currency Name"
-                register={register}
-                error={errors.nativeCurrencyName?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="nativeCurrencySymbol"
-                label="Native Currency Symbol"
-                placeholder="Native Currency Symbol"
-                register={register}
-                error={errors.nativeCurrencySymbol?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="nativeCurrencyDecimals"
-                type="number"
-                label="Native Currency Decimals"
-                placeholder="Native Currency Decimals"
-                register={register}
-                error={errors.nativeCurrencyDecimals?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="publicRpcUrl"
-                label="Public RPC URL"
-                placeholder="Public RPC URL"
-                register={register}
-                type="url"
-                error={errors.publicRpcUrl?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="localRpcUrl"
-                label="Local RPC URL"
-                placeholder="Local RPC URL"
-                register={register}
-                type="url"
-                error={errors.localRpcUrl?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="logoURI"
-                label="Logo URI"
-                placeholder="Logo URI"
-                register={register}
-                type="url"
-                error={errors.logoURI?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Checkbox
-                name="isTestnet"
-                label="Is Testnet"
-                register={register}
-              />
-            </div>
-            <div className="mb-6">
-              <EnumSelect
-                name="chainType"
-                label="Chain Type"
-                enumValues={ChainType}
-                register={register}
-              />
-            </div>
+            <Input
+              disabled={editing}
+              name="chainId"
+              type="number"
+              label="Chain id"
+              placeholder="Chain ID"
+              register={register}
+              error={errors.chainId?.message}
+            />
+            <Input
+              name="name"
+              label="Chain name"
+              placeholder="Chain name"
+              register={register}
+              error={errors.name?.message}
+            />
+            <Input
+              name="bridge"
+              label="Bridge"
+              placeholder="Bridge"
+              register={register}
+              error={errors.bridge?.message}
+            />
+            <Input
+              name="inbox"
+              label="Inbox"
+              placeholder="Inbox"
+              register={register}
+              error={errors.inbox?.message}
+            />
+            <Input
+              name="sequencerInbox"
+              label="Sequencer Inbox"
+              placeholder="Sequencer Inbox"
+              register={register}
+              error={errors.sequencerInbox?.message}
+            />
+            <Input
+              name="outbox"
+              label="Outbox"
+              placeholder="Outbox"
+              register={register}
+              error={errors.outbox?.message}
+            />
+            <Input
+              name="rollup"
+              label="Rollup"
+              placeholder="Rollup"
+              register={register}
+              error={errors.rollup?.message}
+            />
+            <Input
+              name="explorerUrl"
+              label="Explorer URL"
+              placeholder="Explorer URL"
+              register={register}
+              error={errors.explorerUrl?.message}
+            />
+            <Input
+              name="nativeCurrencyName"
+              label="Native Currency Name"
+              placeholder="Native Currency Name"
+              register={register}
+              error={errors.nativeCurrencyName?.message}
+            />
+            <Input
+              name="nativeCurrencySymbol"
+              label="Native Currency Symbol"
+              placeholder="Native Currency Symbol"
+              register={register}
+              error={errors.nativeCurrencySymbol?.message}
+            />
+            <Input
+              name="nativeCurrencyDecimals"
+              type="number"
+              label="Native Currency Decimals"
+              placeholder="Native Currency Decimals"
+              register={register}
+              error={errors.nativeCurrencyDecimals?.message}
+            />
+            <Input
+              name="publicRpcUrl"
+              label="Public RPC URL"
+              placeholder="Public RPC URL"
+              register={register}
+              type="url"
+              error={errors.publicRpcUrl?.message}
+            />
+            <Input
+              name="localRpcUrl"
+              label="Local RPC URL"
+              placeholder="Local RPC URL"
+              register={register}
+              type="url"
+              error={errors.localRpcUrl?.message}
+            />
+            <Input
+              name="logoURI"
+              label="Logo URI"
+              placeholder="Logo URI"
+              register={register}
+              type="url"
+              error={errors.logoURI?.message}
+            />
+            <Checkbox name="isTestnet" label="Is Testnet" register={register} />
+            <EnumSelect
+              name="chainType"
+              label="Chain Type"
+              enumValues={ChainType}
+              register={register}
+            />
           </div>
           <Button
             type="submit"

@@ -43,34 +43,34 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   const { chains } = useChains();
 
   const initializeCustomChains = async (address: Address) => {
-    const userChains = await CustomChainService.getUserChains(
+    let userChains = await CustomChainService.getUserChains(
       address,
       "",
       FILTERS.ALL
     );
     if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
       const defaultChain = { ...customArbitrum, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
+      userChains.push({ ...defaultChain, user: address });
+      await CustomChainService.addChain(defaultChain, address);
     }
     if (!userChains.some((x) => x.chainId === customMainnet.chainId)) {
       const defaultChain = { ...customMainnet, user: address };
-      await CustomChainService.addChain(defaultChain);
+      await CustomChainService.addChain(defaultChain, address);
     }
     if (!userChains.some((x) => x.chainId === customSepolia.chainId)) {
       const defaultChain = { ...customSepolia, user: address };
-      await CustomChainService.addChain(defaultChain);
+      await CustomChainService.addChain(defaultChain, address);
     }
     if (!userChains.some((x) => x.chainId === customArbitrumSepolia.chainId)) {
       const defaultChain = { ...customArbitrumSepolia, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
+      userChains.push({ ...defaultChain, user: address });
+      await CustomChainService.addChain(defaultChain, address);
     }
 
     if (!userChains.some((x) => x.chainId === selectedChain.chainId))
       setSelectedChain(defaultCustomChild);
 
-    setCustomChains(userChains as CustomChain[]);
+    setCustomChains(userChains);
   };
 
   useEffect(() => {
@@ -84,15 +84,16 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
 
       setLoading(true);
       let parentChain = await CustomChainService.getChainById(
-        selectedChain.parentChainId
+        selectedChain.parentChainId,
+        address
       );
       if (!parentChain)
         parentChain = chains.filter(
           (x) => x.chainId === selectedChain.parentChainId
-        )[0] as any;
+        )[0];
       if (!parentChain) return;
 
-      setSelectedParentChain(parentChain as any);
+      setSelectedParentChain(parentChain);
       setLoading(false);
     };
     getParent();
@@ -109,6 +110,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
         ...selectedChain,
         isCustom: true,
       };
+
       registerCustomArbitrumNetwork(arbNetwork, {
         throwIfAlreadyRegistered: false,
       });

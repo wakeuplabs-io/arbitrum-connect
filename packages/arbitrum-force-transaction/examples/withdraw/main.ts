@@ -1,35 +1,47 @@
-import "dotenv/config"
-import { BigNumber, providers, Wallet } from 'ethers'
-import { ArbitrumBridge, ArbitrumDelayedInbox } from "arbitrum-force-transaction"
+import "dotenv/config";
+import { BigNumber, providers, Wallet } from "ethers";
+import {
+  ArbitrumBridge,
+  ArbitrumDelayedInbox,
+} from "arbitrum-force-transaction";
 
 if (!process.env.DEVNET_PRIVKEY) {
-    throw new Error('DEVNET_PRIVKEY env variable is required')
+  throw new Error("DEVNET_PRIVKEY env variable is required");
 } else if (!process.env.L2RPC) {
-    throw new Error('L2RPC env variable is required')
+  throw new Error("L2RPC env variable is required");
 } else if (!process.env.L1RPC) {
-    throw new Error('L1RPC env variable is required')
+  throw new Error("L1RPC env variable is required");
 }
 
-const walletPrivateKey = process.env.DEVNET_PRIVKEY as string
+const walletPrivateKey = process.env.DEVNET_PRIVKEY as string;
 
-const l1Provider = new providers.JsonRpcProvider(process.env.L1RPC)
-const l2Provider = new providers.JsonRpcProvider(process.env.L2RPC)
+const l1Provider = new providers.JsonRpcProvider(process.env.L1RPC);
+const l2Provider = new providers.JsonRpcProvider(process.env.L2RPC);
 
-const l1Wallet = new Wallet(walletPrivateKey, l1Provider)
-const l2Wallet = new Wallet(walletPrivateKey, l2Provider)
+const l1Wallet = new Wallet(walletPrivateKey, l1Provider);
+const l2Wallet = new Wallet(walletPrivateKey, l2Provider);
 
-const amountInWei = 1
+const amountInWei = 1;
 
-const arbDelayedInbox = new ArbitrumDelayedInbox(421614)
-const arbBridge = new ArbitrumBridge(l1Provider, l2Provider)
+const arbDelayedInbox = new ArbitrumDelayedInbox(421614);
+const arbBridge = new ArbitrumBridge(l1Provider, l2Provider);
 
 async function initiateWithdraw() {
-    const bridgeTx = await arbBridge.assembleWithdraw(l2Wallet.address, BigNumber.from(amountInWei))
-    
-    const signedTx = await arbDelayedInbox.signChildTransaction(l2Wallet, bridgeTx)
-    const delayedInboxTx = await arbDelayedInbox.sendChildTransactionToParent(l1Wallet, signedTx)
+  const bridgeTx = await arbBridge.assembleWithdraw(
+    l2Wallet.address,
+    BigNumber.from(amountInWei)
+  );
 
-    return delayedInboxTx
+  const signedTx = await arbDelayedInbox.signChildTransaction(
+    l2Wallet,
+    bridgeTx
+  );
+  const delayedInboxTx = await arbDelayedInbox.sendChildTransactionToParent(
+    l1Wallet,
+    signedTx
+  );
+
+  return delayedInboxTx;
 }
 
 // =========================================================================
@@ -42,7 +54,7 @@ async function initiateWithdraw() {
 // initiateWithdraw().then(console.log)
 
 // If the sequencer didn't take our tx for 24 hours, this should be true
-arbDelayedInbox.canForceInclude(l1Wallet).then(console.log)
+arbDelayedInbox.canForceInclude(l1Wallet).then(console.log);
 
 // If the sequencer didn't take our tx for 24 hours, we can run this to force include it
 // forceInclude(l1Wallet, l2Wallet).then(console.log)

@@ -3,15 +3,17 @@
 [Original Proposal Link](https://forum.arbitrum.foundation/t/tally-front-end-interface-to-force-transaction-inclusion-during-sequencer-downtime/21247)
 
 ## **Objective**
+
 To design and implement a robust open-source front-end interface enabling transaction force-inclusion during sequencer downtime for Orbit Chains. This includes researching delayed inbox mechanisms and integrating the solution into the broader Orbit ecosystem.
 
 ---
 
 ## **Scope**
+
 1. Analyze the **Orbit Chain stack** to understand existing infrastructure and limitations.
 2. Research mechanisms for **Force-Inclusion** during sequencer downtime.
-4. Produce public-facing documentation for technical insights and implementation guidance.
-5. Build a collaborative framework with Arbitrum DAO and ecosystem partners.
+3. Produce public-facing documentation for technical insights and implementation guidance.
+4. Build a collaborative framework with Arbitrum DAO and ecosystem partners.
 
 ---
 
@@ -19,13 +21,14 @@ To design and implement a robust open-source front-end interface enabling transa
 
 1. **Sequencer:** In blockchain networks like Arbitrum, a sequencer is responsible for ordering transactions and ensuring they are processed correctly. It helps maintain the sequence and integrity of transactions on the network.
 2. **Cross-chain transfers:** These are transactions that move assets or data between
-different blockchain networks. For example, transferring funds from an Ethereum Layer 2 network to the Ethereum Layer 1 network.
+   different blockchain networks. For example, transferring funds from an Ethereum Layer 2 network to the Ethereum Layer 1 network.
 3. **Arbitrum SDK:** A software development kit (SDK) provided by Arbitrum, designed to facilitate the creation and management of applications on the Arbitrum blockchain, including tools for interacting with smart contracts and handling transactions.
 4. **Delayed Inbox Functionality:** Provides a mechanism for handling transaction delays during downtime. Users can submit transactions directly to L1 for forced inclusion, mitigating the risks of sequencer outages or censorship.
 5. **Outbox System:** Validates L2-to-L1 messages through Merkle proofs and manages the execution of these messages on L1, ensuring consistency with Arbitrum’s rollup design.
 6. **Arbitrum One** implements the Rollup protocol, which stores raw transaction data on Ethereum L1, while **Arbitrum Nova** implements the AnyTrust protocol, which uses a data availability committee (DAC) to store raw transaction data, expediting settlement and reducing costs by introducing a security assumption.
 
 ---
+
 ## State of the art
 
 The project builds on the foundational work of Arbitrum's Delayed Inbox and Outbox systems, leveraging their mechanisms to handle L2-to-L1 messaging during sequencer downtime or failures. These systems play a vital role in ensuring the resilience of Arbitrum Rollups by enabling the secure and reliable inclusion of L2 transactions on L1.
@@ -49,16 +52,16 @@ export class ArbitrumDelayedInbox {
     async assembleChildTransaction(l2Signer: ethers.Signer, tx: any) {
         const l2Network = await getArbitrumNetwork(this.childChainId)
         const inboxSdk = new InboxTools(l2Signer, l2Network)
-    
+
         return await inboxSdk.assembleChildTx(tx, l2Signer)
     }
 
     async signChildTransaction(l2Signer: ethers.Signer, tx: any): Promise<string> {
         const l2Network = await getArbitrumNetwork(this.childChainId)
         const inboxSdk = new InboxTools(l2Signer, l2Network)
-    
+
         const l2SignedTx = await inboxSdk.signChildTx(tx, l2Signer)
-        const l2TxHash = ethers.utils.parseTransaction(l2SignedTx).hash 
+        const l2TxHash = ethers.utils.parseTransaction(l2SignedTx).hash
         if (!l2TxHash) {
             throw new Error("Error signing child transaction")
         }
@@ -68,9 +71,9 @@ export class ArbitrumDelayedInbox {
     async sendChildTransaction(l2Signer: ethers.Signer, tx: any): Promise<string> {
         const l2Network = await getArbitrumNetwork(this.childChainId)
         const inboxSdk = new InboxTools(l2Signer, l2Network)
-    
+
         const l2SignedTx = await inboxSdk.sendChildTx(tx, l2Signer)
-        const l2TxHash = ethers.utils.parseTransaction(l2SignedTx).hash 
+        const l2TxHash = ethers.utils.parseTransaction(l2SignedTx).hash
         if (!l2TxHash) {
             throw new Error("Error signing child transaction")
         }
@@ -91,16 +94,16 @@ export class ArbitrumDelayedInbox {
     async canForceInclude(l1Signer: ethers.Signer) {
         const l2Network = getArbitrumNetwork(this.childChainId);
         const inboxSdk = new InboxTools(l1Signer, l2Network);
-    
+
         return !!(await inboxSdk.getForceIncludableEvent());
     }
 
     async forceInclude(l1Signer: ethers.Signer): Promise<ethers.ContractReceipt | null> {
         const l2Network = getArbitrumNetwork(this.childChainId);
         const inboxTools = new InboxTools(l1Signer, l2Network);
-    
+
         const forceInclusionTx = await inboxTools.forceInclude();
-    
+
         if (forceInclusionTx) {
             return await forceInclusionTx.wait();
         } else return null;
@@ -110,30 +113,24 @@ export class ArbitrumDelayedInbox {
 
 The core of the solution lies in establishing communication with the Delayed Inbox. The primary objective at this stage is to develop a comprehensive plan and identify potential limitations within the implementation of Orbit Chains.
 
-
 ### Process flow
 
 The Arbitrum Sdk supports all types of transactions, but our user interface (UI) is currently
 limited to handling withdrawals, the most popular and important use case. Here's a step-by-step breakdown of the withdrawal process:
 
 1. **Initiation:** Users specify the amount they wish to withdraw and sign the Layer 2 (L2)
-withdrawal transaction.
-    - We use the SDK's InboxTools signChildTx function to minimize complexity.
-    
+   withdrawal transaction. - We use the SDK's InboxTools signChildTx function to minimize complexity.
 2. **Submission to Delayed Inbox:** To account for potential sequencer failures or user
-bans, our system immediately submits the transaction to the Delayed Inbox. The user
-signs a second transaction on L1 to post the initial transaction.
-    - We use the SDK's InboxTools sendChildSignedTx function which executes the contract *Inbox.sol:SendL2Message* function.
-    
-3. **Waiting Period:** The system waits for the sequencer to process the transaction. If the sequencer resumes normal operations, the transaction is processed, and the user can claim the funds to complete the withdrawal.
-    - Validation consists of a local check for elapsed 24 hours plus the SDK’s InboxTools getForceIncludableEvent function which relies on two contracts: *SequencerInbox.sol:totalDelayedMessagesRead* function and
-*Bridge.sol:delayedInboxAccs* function.
+   bans, our system immediately submits the transaction to the Delayed Inbox. The user
+   signs a second transaction on L1 to post the initial transaction. - We use the SDK's InboxTools sendChildSignedTx function which executes the contract _Inbox.sol:SendL2Message_ function.
+3. **Waiting Period:** The system waits for the sequencer to process the transaction. If the sequencer resumes normal operations, the transaction is processed, and the user can claim the funds to complete the withdrawal. - Validation consists of a local check for elapsed 24 hours plus the SDK’s InboxTools getForceIncludableEvent function which relies on two contracts: _SequencerInbox.sol:totalDelayedMessagesRead_ function and
+   _Bridge.sol:delayedInboxAccs_ function.
 
 4. **Forced Inclusion:** If the sequencer does not process the transaction within ~24 hours, the user signs a final transaction on L1 to force the inclusion of the initial transaction, allowing for the subsequent withdrawal.
-    - Execution is achieved through the SDK's InboxTools forceInclude function which executes the contract SequencerInbox.sol:forceInclusion function.
+
+   - Execution is achieved through the SDK's InboxTools forceInclude function which executes the contract SequencerInbox.sol:forceInclusion function.
 
 5. **Funds Claim:** Regardless of the transaction being included by the sequencer or forced, the user can claim its funds through our UI (or through the bridge).
-
 
 ## Orbit Chains
 
@@ -147,13 +144,12 @@ The problem can be separated into two big categories: Orbit L2 and L3. In both c
 
 ```javascript
 // Pseudocode
-signChildTx();         // Sign the child transaction
-sendChildSignedTx();   // Send the signed child transaction
-forceInclusion();      // Force inclusion of the transaction
+signChildTx(); // Sign the child transaction
+sendChildSignedTx(); // Send the signed child transaction
+forceInclusion(); // Force inclusion of the transaction
 ```
 
-
-Every Orbit chain can be configured to be either a Rollup or AnyTrust Chain. They are powered by self-managed nodes running their own instance of Arbitrum Nitro's node software. This software implements both AnyTrust and Rollup protocols; your Orbit chain can be configured to use either. 
+Every Orbit chain can be configured to be either a Rollup or AnyTrust Chain. They are powered by self-managed nodes running their own instance of Arbitrum Nitro's node software. This software implements both AnyTrust and Rollup protocols; your Orbit chain can be configured to use either.
 
 As we can can think of Orbit chains as deployable, configurable instances of the Arbitrum Nitro tech stack, all of them will have the same architecture.
 
@@ -169,20 +165,17 @@ graph TD
         SequencerInbox["Sequencer Inbox"]
         DelayedInbox["Delayed Inbox"]
     end
-    
+
     L1 -->|Fast Path Messages| L2Rollup["L2 Rollup"]
     L1 -->|Delayed Messages| L2Rollup
 ```
 
 - The Sequencer Inbox and Delayed Inbox are deployed on L1 (Ethereum).
-Orbit Chain L2 Rollup interacts with these contracts to process messages:
-    - Fast Path Messages via the Sequencer Inbox.
-    - Delayed Messages via the Delayed Inbox.
+  Orbit Chain L2 Rollup interacts with these contracts to process messages: - Fast Path Messages via the Sequencer Inbox. - Delayed Messages via the Delayed Inbox.
 
 #### Limitations
 
 One potential limitation lies in the Arbitrum SDK, as it was primarily designed for use with the main Arbitrum chains. However, this is not a significant issue because each Orbit chain will have its own Sequencer and Delayed Inbox. Instead of relying solely on the SDK, we can directly interact with the relevant smart contracts, ensuring compatibility and functionality for custom Orbit deployments.
-
 
 #### Proof of concept
 
@@ -190,10 +183,10 @@ To illustrate the concept, we can use Arbitrum One as a proof of concept (PoC). 
 
 For our purposes, we focus on two critical components: the Sequencer Inbox and the Delayed Inbox. These contracts are present in all three example rollups mentioned: Arbitrum One, Arbitrum Nova, and Arbitrum Sepolia.
 
-| Contract            | Arbitrum One       | Arbitrum Nova      | Arbitrum Sepolia   |
-|---------------------|--------------------|--------------------|--------------------|
-| Sequencer Inbox    | [0x1c47...82B6](https://etherscan.io/address/0x1c479675ad559DC151F6Ec7ed3FbF8ceE79582B6)      | [0x211E...c21b](https://etherscan.io/address/0x211E1c4c7f1bF5351Ac850Ed10FD68CFfCF6c21b)      | [0x6c97...be0D](https://sepolia.etherscan.io/address/0x6c97864CE4bEf387dE0b3310A44230f7E3F1be0D)      |
-| Delayed Inbox      | [0x4Dbd...AB3f](https://etherscan.io/address/0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f)      | [0xc444...3949](https://etherscan.io/address/0xc4448b71118c9071Bcb9734A0EAc55D18A153949)      | [0xaAe2...ae21](https://sepolia.etherscan.io/address/0xaAe29B0366299461418F5324a79Afc425BE5ae21)      |
+| Contract        | Arbitrum One                                                                             | Arbitrum Nova                                                                            | Arbitrum Sepolia                                                                                 |
+| --------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Sequencer Inbox | [0x1c47...82B6](https://etherscan.io/address/0x1c479675ad559DC151F6Ec7ed3FbF8ceE79582B6) | [0x211E...c21b](https://etherscan.io/address/0x211E1c4c7f1bF5351Ac850Ed10FD68CFfCF6c21b) | [0x6c97...be0D](https://sepolia.etherscan.io/address/0x6c97864CE4bEf387dE0b3310A44230f7E3F1be0D) |
+| Delayed Inbox   | [0x4Dbd...AB3f](https://etherscan.io/address/0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f) | [0xc444...3949](https://etherscan.io/address/0xc4448b71118c9071Bcb9734A0EAc55D18A153949) | [0xaAe2...ae21](https://sepolia.etherscan.io/address/0xaAe29B0366299461418F5324a79Afc425BE5ae21) |
 
 Since each implementation includes both the Sequencer Inbox and the Delayed Inbox, we can replicate the steps already mentioned.
 
@@ -232,6 +225,7 @@ As a proof of concept, we deployed a rollup over Arbitrum. This resulted in the 
   "deployedAtBlockNumber": 101101355
 }
 ```
+
 For this implementation, the Sequencer Inbox and Inbox addresses are particularly important as they handle fast-path and delayed message flows.
 
 #### Architecture
@@ -244,17 +238,17 @@ graph TD
         SequencerInbox["Sequencer Inbox"]
         DelayedInbox["Delayed Inbox"]
     end
-    
+
     subgraph L2["Layer 2 (Rollup)"]
         L2Rollup["L2 Rollup"]
         SequencerInboxL2["Sequencer Inbox (L2)"]
         DelayedInboxL2["Delayed Inbox (L2)"]
     end
-    
+
     subgraph L3["Layer 3 (Orbit Chain)"]
         L3Orbit["L3 Orbit Chain"]
     end
-    
+
     L1 -->|Fast Path Messages| L2Rollup
     L1 -->|Delayed Messages| L2Rollup
     SequencerInboxL2 -->|Fast Path Messages| L3Orbit
@@ -269,24 +263,19 @@ For this case, we are focusing solely on L3-to-L2 communication.
 This implementation builds upon the existing version, extending it to support Orbit chains. The primary focus is on enabling transactions to be forced from an L3 Orbit Chain to Arbitrum (L2).
 
 1. **Chains selectors**
-    a. **From Label (L3 Source Selection)**
-        - The "From" field should present a list of well-known Orbit chains along with a custom option.
-        - **Important Note:** L3 Orbit Chains can only communicate directly with L2 (Arbitrum), not with L1.
+   a. **From Label (L3 Source Selection)** - The "From" field should present a list of well-known Orbit chains along with a custom option. - **Important Note:** L3 Orbit Chains can only communicate directly with L2 (Arbitrum), not with L1.
 
-    b. **To Label (L1 or L2 Source Selection)**
-        - The "To" field should present a list of well-known chains: Arbitrum or Ethereum.
-        **Important Note:** 
-            - L3 Orbit Chains can only communicate directly with L2 not with L1.
-            - L2 Orbit Chains can only communicate directly with L1 (Ethereum)
+   b. **To Label (L1 or L2 Source Selection)** - The "To" field should present a list of well-known chains: Arbitrum or Ethereum.
+   **Important Note:** - L3 Orbit Chains can only communicate directly with L2 not with L1. - L2 Orbit Chains can only communicate directly with L1 (Ethereum)
 
- **Example wireframe:**
+**Example wireframe:**
 
 ![image](./assets/wireframe-step1.png)
 
 3. **Custom Orbit Chain Option**
 
-    - To accommodate custom solutions, users should have the ability to add their own Orbit chains. This information could be stored in a centralized database.
-    - While the final design will undergo a proper UI/UX process, a preliminary concept for the UI might resemble the following image:
+   - To accommodate custom solutions, users should have the ability to add their own Orbit chains. This information could be stored in a centralized database.
+   - While the final design will undergo a proper UI/UX process, a preliminary concept for the UI might resemble the following image:
 
 ![image](./assets/wireframe-step2.png)
 
@@ -318,13 +307,10 @@ Once the process is complete, users will have their funds successfully transferr
 
 ## Considerations
 
-
 - **L3-to-L1 Transfers:** It is not possible to transfer funds directly from L3 to L1. However, this can be achieved in two steps by first transferring from L3 to L2 (Arbitrum) and then from L2 to L1.
 - **Placeholder Images:** The included images are for descriptive purposes only. A dedicated UI/UX designer will refine the interface to ensure a seamless and user-friendly experience in later stages.
 - **Adaptability:** The solution may require slight modifications during the development phase if any limitations are identified.
 - **Multichain:** Orbit Chains can function either as Layer 2 (L2) chains that settle directly on Ethereum or as Layer 3 (L3) chains that settle on any Ethereum L2, such as Arbitrum One. For L3 cases, the project will initially focus on L3 settling over Arbitrum, with plans to extend support to other L2s in the future, if feasible.
-
-
 
 ## Next Steps
 
@@ -332,7 +318,6 @@ Once the process is complete, users will have their funds successfully transferr
 - Adapt UI to show the most popular Orbit chains.
 - Create a BE with a DB to storage custom Orbit chains for users.
 - Document the solutions and issues found during the process of development.
-
 
 # Useful links
 

@@ -1,4 +1,3 @@
-import { useUser } from "@/hooks/use-user";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import cn from "classnames";
 import { ConnectButtonProps } from "node_modules/@rainbow-me/rainbowkit/dist/components/ConnectButton/ConnectButton";
@@ -8,13 +7,8 @@ interface ICustomConnectButton
     ConnectButtonProps {
   tooltip?: boolean;
 }
-export default function CustomConnectButton({
-  chainStatus,
-  tooltip,
-  children,
-  ...btnProps
-}: ICustomConnectButton) {
-  useUser();
+export default function CustomConnectButton(props: ICustomConnectButton) {
+  const { chainStatus, tooltip, ...btnProps } = props;
   return (
     <ConnectButton.Custom>
       {({
@@ -38,7 +32,7 @@ export default function CustomConnectButton({
           >
             {!connected ? (
               <button onClick={openConnectModal} type="button" {...btnProps}>
-                {children ?? "Connect Wallet"}
+                {props.children ?? "Connect Wallet"}
               </button>
             ) : chain.unsupported ? (
               <button onClick={openChainModal} type="button" {...btnProps}>
@@ -52,7 +46,7 @@ export default function CustomConnectButton({
                 data-tip={chain.name}
               >
                 <button onClick={openAccountModal} type="button" {...btnProps}>
-                  {chainStatus === "icon" && chain.hasIcon && (
+                  {props.chainStatus === "icon" && chain.hasIcon && (
                     <img src={chain.iconUrl} width={20} alt="chain icon" />
                   )}
                   {account.displayName}

@@ -2,12 +2,10 @@ import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
 import CustomChainService from "@/services/custom-chain-service";
 import {
-  ArbitrumNetwork,
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
-
 type ChainsContextType = {
   chains: CustomChain[];
   setChains: React.Dispatch<React.SetStateAction<CustomChain[]>>;
@@ -24,7 +22,6 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
     const getAllChains = async () => {
       // All chains must be registered to wagmi & to the arb sdk
       const allChains = await CustomChainService.getAllChains();
-
       // So we de-duplicate since we use the same table for every user
       const dedupedChains = allChains.filter(
         (obj, index, self) =>
@@ -42,13 +39,13 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
               ...chain,
               isCustom: true,
             };
-            registerCustomArbitrumNetwork(arbNetwork as ArbitrumNetwork, {
+            registerCustomArbitrumNetwork(arbNetwork, {
               throwIfAlreadyRegistered: false,
             });
           }
         });
 
-      setChains(dedupedChains as unknown as CustomChain[]);
+      setChains(dedupedChains);
     };
     getAllChains();
   }, []);
