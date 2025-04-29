@@ -62,7 +62,7 @@ export default function ConfirmWithdrawal({
             delayedInboxTimestamp: Date.now(),
           });
         },
-      },
+      }
     );
   }
 

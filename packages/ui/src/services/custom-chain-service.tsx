@@ -58,7 +58,7 @@ export default class CustomChainService {
   static addChain = async (chain: CustomChain, userAddress: Address) => {
     const existingChain = await CustomChainService.getChainById(
       chain.chainId,
-      userAddress,
+      userAddress
     );
 
     if (existingChain) return existingChain;
@@ -87,12 +87,12 @@ export default class CustomChainService {
   static getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS,
+    filter: FILTERS
   ) => {
     const filteredChains = await db.chains
       .where({ user: userAddress })
       .and((c) =>
-        search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
+        search ? c.name.toLowerCase().includes(search.toLowerCase()) : true
       )
       .and((c) => CustomChainService.filterChain(c, filter))
       .and((c) => c.chainType !== "L1")
@@ -124,7 +124,7 @@ export default class CustomChainService {
 
     const dbChain = await CustomChainService.getChainById(
       payload.chainId,
-      payload.user,
+      payload.user
     );
     if (!dbChain) throw new Error("attempting to edit another user's chain");
 
@@ -134,7 +134,7 @@ export default class CustomChainService {
         user: chain.user,
         chainId: chain.chainId,
       } as CustomChain,
-      { ...chain },
+      { ...chain }
     );
 
     return chain;
@@ -151,7 +151,7 @@ export default class CustomChainService {
       { id: chain.id, user: userAddress, chainId: chainId } as CustomChain,
       {
         featured: chain.featured,
-      },
+      }
     );
 
     return chain;

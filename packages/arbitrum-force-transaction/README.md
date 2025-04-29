@@ -1,4 +1,3 @@
-
 # Setup
 
 ## Patches in node_modules:
@@ -54,8 +53,3 @@ Or with `hardhat-mine`, adjust block, timestamp and rpc and run with `ts-node ha
 npm run start:arb
 npm run start:eth
 ```
-
-
-
-
-

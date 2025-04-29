@@ -92,9 +92,13 @@ export const ChainForm = ({
   const onSubmit = async (data: any) => {
     let parentChainId;
     if (data.chainType === ChainType.L3)
-      parentChainId = data.isTestnet ? customArbitrumSepolia.chainId : customArbitrum.chainId;
+      parentChainId = data.isTestnet
+        ? customArbitrumSepolia.chainId
+        : customArbitrum.chainId;
     if (data.chainType === ChainType.L2)
-      parentChainId = data.isTestnet ? customSepolia.chainId : customMainnet.chainId;
+      parentChainId = data.isTestnet
+        ? customSepolia.chainId
+        : customMainnet.chainId;
 
     if (!parentChainId) throw new Error("invalid chainType");
     const payload: CustomChainPayload = {
@@ -116,7 +120,7 @@ export const ChainForm = ({
     const validateChainId = async () => {
       const chainExists = await CustomChainService.getChainById(
         Number(chainId),
-        address,
+        address
       );
       if (chainExists) {
         // on submit button disabled checks for this error since async validation couldn't be achieved through Zod + react-hook-forms

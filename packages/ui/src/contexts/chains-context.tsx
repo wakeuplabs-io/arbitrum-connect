@@ -12,7 +12,7 @@ type ChainsContextType = {
 };
 
 export const ChainsContext = createContext<ChainsContextType | undefined>(
-  undefined,
+  undefined
 );
 
 export function ChainsProvider({ children }: { children: ReactNode }) {
@@ -25,7 +25,7 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
       // So we de-duplicate since we use the same table for every user
       const dedupedChains = allChains.filter(
         (obj, index, self) =>
-          self.findIndex((o) => o.chainId === obj.chainId) === index,
+          self.findIndex((o) => o.chainId === obj.chainId) === index
       );
       const arbNetworks = getArbitrumNetworks();
       dedupedChains
@@ -44,7 +44,6 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
             });
           }
         });
-
 
       setChains(dedupedChains);
     };

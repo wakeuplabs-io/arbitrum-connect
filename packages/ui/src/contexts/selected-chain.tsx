@@ -46,7 +46,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     let userChains = await CustomChainService.getUserChains(
       address,
       "",
-      FILTERS.ALL,
+      FILTERS.ALL
     );
     if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
       const defaultChain = { ...customArbitrum, user: address };
@@ -85,11 +85,11 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       let parentChain = await CustomChainService.getChainById(
         selectedChain.parentChainId,
-        address,
+        address
       );
       if (!parentChain)
         parentChain = chains.filter(
-          (x) => x.chainId === selectedChain.parentChainId,
+          (x) => x.chainId === selectedChain.parentChainId
         )[0];
       if (!parentChain) return;
 

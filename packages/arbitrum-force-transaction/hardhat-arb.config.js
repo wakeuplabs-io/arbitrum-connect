@@ -1,4 +1,4 @@
-require("dotenv/config")
+require("dotenv/config");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -9,8 +9,8 @@ module.exports = {
       blockGasLimit: 200000000,
       forking: {
         url: process.env.FORK_L2_RPC,
-        blockNumber: 69375379 
+        blockNumber: 69375379,
       },
     },
-  }
+  },
 };

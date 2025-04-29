@@ -22,8 +22,8 @@ Users can now withdraw funds while bypassing the sequencer, regardless of whethe
 
 To enhance privacy and ensure consistent handling of user data, we implemented an API that runs on AWS Lambda functions. These are backed by a dedicated PostgreSQL database, which keeps track of:
 
-- Users  
-- Features and custom chains (created by the user)  
-- Records of transactions associated with each user  
+- Users
+- Features and custom chains (created by the user)
+- Records of transactions associated with each user
 
 With this approach, users now enjoy a complete experience on the dApp — they can monitor their transactions and create a personalized environment by adding their own or custom Orbit Chains.

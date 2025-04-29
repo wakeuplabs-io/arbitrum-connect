@@ -11,7 +11,7 @@ type Web3ClientContextValue = {
 };
 
 const Web3ClientContext = createContext<Web3ClientContextValue | undefined>(
-  undefined,
+  undefined
 );
 
 interface Web3ClientProviderProps {
@@ -28,7 +28,7 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
         ...selectedParentChain,
         id: selectedParentChain.chainId,
       }),
-    [selectedParentChain?.chainId],
+    [selectedParentChain?.chainId]
   );
 
   const childChainSelected = useMemo(
@@ -37,7 +37,7 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
         ...selectedChain,
         id: selectedChain.chainId,
       }),
-    [selectedChain?.chainId],
+    [selectedChain?.chainId]
   );
   const publicParentClient = useMemo(
     () =>
@@ -45,7 +45,7 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
         chain: parentChainSelected,
         transport: http(parentChainSelected.rpcUrls.default.http[0]),
       }),
-    [parentChainSelected.chainId],
+    [parentChainSelected.chainId]
   );
 
   const publicChildClient = useMemo(
@@ -54,22 +54,22 @@ export const Web3ClientProvider: React.FC<Web3ClientProviderProps> = ({
         chain: childChainSelected,
         transport: http(childChainSelected.rpcUrls.default.http[0]),
       }),
-    [childChainSelected.chainId],
+    [childChainSelected.chainId]
   );
 
   const parentProvider = useMemo(
     () =>
       new ethers.providers.JsonRpcProvider(
-        parentChainSelected.rpcUrls.default.http[0],
+        parentChainSelected.rpcUrls.default.http[0]
       ),
-    [parentChainSelected.chainId],
+    [parentChainSelected.chainId]
   );
   const childProvider = useMemo(
     () =>
       new ethers.providers.JsonRpcProvider(
-        childChainSelected.rpcUrls.default.http[0],
+        childChainSelected.rpcUrls.default.http[0]
       ),
-    [childChainSelected.chainId],
+    [childChainSelected.chainId]
   );
 
   const values = {

@@ -28,7 +28,7 @@ export function useCustomChain() {
     setLoading(true);
     const newChains = await CustomChainService.deleteChain(
       userAddress,
-      chainId,
+      chainId
     );
     setChains(newChains);
     setCustomChains(newChains);
@@ -37,13 +37,13 @@ export function useCustomChain() {
   const getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS,
+    filter: FILTERS
   ) => {
     setLoading(true);
     const filteredChains = await CustomChainService.getUserChains(
       userAddress,
       search,
-      filter,
+      filter
     );
     setCustomChains(filteredChains);
     setLoading(false);

@@ -28,6 +28,8 @@ describe("Counter", function () {
   });
 
   it("should not allow decrement below zero", async function () {
-    await expect(counter.decrement()).to.be.revertedWith("Counter: cannot decrement below zero");
+    await expect(counter.decrement()).to.be.revertedWith(
+      "Counter: cannot decrement below zero"
+    );
   });
 });
