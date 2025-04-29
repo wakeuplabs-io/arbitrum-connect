@@ -8,7 +8,6 @@ interface TestnetIndicatorProps {
 
 export function TestnetIndicator(props: TestnetIndicatorProps) {
   const { isConnected } = useAccount();
-
   
   // If user is connected to a testnet
   if (envParsed().IS_TESTNET && isConnected) {
