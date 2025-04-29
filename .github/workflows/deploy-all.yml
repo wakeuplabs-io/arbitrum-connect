@@ -87,6 +87,8 @@ jobs:
           echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
           echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
           echo "VITE_API_URL=${{ vars.API_URL }}" >> .env
+          echo "VITE_HTTPS_ETH_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com"  >> .env
+          echo "VITE_HTTPS_ARB_RPC_URL=https://sepolia-rollup.arbitrum.io/rpc" >> .env
 
       - name: Build UI
         working-directory: ./packages/ui
