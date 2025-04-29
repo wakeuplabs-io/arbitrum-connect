@@ -15,8 +15,8 @@ type RpcUrls = {
 type BlockExplorers = {
   default: {
     url: string;
-  };
-};
+  }
+}
 
 type NetworkConfig = {
   id?: number;
@@ -29,11 +29,11 @@ type NetworkConfig = {
   chainType: ChainType | "L1";
 };
 
-export type CustomChain = ArbitrumNetwork & NetworkConfig;
+export type CustomChain = ArbitrumNetwork & NetworkConfig
 
 export enum ChainType {
-  L2 = "L2",
-  L3 = "L3",
+  L2 = 'L2',
+  L3 = 'L3',
 }
 
 export type CustomChainPayload = {

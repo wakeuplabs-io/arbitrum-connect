@@ -1,7 +1,7 @@
 import { FILTERS } from "@/constants";
+import { db } from "@/db/db";
 import { CustomChainPayload, CustomChain } from "@/types";
 import { Address } from "viem";
-import { api } from "./api";
 
 export default class CustomChainService {
   static formatChainPayload(data: CustomChainPayload): CustomChain {
@@ -41,28 +41,37 @@ export default class CustomChainService {
   }
 
   static createChain = async (payload: CustomChainPayload) => {
+    const chainExists = await db.chains
+      .where(["user", "chainId"])
+      .equals([payload.user, payload.chainId])
+      .first();
+
+    if (chainExists) throw new Error("Chain already exists");
+
     const chain = CustomChainService.formatChainPayload(payload);
-    await api.chains.create(chain);
+
+    db.chains.add(chain);
+
     return chain;
   };
 
-  static addChain = async (chain: CustomChain) => {
-    const existingChain = await CustomChainService.getChainById(chain.chainId);
+  static addChain = async (chain: CustomChain, userAddress: Address) => {
+    const existingChain = await CustomChainService.getChainById(
+      chain.chainId,
+      userAddress,
+    );
 
     if (existingChain) return existingChain;
 
-    await api.chains.create(chain);
+    await db.chains.add({ ...chain, id: undefined });
 
     return chain;
   };
 
   static deleteChain = async (userAddress: Address, chainId: number) => {
-    await api.chains.delete(chainId);
+    await db.chains.where({ user: userAddress, chainId }).delete();
 
-    return await Promise.all([
-      api.chains.getAllUserChains(userAddress),
-      api.chains.getAllPublic(),
-    ]).then(([userChains, allChains]) => [...userChains, ...allChains]);
+    return await db.chains.where("user").equals(userAddress).toArray();
   };
 
   static filterChain(chain: CustomChain, filter: FILTERS) {
@@ -78,53 +87,72 @@ export default class CustomChainService {
   static getUserChains = async (
     userAddress: Address,
     search: string = "",
-    filter: FILTERS
+    filter: FILTERS,
   ) => {
-    const [publicChains, userChains] = await Promise.all([
-      api.chains.getAllPublic(),
-      api.chains.getAllUserChains(userAddress),
-    ]);
-    const filteredChains = [...publicChains, ...userChains]
-      .filter((chain) =>
-        search ? chain.name.toLowerCase().includes(search.toLowerCase()) : true
+    const filteredChains = await db.chains
+      .where({ user: userAddress })
+      .and((c) =>
+        search ? c.name.toLowerCase().includes(search.toLowerCase()) : true,
       )
-      .filter((chain) =>
-        CustomChainService.filterChain(chain as CustomChain, filter)
-      )
-      .filter((chain) => chain.chainType !== "L1");
-
+      .and((c) => CustomChainService.filterChain(c, filter))
+      .and((c) => c.chainType !== "L1")
+      .toArray();
     return filteredChains;
   };
 
   static getAllChains = async () => {
-    const apiChains = await api.chains.getAllPublic();
-    return apiChains;
+    const dbChains = await db.chains.toArray();
+
+    return dbChains;
   };
 
-  static getChainById = async (chainId: number) => {
-    const chain = await api.chains.getByChainId(chainId);
+  static getChainById = async (chainId: number, userAddress?: Address) => {
+    let chain: CustomChain | undefined;
 
-    return chain;
+    if (userAddress)
+      chain = await db.chains
+        .where(["user", "chainId"])
+        .equals([userAddress, chainId])
+        .first();
+    else chain = await db.chains.where("chainId").equals(chainId).first();
+
+    return chain || null;
   };
 
   static editChain = async (payload: CustomChainPayload) => {
     const chain = CustomChainService.formatChainPayload(payload);
 
-    const dbChain = await CustomChainService.getChainById(payload.chainId);
+    const dbChain = await CustomChainService.getChainById(
+      payload.chainId,
+      payload.user,
+    );
     if (!dbChain) throw new Error("attempting to edit another user's chain");
 
-    await api.chains.edit(chain);
+    await db.chains.update(
+      {
+        id: dbChain.id,
+        user: chain.user,
+        chainId: chain.chainId,
+      } as CustomChain,
+      { ...chain },
+    );
+
     return chain;
   };
 
-  static featureChain = async (chainId: number, userAddress: Address) => {
-    const chain = await api.chains.getByChainId(chainId);
+  static featureChain = async (userAddress: Address, chainId: number) => {
+    let chain = await db.chains.where({ user: userAddress, chainId }).first();
 
     if (!chain) throw new Error("Chain doesn't exist for the user");
 
     chain.featured = !chain.featured;
 
-    await api.chains.setFeatured(chain.chainId, chain.featured, userAddress);
+    await db.chains.update(
+      { id: chain.id, user: userAddress, chainId: chainId } as CustomChain,
+      {
+        featured: chain.featured,
+      },
+    );
 
     return chain;
   };

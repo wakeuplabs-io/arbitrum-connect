@@ -30,5 +30,5 @@ body div#root div[data-rk] {
 }
 
 .collapse-title::after {
-  inset-inline-end: 1rem !important;
+  inset-inline-end: 1rem !important
 }

@@ -18,7 +18,7 @@ const Button: React.FC<ButtonProps> = ({
       className={classNames(
         "btn w-full btn-primary font-normal rounded-3xl text-neutral-100 disabled:text-neutral-400 disabled:bg-neutral-200",
         { "animate-shake": error },
-        className
+        className,
       )}
       {...rest}
     >

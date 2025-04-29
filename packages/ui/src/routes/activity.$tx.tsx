@@ -14,7 +14,7 @@ import { Address, formatEther } from "viem";
 export const Route = createFileRoute("/activity/$tx")({
   loader: async ({ params }) => {
     const tx = await TransactionsStorageService.getByBridgeHash(
-      (params.tx as Address) ?? "0x"
+      (params.tx as Address) ?? "0x",
     );
     if (!tx) throw notFound();
     return tx;

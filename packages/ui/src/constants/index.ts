@@ -1,11 +1,10 @@
-import type { NavbarLink } from "@/components/layout/navbar";
-import envParsed from "@/envParsed";
+import type { NavbarLink } from '@/components/layout/navbar';
+import envParsed from '@/envParsed';
 
-export const LEARN_MORE_URI =
-  "https://docs.arbitrum.io/how-arbitrum-works/sequencer";
+export const LEARN_MORE_URI = 'https://docs.arbitrum.io/how-arbitrum-works/sequencer';
 export const NAV_LINKS: NavbarLink[] = [
   {
-    label: "Learn more",
+    label: 'Learn more',
     to: envParsed().RESERCH_LINK_URL,
     targetBlank: true,
   },

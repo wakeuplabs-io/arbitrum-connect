@@ -4,11 +4,7 @@ interface ModalContextType {
   isOpen: boolean;
   title: string;
   description: string;
-  openModal: (
-    title: string,
-    description: string,
-    callback?: VoidFunction
-  ) => void;
+  openModal: (title: string, description: string, callback ?: VoidFunction) => void;
   closeModal: VoidFunction;
   onSubmit: VoidFunction | undefined;
   setOnSubmit: (callback: VoidFunction) => void;
@@ -20,15 +16,9 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [onSubmit, setOnSubmitCallback] = useState<VoidFunction | undefined>(
-    () => () => {}
-  );
+  const [onSubmit, setOnSubmitCallback] = useState<VoidFunction | undefined>(() => () => {});
 
-  const openModal = (
-    title: string,
-    description: string,
-    callback?: VoidFunction
-  ) => {
+  const openModal = (title: string, description: string, callback?: VoidFunction) => {
     setTitle(title);
     setDescription(description);
     setIsOpen(true);
@@ -47,15 +37,7 @@ export const ModalProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <ModalContext.Provider
-      value={{
-        isOpen,
-        title,
-        description,
-        openModal,
-        closeModal,
-        onSubmit,
-        setOnSubmit,
-      }}
+      value={{ isOpen, title, description, openModal, closeModal, onSubmit, setOnSubmit }}
     >
       {children}
     </ModalContext.Provider>

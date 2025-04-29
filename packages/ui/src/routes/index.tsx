@@ -79,7 +79,7 @@ function HomeScreen() {
                 type="number"
                 className={cn(
                   "flex bg-transparent text-primary-700 text-center text-7xl w-full outline-none remove-arrow font-semibold duration-200 ease-in-out focus:placeholder-transparent",
-                  { "text-red-600": error }
+                  { "text-red-600": error },
                 )}
               />
               <div className="flex gap-1 ml-4 text-neutral-400 items-center">
@@ -105,7 +105,7 @@ function HomeScreen() {
                 <div
                   className={cn(
                     "text-primary-700 font-bold text-xl duration-200 ease-in-out",
-                    { "text-red-600": error?.balance }
+                    { "text-red-600": error?.balance },
                   )}
                 >
                   ETH

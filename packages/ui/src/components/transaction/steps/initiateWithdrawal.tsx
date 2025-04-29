@@ -13,7 +13,7 @@ export default function InitiateWithdrawal({
 
   useEffect(() => {
     CustomChainService.getChainById(transaction.childChainId).then((x) => {
-      const txUrl = `${x?.explorer?.default.url}/tx/${transaction.bridgeHash}`;
+      const txUrl = `${x?.explorer.default.url}/tx/${transaction.bridgeHash}`;
       setL2TxUrl(txUrl);
     });
   }, []);
@@ -30,7 +30,6 @@ export default function InitiateWithdrawal({
         href={l2TxUrl}
         target="_blank"
         className="link text-sm flex space-x-1 items-center"
-        rel="noreferrer"
       >
         <span>Arbitrum tx </span>
         <ArrowUpRight className="h-3 w-3" />

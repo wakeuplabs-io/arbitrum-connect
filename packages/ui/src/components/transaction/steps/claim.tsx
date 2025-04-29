@@ -62,7 +62,7 @@ export default function ClaimStep({
             claimStatus: ClaimStatus.CLAIMED,
           });
         },
-      }
+      },
     );
   }
 

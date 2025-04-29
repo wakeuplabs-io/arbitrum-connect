@@ -3,7 +3,7 @@ import { Transaction } from "@/lib/transactions";
 import { ClaimStatus } from "./use-arbitrum-bridge";
 
 export function useTransactionStatus(
-  transaction: Transaction
+  transaction: Transaction,
 ): TransactionState {
   const withdrawCompleted = transaction.claimStatus === ClaimStatus.CLAIMED; //&& !transaction.delayedInboxHash && !transaction.delayedInboxTimestamp;
   if (withdrawCompleted) {

@@ -17,7 +17,7 @@ function ActivityScreen() {
   useEffect(() => {
     if (address)
       TransactionsStorageService.getByAccount(address).then((x) =>
-        setTxHistory(x)
+        setTxHistory(x),
       );
   }, [address]);
 
