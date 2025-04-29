@@ -8,25 +8,6 @@ import { dirname } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-/**
- * Ensures that logo paths are correctly formatted,
- * keeping them as relative paths to work in any environment
- */
-function normalizeLogoURI(logoURI: string): string {
-  // If it's a complete URL (e.g. https://...) leave it as is
-  if (logoURI.startsWith("http://") || logoURI.startsWith("https://")) {
-    return logoURI;
-  }
-
-  // If it already starts with /, leave it as is (relative path from root)
-  if (logoURI.startsWith("/")) {
-    return logoURI;
-  }
-
-  // For any other case, add / at the beginning
-  return `/${logoURI}`;
-}
-
 async function seed() {
   console.log("🌱 Seeding default chains...");
 
@@ -49,7 +30,7 @@ async function seed() {
           chainId: chain.chainId,
           parentChainId: chain.parentChainId,
           chainType: chain.chainType,
-          logoURI: chain.logoURI ? normalizeLogoURI(chain.logoURI) : null,
+          logoURI: chain.logoURI,
           confirmPeriodBlocks: chain.confirmPeriodBlocks,
           isTestnet: chain.isTestnet || false,
           isCustom: chain.isCustom || false,
