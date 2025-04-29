@@ -1,12 +1,10 @@
-import { useNavigate } from "@tanstack/react-router";
+import { IButtonProps } from "@/types";
+import {
+  useNavigate,
+} from "@tanstack/react-router";
 import cn from "classnames";
 
-interface HomeButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  className?: string;
-}
-
-const HomeButton: React.FC<HomeButtonProps> = ({ className, ...props }) => {
+export default function HomeButton({className, ...props} :  IButtonProps) {
   const navigate = useNavigate();
   return (
     <button
@@ -21,6 +19,4 @@ const HomeButton: React.FC<HomeButtonProps> = ({ className, ...props }) => {
       Return home
     </button>
   );
-};
-
-export default HomeButton;
+}

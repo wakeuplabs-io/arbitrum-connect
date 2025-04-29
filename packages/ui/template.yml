@@ -9,9 +9,6 @@ Parameters:
   DomainName:
     Description: The domain name of the existing Route 53 hosted zone
     Type: String
-  Subdomain:
-    Description: The subdomain name of the existing Route 53 hosted zone
-    Type: String
   HostedZoneId:
     Description: The ID of the existing Route 53 hosted zone
     Type: String
@@ -48,7 +45,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub "${Subdomain}.${DomainName}"
+      BucketName: !Sub "${StackName}.${DomainName}"
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: index.html
@@ -86,7 +83,7 @@ Resources:
           MinimumProtocolVersion: TLSv1.2_2021
         DefaultCacheBehavior:
           TargetOriginId: !Sub "${StackName}S3Origin"
-          ViewerProtocolPolicy: redirect-to-https
+          ViewerProtocolPolicy: redirect-to-https # Check what happens if there's no certificate, switch for allow-all
           AllowedMethods:
             - HEAD
             - GET
