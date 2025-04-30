@@ -5,13 +5,14 @@ on:
     branches:
       - main
       - develop
+      - devops/deploy-main
     paths:
       - "**/template.yml"
 
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || github.ref == 'refs/heads/develop' && 'Staging'}}
+    environment: ${{ github.ref == 'refs/heads/devops/deploy-main' && 'Production' || github.ref == 'refs/heads/develop' && 'Staging'}}
 
     steps:
       - uses: actions/checkout@v4
