@@ -3,7 +3,7 @@ name: Deploy Arbitrum Connect
 on:
   push:
     branches:
-      - devops/deploy-main
+      - main
       - develop
     paths:
       - "packages/**"
@@ -14,7 +14,7 @@ on:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: ${{ github.ref == 'refs/heads/devops/deploy-main' && 'Production' || github.ref == 'refs/heads/develop' && 'Staging'}}
+    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || github.ref == 'refs/heads/develop' && 'Staging'}}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -36,7 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      # Deploy infrastructure
+      # Deploy infrastructure (optional if it already exists)
       - name: SAM Build
         run: sam build
 
@@ -64,7 +64,7 @@ jobs:
       #   working-directory: ./packages/api
       #   run: |
       #     echo "DATABASE_URL=${{ vars.DATABASE_URL }}" > .env
-      #     echo "NODE_ENV=${{ github.ref == 'refs/heads/devops/deploy-main' && 'production' || 'development' }}" >> .env
+      #     echo "NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}" >> .env
 
       # - name: Build API package
       #   working-directory: ./packages/api
@@ -74,15 +74,15 @@ jobs:
       #   working-directory: ./packages/api
       #   run: |
       #         pnpm zip
-      #         aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/devops/deploy-main' && 'prod' || 'dev' }}
-      #         aws lambda wait function-updated --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/devops/deploy-main' && 'prod' || 'dev' }}
-      #         aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/devops/deploy-main' && 'prod' || 'dev' }} --handler dist/index.handler --environment "Variables={DATABASE_URL=${{ vars.DATABASE_URL }},NODE_ENV=${{ github.ref == 'refs/heads/devops/deploy-main' && 'production' || 'development' }},PRISMA_QUERY_ENGINE_LIBRARY=/var/task/dist/libquery_engine-rhel-openssl-3.0.x.so.node,CORS_ORIGINS=${{ vars.CORS_ORIGINS }},LOG_LEVEL=debug,PORT=9999,PRISMA_CLI_BINARY_TARGETS=rhel-openssl-3.0.x}"
+      #         aws lambda update-function-code --zip-file fileb://lambda.zip --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+      #         aws lambda wait function-updated --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+      #         aws lambda update-function-configuration --function-name arbitrum-connect-api-${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }} --handler dist/index.handler --environment "Variables={DATABASE_URL=${{ vars.DATABASE_URL }},NODE_ENV=${{ github.ref == 'refs/heads/main' && 'production' || 'development' }},PRISMA_QUERY_ENGINE_LIBRARY=/var/task/dist/libquery_engine-rhel-openssl-3.0.x.so.node,CORS_ORIGINS=${{ vars.CORS_ORIGINS }},LOG_LEVEL=debug,PORT=9999,PRISMA_CLI_BINARY_TARGETS=rhel-openssl-3.0.x}"
 
       # 3. Build and deploy UI
       - name: Generate UI env file
         working-directory: ./packages/ui
         env:
-          NETWORK: ${{ github.ref == 'refs/heads/devops/deploy-main' && 'mainnet' || 'sepolia'}}
+          NETWORK: ${{ github.ref == 'refs/heads/main' && 'mainnet' || 'sepolia'}}
         run: |
           echo "VITE_IS_TESTNET=${{ vars.IS_TESTNET }}" >> .env
           echo "VITE_RESERCH_LINK_URL=${{ vars.RESERCH_LINK_URL }}" >> .env
@@ -97,4 +97,4 @@ jobs:
       - name: Deploy UI to S3
         working-directory: ./packages/ui
         run: |
-          aws s3 sync dist s3://${{vars.SUBDOMAIN}}.${{vars.UI_DOMAIN}}/ --delete
+          aws s3 sync dist s3://${{vars.SUBDOMAIN}}.${{vars.UI_DOMAIN}}/ --delete 
