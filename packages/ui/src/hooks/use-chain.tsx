@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 export default function useChain() {
   const { chainId } = useAccount();
   const [isChainValid, setIsChainValid] = useState(false);
-
+  console.log("chainId", chainId);
   useEffect(() => {
     if (!chainId) return;
     setIsChainValid(isChainSupported(chainId));
