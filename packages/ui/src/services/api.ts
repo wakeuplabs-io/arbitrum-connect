@@ -4,7 +4,9 @@ import { Transaction } from "@/lib/transactions";
 import { Address } from "viem";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { CustomChain } from "@/types";
-const API_URL = import.meta.env.VITE_API_URL;
+import envParsed from "@/envParsed";
+
+const API_URL = envParsed().API_URL;
 const client = hc<AppType>(API_URL);
 
 // Define interface for API transaction response
