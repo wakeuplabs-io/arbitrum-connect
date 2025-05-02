@@ -69,10 +69,10 @@ export const api = {
     },
   },
   chains: {
-    getAllPublic: async () => {
+    getAllPublicChains: async () => {
       const res = await client.api.chains.chains.list.$get();
 
-      if (!res.ok) {
+      if (!res?.ok) {
         throw new Error("Failed to get all public chains");
       }
 
@@ -99,20 +99,24 @@ export const api = {
         chainId: parseInt(chain.chainId),
       }));
     },
-    getByChainId: async (chainId: number): Promise<CustomChain> => {
+    getByChainId: async (
+      chainId: number,
+      userAddress: Address
+    ): Promise<CustomChain> => {
       const res = await client.api.chains.chains.get[":id"].$get({
         param: { id: chainId.toString() },
+        query: { userAddress },
       });
-
+    
       if (!res.ok) {
         throw new Error("Failed to get chain");
       }
-
+    
       const data = await res.json();
-
+    
       return {
         ...data,
-        chainId: parseInt(data.chainId),
+        chainId: parseInt(data.chainId, 10),
       } as CustomChain;
     },
     create: async (chain: CustomChain) => {

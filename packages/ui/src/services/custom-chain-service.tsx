@@ -47,8 +47,11 @@ export default class CustomChainService {
     return chain;
   };
 
-  static addChain = async (chain: CustomChain) => {
-    const existingChain = await CustomChainService.getChainById(chain.chainId);
+  static addChain = async (chain: CustomChain, userAddress: Address) => {
+    const existingChain = await CustomChainService.getChainById(
+      chain.chainId,
+      userAddress
+    );
 
     if (existingChain) return existingChain;
 
@@ -62,7 +65,7 @@ export default class CustomChainService {
 
     return await Promise.all([
       api.chains.getAllUserChains(userAddress),
-      api.chains.getAllPublic(),
+      api.chains.getAllPublicChains(),
     ]).then(([userChains, allChains]) => [...userChains, ...allChains]);
   };
 
@@ -101,13 +104,22 @@ export default class CustomChainService {
     return matchesSearch && matchesFilter && isOrbitChain && matchesNetwork;
   }
 
-  static getUserChains = async (
+  static getUserChains = async (userAddress?: Address) => {
+    const promises = [api.chains.getAllPublicChains()];
+    if (userAddress) promises.push(api.chains.getAllUserChains(userAddress));
+
+    const [publicChains, userChains = []] = await Promise.all(promises);
+
+    return [...publicChains, ...userChains];
+  };
+
+  static getFilteredUserChains = async (
     userAddress: Address,
     search: string = "",
     filter: FILTERS,
     testnetFilter?: NetworkFilter
   ) => {
-    const promises = [api.chains.getAllPublic()];
+    const promises = [api.chains.getAllPublicChains()];
     if (userAddress !== "0x")
       promises.push(api.chains.getAllUserChains(userAddress));
 
@@ -124,12 +136,12 @@ export default class CustomChainService {
   };
 
   static getAllChains = async () => {
-    const apiChains = await api.chains.getAllPublic();
+    const apiChains = await api.chains.getAllPublicChains();
     return apiChains;
   };
 
-  static getChainById = async (chainId: number) => {
-    const chain = await api.chains.getByChainId(chainId);
+  static getChainById = async (chainId: number, userAddress: Address) => {
+    const chain = await api.chains.getByChainId(chainId, userAddress);
 
     return chain;
   };
@@ -137,15 +149,14 @@ export default class CustomChainService {
   static editChain = async (payload: CustomChainPayload) => {
     const chain = CustomChainService.formatChainPayload(payload);
 
-    const dbChain = await CustomChainService.getChainById(payload.chainId);
-    if (!dbChain) throw new Error("attempting to edit another user's chain");
+    // add signature for validation and send edited chain
 
     await api.chains.edit(chain);
     return chain;
   };
 
   static featureChain = async (chainId: number, userAddress: Address) => {
-    const chain = await api.chains.getByChainId(chainId);
+    const chain = await api.chains.getByChainId(chainId, userAddress);
 
     if (!chain) throw new Error("Chain doesn't exist for the user");
 

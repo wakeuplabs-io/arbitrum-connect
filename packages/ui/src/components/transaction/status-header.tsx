@@ -1,26 +1,24 @@
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { Transaction } from "@/lib/transactions";
-import CustomChainService from "@/services/custom-chain-service";
 import { formatEther } from "ethers/lib/utils";
 import { useEffect, useState } from "react";
 import { CustomChain } from "@/types";
 import ChainAvatar from "../chain-avatar";
+import { useChains } from "@/hooks/use-chains";
 
 export function TransactionStatusHeader(props: { tx: Transaction }) {
   const [txChildChain, setTxChildChain] = useState<CustomChain | null>();
-  const [chainLoading, setChainLoading] = useState<boolean>(false);
+  const { getChainById, isLoading: isChainsLoading } = useChains();
 
   useEffect(() => {
-    setChainLoading(true);
-    CustomChainService.getChainById(props.tx.childChainId).then((x) => {
-      setTxChildChain(x as CustomChain);
-      setChainLoading(false);
-    });
-  }, [props.tx.childChainId]);
+    if (isChainsLoading) return;
+    const childChain = getChainById(props.tx.childChainId);
+    setTxChildChain(childChain);
+  }, [props.tx.childChainId, isChainsLoading, getChainById]);
 
   if (txChildChain === null)
     return <>Missing configuration for chain id: {props.tx.childChainId}</>;
-  if (chainLoading) return undefined;
+  if (isChainsLoading) return undefined;
 
   return (
     <>

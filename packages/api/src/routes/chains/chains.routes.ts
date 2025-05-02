@@ -49,14 +49,17 @@ export const getChain = createRoute({
     params: z.object({
       id: z.string(),
     }),
+    query: z.object({
+      userAddress: z.string().optional(),
+    }),
   },
   tags,
   responses: {
     [HttpStatusCodes.OK]: jsonContent(ChainSchema, "A single chain"),
     [HttpStatusCodes.NOT_FOUND]: jsonContent(notFoundSchema, "Chain not found"),
     [HttpStatusCodes.UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(z.object({ id: z.string() })),
-      "Invalid chain id error"
+      createErrorSchema(z.object({ id: z.string(), userAddress: z.string() })),
+      "Invalid parameters"
     ),
   },
 });

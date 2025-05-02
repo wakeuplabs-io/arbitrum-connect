@@ -19,7 +19,7 @@ export const ChainSelector = () => {
   const {
     customChains,
     publicChains,
-    getUserChains,
+    getFilteredUserChains,
     getFilteredPublicChains,
     deleteChain,
     loading,
@@ -45,7 +45,7 @@ export const ChainSelector = () => {
 
   useEffect(() => {
     if (address) {
-      getUserChains(address, searchTerm, filter, testnetFilter);
+      getFilteredUserChains(address, searchTerm, filter, testnetFilter);
     } else {
       getFilteredPublicChains(searchTerm, filter, testnetFilter);
     }

@@ -7,9 +7,9 @@ import { useChains } from "./use-chains";
 import { useSelectedChain } from "./use-selected-chain";
 
 export function useCustomChain() {
-  const { setChains } = useChains();
+  const { setChains, isLoading: isChainsLoading } = useChains();
   const { customChains, setCustomChains } = useSelectedChain();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(isChainsLoading);
   const [publicChains, setPublicChains] = useState<CustomChain[]>([]);
 
   const createChain = async (chain: CustomChainPayload) => {
@@ -35,14 +35,20 @@ export function useCustomChain() {
     setCustomChains(newChains as CustomChain[]);
   };
 
-  const getUserChains = async (
+  const getUserChains = async (userAddress: Address) => {
+    setLoading(true);
+    const filteredChains = await CustomChainService.getUserChains(userAddress);
+    setCustomChains(filteredChains as CustomChain[]);
+    setLoading(false);
+  };
+  const getFilteredUserChains = async (
     userAddress: Address,
     search: string = "",
     filter: FILTERS,
     testnetFilter?: NetworkFilter
   ) => {
     setLoading(true);
-    const filteredChains = await CustomChainService.getUserChains(
+    const filteredChains = await CustomChainService.getFilteredUserChains(
       userAddress,
       search,
       filter,
@@ -118,6 +124,7 @@ export function useCustomChain() {
     createChain,
     deleteChain,
     getUserChains,
+    getFilteredUserChains,
     getFilteredPublicChains,
     editChain,
     setCustomChains,
