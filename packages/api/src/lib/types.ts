@@ -2,10 +2,12 @@
 import type { OpenAPIHono, RouteConfig, RouteHandler } from "@hono/zod-openapi";
 import type { Schema } from "hono";
 import type { PinoLogger } from "hono-pino";
+import { Address } from "viem";
 
 export interface AppBindings {
   Variables: {
     logger: PinoLogger;
+    userAddress: Address;
   };
 }
 

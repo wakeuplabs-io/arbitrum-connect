@@ -13,17 +13,19 @@ import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { SkeletonList } from "./loading";
 import { TestnetFilterTabs } from "./testnet-filter";
+import { useApiClient } from "@/hooks/use-api-client";
 
 export const ChainSelector = () => {
   const { address } = useAccount();
   const {
     customChains,
     publicChains,
-    getUserChains,
+    getFilteredUserChains,
     getFilteredPublicChains,
     deleteChain,
     loading,
   } = useCustomChain();
+  const client = useApiClient();
 
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
@@ -45,7 +47,7 @@ export const ChainSelector = () => {
 
   useEffect(() => {
     if (address) {
-      getUserChains(address, searchTerm, filter, testnetFilter);
+      getFilteredUserChains(searchTerm, filter, testnetFilter);
     } else {
       getFilteredPublicChains(searchTerm, filter, testnetFilter);
     }
@@ -59,7 +61,7 @@ export const ChainSelector = () => {
   const handleDeleteChain = (chain: CustomChain) => {
     openModal("Delete Chain", `Confirm action delete ${chain.name}`, () => {
       if (!address) return;
-      deleteChain(address, chain.chainId);
+      deleteChain(client, chain.chainId);
     });
   };
 

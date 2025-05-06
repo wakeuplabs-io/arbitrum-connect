@@ -7,9 +7,9 @@ import { Step, TransactionState } from "@/constants";
 import { Transaction } from "@/lib/transactions";
 import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
-import CustomChainService from "@/services/custom-chain-service";
 import { useEffect, useState } from "react";
 import { CustomChain } from "@/types";
+import { useChains } from "@/hooks/use-chains";
 
 export default function ConfirmWithdrawal({
   transaction,
@@ -32,6 +32,7 @@ export default function ConfirmWithdrawal({
     childChainId: transaction.childChainId,
   });
   const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
+  const { getChainById } = useChains();
 
   const confirmTx = useMutation({
     mutationFn: pushChildTxToParent,
@@ -64,24 +65,19 @@ export default function ConfirmWithdrawal({
             ...updatedTx,
             delayedInboxTimestamp: Date.now(),
           });
-          CustomChainService.getChainById(transaction.parentChainId).then(
-            (x) => {
-              const txUrl = `${x?.explorer?.default.url}/tx/${inboxTx.hash}`;
-
-              setParentTxUrl(txUrl);
-            }
-          );
+          const parentChain = getChainById(transaction.parentChainId);
+          const txUrl = `${parentChain?.explorer?.default.url}/tx/${inboxTx.hash}`;
+          setParentTxUrl(txUrl);
         },
       }
     );
   }
 
   useEffect(() => {
-    CustomChainService.getChainById(transaction.parentChainId).then((x) => {
-      const txUrl = `${x?.explorer?.default.url}/tx/${transaction.delayedInboxHash}`;
-      setParentTxUrl(txUrl);
-    });
-  }, []);
+    const parentChain = getChainById(transaction.parentChainId);
+    const txUrl = `${parentChain?.explorer?.default.url}/tx/${transaction.delayedInboxHash}`;
+    setParentTxUrl(txUrl);
+  }, [getChainById, transaction]);
 
   return (
     <StatusStep

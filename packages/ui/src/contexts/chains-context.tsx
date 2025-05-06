@@ -7,11 +7,12 @@ import {
   registerCustomArbitrumNetwork,
 } from "@arbitrum/sdk";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
-import { FILTERS } from "@/constants";
 
 type ChainsContextType = {
   chains: CustomChain[];
   setChains: React.Dispatch<React.SetStateAction<CustomChain[]>>;
+  getChainById(chainId: number): CustomChain | undefined;
+  isLoading: boolean;
 };
 
 export const ChainsContext = createContext<ChainsContextType | undefined>(
@@ -20,18 +21,16 @@ export const ChainsContext = createContext<ChainsContextType | undefined>(
 
 export function ChainsProvider({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<CustomChain[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getAllChains = async () => {
-      // All chains must be registered to wagmi & to the arb sdk
-      const lastAddress = localStorage.getItem("last-wallet-address");
-      const userChains = await CustomChainService.getUserChains(
-        (lastAddress ?? "0x") as `0x${string}`,
-        "",
-        FILTERS.ALL
-      );
+      setIsLoading(true);
+      const userChains = await CustomChainService.getUserChains();
 
+      // All chains must be registered to wagmi & to the arb sdk
       const arbNetworks = getArbitrumNetworks();
+      //Registering networks to arbitrum sdk
       userChains
         .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
         .filter((x) => x.isOrbit)
@@ -50,16 +49,26 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
           }
         });
 
+      // Setting chains which will be consumed to populate Wagmi config
       setChains(userChains as unknown as CustomChain[]);
+      setIsLoading(false);
     };
     getAllChains();
   }, []);
+
+  const getChainById = (chainId: number): CustomChain | undefined => {
+    const chain = chains.filter((x) => x.chainId === chainId)[0];
+
+    return chain;
+  };
 
   return (
     <ChainsContext.Provider
       value={{
         chains,
         setChains,
+        getChainById,
+        isLoading,
       }}
     >
       {children}

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/services/api";
 import { Transaction } from "@/lib/transactions";
+import { useChains } from "../use-chains";
 
 /**
  * Custom hook to fetch both parent and child chains associated with a transaction
@@ -11,14 +11,15 @@ export const useGetTransactionChains = (transaction?: Transaction) => {
   const parentChainId = transaction?.parentChainId;
   const childChainId = transaction?.childChainId;
   const txId = transaction?.bridgeHash;
+  const { getChainById } = useChains();
 
   const chainsQuery = useQuery({
     queryKey: ["tx-chains", txId],
-    queryFn: async () => {
-      const [parentChain, childChain] = await Promise.all([
-        api.chains.getByChainId(parentChainId!),
-        api.chains.getByChainId(childChainId!),
-      ]);
+    queryFn: () => {
+      const [parentChain, childChain] = [
+        getChainById(parentChainId!),
+        getChainById(childChainId!),
+      ];
 
       return { parentChain, childChain };
     },

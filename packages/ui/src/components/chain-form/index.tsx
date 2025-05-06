@@ -14,6 +14,7 @@ import { Checkbox } from "../checkbox";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { TokenBridge } from "@arbitrum/sdk/dist/lib/dataEntities/networks";
 import { useChains } from "@/hooks/use-chains";
+import { useApiClient } from "@/hooks/use-api-client";
 
 const tokenBridgeObjectSchema: z.ZodType<TokenBridge> = z.object({
   parentGatewayRouter: z.string(),
@@ -106,6 +107,7 @@ export const ChainForm = ({
   const { setSelectedChain } = useSelectedChain();
   const navigate = useNavigate();
   const { openConnectModal } = useConnectModal();
+  const client = useApiClient();
 
   const {
     register,
@@ -148,8 +150,8 @@ export const ChainForm = ({
     };
 
     if (address) {
-      if (editing) setSelectedChain(await editChain(payload));
-      else setSelectedChain(await createChain(payload));
+      if (editing) setSelectedChain(await editChain(client, payload));
+      else setSelectedChain(await createChain(client, payload));
 
       navigate({ to: "/" });
     }
@@ -165,8 +167,7 @@ export const ChainForm = ({
           chainExists = !!chains.filter(
             (x) => x.chainId === Number(chainId)
           )[0];
-        } catch (err) {
-          console.log("error: ", err);
+        } catch {
           // we catch it if no chain exist
         }
 

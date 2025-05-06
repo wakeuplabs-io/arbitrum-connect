@@ -30,7 +30,7 @@ type NetworkConfig = {
   isOrbit: boolean;
 };
 
-export type CustomChain = ArbitrumNetwork & NetworkConfig;
+export type CustomChain = ArbitrumNetwork & NetworkConfig & {isTestnet: boolean};
 
 export type CustomChainPayload = {
   isTestnet: boolean;
