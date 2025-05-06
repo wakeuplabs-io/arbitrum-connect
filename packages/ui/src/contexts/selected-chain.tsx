@@ -10,6 +10,7 @@ import { arbitrum, arbitrumSepolia } from "viem/chains";
 import { useAccount } from "wagmi";
 import { useChains } from "@/hooks/use-chains";
 import { FILTERS } from "@/constants";
+import { Address } from "viem";
 
 type SelectedChainContextType = {
   loading: boolean;
@@ -37,7 +38,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!address) return;
     const initializeCustomChains = async () => {
-      const userChains = await CustomChainService.getUserChains(address);
+      const userChains = await CustomChainService.getUserChains();
 
       if (!userChains.some((x) => x.chainId === selectedChain.chainId))
         setSelectedChain(defaultCustomChild);
@@ -49,7 +50,7 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
       setCustomChains(filteredUserChains as CustomChain[]);
     };
 
-    const lastAddress = localStorage.getItem("last-wallet-address");
+    const lastAddress = localStorage.getItem("last-wallet-address") as Address;
 
     if (address !== lastAddress) {
       localStorage.setItem("last-wallet-address", address);

@@ -26,11 +26,8 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const getAllChains = async () => {
       setIsLoading(true);
-      const lastAddress = localStorage.getItem("last-wallet-address") as
-      | `0x${string}`
-      | undefined;
-      const userChains = await CustomChainService.getUserChains(lastAddress);
-      
+      const userChains = await CustomChainService.getUserChains();
+
       // All chains must be registered to wagmi & to the arb sdk
       const arbNetworks = getArbitrumNetworks();
       //Registering networks to arbitrum sdk

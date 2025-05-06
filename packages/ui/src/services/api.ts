@@ -5,6 +5,7 @@ import { Address } from "viem";
 import { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import { CustomChain } from "@/types";
 import envParsed from "@/envParsed";
+import { AuthenticatedApiClient } from "@/hooks/use-api-client";
 
 const API_URL = envParsed().API_URL;
 const client = hc<AppType>(API_URL);
@@ -60,7 +61,7 @@ export const api = {
 
       return res.json();
     },
-    get: async (address: string) => {
+    get: async (client: AuthenticatedApiClient, address: string) => {
       const res = await client.api.users.users.get[":address"].$get({
         param: { address },
       });
@@ -83,7 +84,9 @@ export const api = {
         chainId: parseInt(chain.chainId),
       }));
     },
-    getAllUserChains: async (userAddress: string) => {
+    getAllUserChains: async () => {
+      const userAddress = localStorage.getItem("last-wallet-address") as Address
+
       const res = await client.api.chains.chains.list.user.$get({
         query: { userAddress },
       });
@@ -107,27 +110,27 @@ export const api = {
         param: { id: chainId.toString() },
         query: { userAddress },
       });
-    
+
       if (!res.ok) {
         throw new Error("Failed to get chain");
       }
-    
+
       const data = await res.json();
-    
+
       return {
         ...data,
         chainId: parseInt(data.chainId, 10),
       } as CustomChain;
     },
-    create: async (chain: CustomChain) => {
-      const res = await client.api.chains.chains.create.$post({
+    create: async (clientWithAuth: AuthenticatedApiClient, chain: CustomChain) => {
+      const res = await clientWithAuth.api.chains.chains.create.$post({
         json: {
           ...chain,
           userAddress: chain.user as string,
           logoURI: chain.logoURI ?? null,
           chainId: chain.chainId.toString(),
           tokenBridge: chain.tokenBridge,
-        },
+        }
       });
 
       if (!res.ok) {
@@ -138,15 +141,15 @@ export const api = {
 
       return data;
     },
-    edit: async (chain: CustomChain) => {
-      const res = await client.api.chains.chains.update.$put({
+    edit: async (clientWithAuth: AuthenticatedApiClient, chain: CustomChain) => {
+      const res = await clientWithAuth.api.chains.chains.update.$put({
         json: {
           ...chain,
           userAddress: chain.user as string,
           chainId: chain.chainId.toString(),
           logoURI: chain.logoURI ?? null,
           tokenBridge: chain.tokenBridge,
-        },
+        }
       });
 
       if (!res.ok) {
@@ -160,13 +163,12 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    setFeatured: async (
+    setFeatured: async (clientWithAuth: AuthenticatedApiClient,
       chainId: number,
-      featured: boolean,
-      userAddress: Address
+      featured: boolean
     ) => {
-      const res = await client.api.chains.chains["set-featured"].$put({
-        json: { chainId: chainId.toString(), featured, userAddress },
+      const res = await clientWithAuth.api.chains.chains["set-featured"].$put({
+        json: { chainId: chainId.toString(), featured }
       });
 
       if (!res.ok) {
@@ -180,11 +182,10 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    delete: async (userAddress: Address, chainId: number) => {
-      const res = await client.api.chains.chains.delete.$delete({
+    delete: async (clientWithAuth: AuthenticatedApiClient, chainId: number) => {
+      const res = await clientWithAuth.api.chains.chains.delete.$delete({
         json: {
           chainId: chainId.toString(),
-          userAddress,
         },
       });
 

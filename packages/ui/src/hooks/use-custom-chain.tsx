@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { CustomChain, CustomChainPayload, NetworkFilter } from "@/types";
-import { Address } from "viem";
 import { FILTERS } from "@/constants";
 import CustomChainService from "@/services/custom-chain-service";
 import { useChains } from "./use-chains";
 import { useSelectedChain } from "./use-selected-chain";
+import { AuthenticatedApiClient } from "./use-api-client";
+import { Address } from "viem";
 
 export function useCustomChain() {
   const { setChains, isLoading: isChainsLoading } = useChains();
@@ -12,9 +13,12 @@ export function useCustomChain() {
   const [loading, setLoading] = useState(isChainsLoading);
   const [publicChains, setPublicChains] = useState<CustomChain[]>([]);
 
-  const createChain = async (chain: CustomChainPayload) => {
+  const createChain = async (
+    client: AuthenticatedApiClient,
+    chain: CustomChainPayload
+  ) => {
     setLoading(true);
-    const newChain = await CustomChainService.createChain(chain);
+    const newChain = await CustomChainService.createChain(client, chain);
     setChains((currentChains) => {
       return [...currentChains, newChain];
     });
@@ -25,31 +29,29 @@ export function useCustomChain() {
     return newChain;
   };
 
-  const deleteChain = async (userAddress: Address, chainId: number) => {
+  const deleteChain = async (
+    client: AuthenticatedApiClient,
+    chainId: number
+  ) => {
+    const newChains = await CustomChainService.deleteChain(client, chainId);
     setLoading(true);
-    const newChains = await CustomChainService.deleteChain(
-      userAddress,
-      chainId
-    );
     setChains(newChains as CustomChain[]);
     setCustomChains(newChains as CustomChain[]);
   };
 
-  const getUserChains = async (userAddress: Address) => {
+  const getUserChains = async () => {
     setLoading(true);
-    const filteredChains = await CustomChainService.getUserChains(userAddress);
+    const filteredChains = await CustomChainService.getUserChains();
     setCustomChains(filteredChains as CustomChain[]);
     setLoading(false);
   };
   const getFilteredUserChains = async (
-    userAddress: Address,
     search: string = "",
     filter: FILTERS,
     testnetFilter?: NetworkFilter
   ) => {
     setLoading(true);
     const filteredChains = await CustomChainService.getFilteredUserChains(
-      userAddress,
       search,
       filter,
       testnetFilter
@@ -79,9 +81,12 @@ export function useCustomChain() {
     setLoading(false);
   };
 
-  const editChain = async (chain: CustomChainPayload) => {
+  const editChain = async (
+    client: AuthenticatedApiClient,
+    chain: CustomChainPayload
+  ) => {
     setLoading(true);
-    const editedChain = await CustomChainService.editChain(chain);
+    const editedChain = await CustomChainService.editChain(client, chain);
     setChains((currentChains) => {
       return currentChains.map((c) => {
         if (c.chainId === editedChain.chainId) {
@@ -102,13 +107,17 @@ export function useCustomChain() {
     return editedChain;
   };
 
-  const featureChain = async (userAddress: Address, chainId: number) => {
+  const featureChain = async (
+    client: AuthenticatedApiClient,
+    chainId: number
+  ) => {
     setLoading(true);
-    const chain = await CustomChainService.featureChain(chainId, userAddress);
+    const chain = await CustomChainService.featureChain(client, chainId);
+    const lastAddress = localStorage.getItem("last-wallet-address") as Address;
 
     setCustomChains((currentChains) => {
       return currentChains.map((c) => {
-        if (c.chainId === chain.chainId && c.user === userAddress) {
+        if (c.chainId === chain.chainId && c.user === lastAddress) {
           return chain as CustomChain;
         }
         return c;

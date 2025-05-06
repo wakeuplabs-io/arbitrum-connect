@@ -2,6 +2,7 @@ import { FILTERS, TESTNET_FILTER } from "@/constants";
 import { CustomChainPayload, CustomChain, NetworkFilter } from "@/types";
 import { Address } from "viem";
 import { api } from "./api";
+import { AuthenticatedApiClient } from "@/hooks/use-api-client";
 
 export default class CustomChainService {
   static formatChainPayload(data: CustomChainPayload): CustomChain {
@@ -41,30 +42,32 @@ export default class CustomChainService {
     };
   }
 
-  static createChain = async (payload: CustomChainPayload) => {
+  static createChain = async (
+    client: AuthenticatedApiClient,
+    payload: CustomChainPayload
+  ) => {
     const chain = CustomChainService.formatChainPayload(payload);
-    await api.chains.create(chain);
+    await api.chains.create(client, chain);
     return chain;
   };
 
-  static addChain = async (chain: CustomChain, userAddress: Address) => {
-    const existingChain = await CustomChainService.getChainById(
-      chain.chainId,
-      userAddress
-    );
-
-    if (existingChain) return existingChain;
-
-    await api.chains.create(chain);
+  static addChain = async (
+    client: AuthenticatedApiClient,
+    chain: CustomChain
+  ) => {
+    await api.chains.create(client, chain);
 
     return chain;
   };
 
-  static deleteChain = async (userAddress: Address, chainId: number) => {
-    await api.chains.delete(userAddress, chainId);
+  static deleteChain = async (
+    client: AuthenticatedApiClient,
+    chainId: number
+  ) => {
+    await api.chains.delete(client, chainId);
 
     return await Promise.all([
-      api.chains.getAllUserChains(userAddress),
+      api.chains.getAllUserChains(),
       api.chains.getAllPublicChains(),
     ]).then(([userChains, allChains]) => [...userChains, ...allChains]);
   };
@@ -104,9 +107,11 @@ export default class CustomChainService {
     return matchesSearch && matchesFilter && isOrbitChain && matchesNetwork;
   }
 
-  static getUserChains = async (userAddress?: Address) => {
+  static getUserChains = async () => {
+    const userAddress = localStorage.getItem("last-wallet-address") as Address;
+
     const promises = [api.chains.getAllPublicChains()];
-    if (userAddress) promises.push(api.chains.getAllUserChains(userAddress));
+    if (userAddress) promises.push(api.chains.getAllUserChains());
 
     const [publicChains, userChains = []] = await Promise.all(promises);
 
@@ -114,14 +119,14 @@ export default class CustomChainService {
   };
 
   static getFilteredUserChains = async (
-    userAddress: Address,
     search: string = "",
     filter: FILTERS,
     testnetFilter?: NetworkFilter
   ) => {
-    const promises = [api.chains.getAllPublicChains()];
-    if (userAddress !== "0x")
-      promises.push(api.chains.getAllUserChains(userAddress));
+    const promises = [
+      api.chains.getAllPublicChains(),
+      api.chains.getAllUserChains(),
+    ];
 
     const [publicChains, userChains] = await Promise.all(promises);
 
@@ -146,23 +151,31 @@ export default class CustomChainService {
     return chain;
   };
 
-  static editChain = async (payload: CustomChainPayload) => {
+  static editChain = async (
+    client: AuthenticatedApiClient,
+    payload: CustomChainPayload
+  ) => {
     const chain = CustomChainService.formatChainPayload(payload);
 
     // add signature for validation and send edited chain
 
-    await api.chains.edit(chain);
+    await api.chains.edit(client, chain);
     return chain;
   };
 
-  static featureChain = async (chainId: number, userAddress: Address) => {
-    const chain = await api.chains.getByChainId(chainId, userAddress);
+  static featureChain = async (
+    client: AuthenticatedApiClient,
+    chainId: number
+  ) => {
+    const address = localStorage.getItem("last-wallet-address") as Address;
+
+    const chain = await api.chains.getByChainId(chainId, address);
 
     if (!chain) throw new Error("Chain doesn't exist for the user");
 
     chain.featured = !chain.featured;
 
-    await api.chains.setFeatured(chain.chainId, chain.featured, userAddress);
+    await api.chains.setFeatured(client, chain.chainId, chain.featured);
 
     return chain;
   };

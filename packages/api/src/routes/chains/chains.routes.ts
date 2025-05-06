@@ -6,8 +6,9 @@ import { notFoundSchema } from "../../lib/constants";
 import {
   ChainSchema,
   CreateChainSchema,
-  UpdateChainSchema,
+  UpdateChainSchema
 } from "./chains.schema";
+import { userAddressAuthMiddleware } from "../../middlewares/user-address-auth";
 
 const tags = ["Chains"];
 
@@ -30,7 +31,6 @@ export const getAllUserChains = createRoute({
   request: {
     query: z.object({
       userAddress: z.string(),
-      name: z.string().optional(),
     }),
   },
   tags,
@@ -65,6 +65,7 @@ export const getChain = createRoute({
 });
 
 export const createChain = createRoute({
+  middleware: userAddressAuthMiddleware,
   path: "/chains/create",
   method: "post",
   request: {
@@ -81,6 +82,7 @@ export const createChain = createRoute({
 });
 
 export const updateChain = createRoute({
+  middleware: userAddressAuthMiddleware,
   path: "/chains/update",
   method: "put",
   request: {
@@ -98,6 +100,7 @@ export const updateChain = createRoute({
 });
 
 export const setFeaturedChain = createRoute({
+  middleware: userAddressAuthMiddleware,
   path: "/chains/set-featured",
   method: "put",
   request: {
@@ -105,7 +108,6 @@ export const setFeaturedChain = createRoute({
       z.object({
         chainId: z.string(),
         featured: z.boolean(),
-        userAddress: z.string(),
       }),
       "The chain to set featured"
     ),
@@ -118,13 +120,13 @@ export const setFeaturedChain = createRoute({
 });
 
 export const deleteChain = createRoute({
+  middleware: userAddressAuthMiddleware,
   path: "/chains/delete",
   method: "delete",
   request: {
     body: jsonContentRequired(
       z.object({
         chainId: z.string(),
-        userAddress: z.string(),
       }),
       "Request body to identify which chain to delete"
     ),
