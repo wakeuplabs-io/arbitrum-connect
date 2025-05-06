@@ -33,22 +33,10 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     useState<CustomChain>(defaultCustomMainnet);
   const { address } = useAccount();
   const [customChains, setCustomChains] = useState<CustomChain[]>([]);
-  const { getChainById, isLoading: chainsLoading } = useChains();
+  const { getChainById, isLoading: chainsLoading, chains } = useChains();
 
   useEffect(() => {
     if (!address) return;
-    const initializeCustomChains = async () => {
-      const userChains = await CustomChainService.getUserChains();
-
-      if (!userChains.some((x) => x.chainId === selectedChain.chainId))
-        setSelectedChain(defaultCustomChild);
-
-      const filteredUserChains = userChains.filter((x) =>
-        CustomChainService.filterChain(x as CustomChain, FILTERS.ALL, "")
-      );
-
-      setCustomChains(filteredUserChains as CustomChain[]);
-    };
 
     const lastAddress = localStorage.getItem("last-wallet-address") as Address;
 
@@ -57,8 +45,14 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
       window.location.reload();
     }
 
-    initializeCustomChains();
   }, [address, selectedChain.chainId]);
+
+  useEffect(() => {
+    const filteredUserChains = chains.filter((x) =>
+      CustomChainService.filterChain(x, FILTERS.ALL, "")
+    );
+    setCustomChains(filteredUserChains);
+  }, [chains]);
 
   useEffect(() => {
     const getParent = () => {
