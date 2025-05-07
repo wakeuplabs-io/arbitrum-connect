@@ -26,7 +26,7 @@ export default function ChainItem({
       className="flex flex-row gap-3 items-start cursor-pointer"
       onClick={handleClick}
     >
-      <ChainAvatar src={chain.logoURI} size={44} />
+      <ChainAvatar src={chain.logoURI} alt={chain?.name} size={44} />
       <div>
         <div className="md:text-sm text-xs text-neutral-500">{header}</div>
         <div className="flex items-end gap-3">

@@ -90,6 +90,9 @@ importers:
       stoker:
         specifier: ^1.4.2
         version: 1.4.2(@asteasolutions/zod-to-openapi@7.3.0(zod@3.23.8))(@hono/zod-openapi@0.19.2(hono@4.7.4)(zod@3.23.8))(hono@4.7.4)(openapi3-ts@4.4.0)
+      viem:
+        specifier: 2.17.3
+        version: 2.17.3(bufferutil@4.0.8)(typescript@5.5.3)(utf-8-validate@5.0.10)(zod@3.23.8)
       zod:
         specifier: ^3.23.8
         version: 3.23.8
@@ -152,25 +155,6 @@ importers:
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@swc/core@1.6.13)(@types/node@22.0.1)(typescript@5.5.3)
-
-  packages/db:
-    dependencies:
-      '@prisma/client':
-        specifier: ^5.10.0
-        version: 5.22.0(prisma@5.22.0)
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.17.24
-      prisma:
-        specifier: ^5.10.0
-        version: 5.22.0
-      ts-node:
-        specifier: ^10.9.2
-        version: 10.9.2(@swc/core@1.6.13)(@types/node@20.17.24)(typescript@5.5.3)
-      typescript:
-        specifier: ^5.4.0
-        version: 5.5.3
 
   packages/ui:
     dependencies:
@@ -249,10 +233,6 @@ importers:
       zod:
         specifier: 3.22.4
         version: 3.22.4
-    optionalDependencies:
-      '@rollup/rollup-linux-x64-gnu':
-        specifier: 4.14.2
-        version: 4.14.2
     devDependencies:
       '@synthetixio/synpress':
         specifier: ^3.7.3
@@ -260,6 +240,9 @@ importers:
       '@tanstack/eslint-plugin-query':
         specifier: 5.51.15
         version: 5.51.15(eslint@8.57.0)(typescript@5.5.3)
+      '@tanstack/react-query-devtools':
+        specifier: ^5.71.10
+        version: 5.71.10(@tanstack/react-query@5.51.1(react@18.2.0))(react@18.2.0)
       '@tanstack/router-cli':
         specifier: 1.45.13
         version: 1.45.13
@@ -296,6 +279,10 @@ importers:
       vite-tsconfig-paths:
         specifier: 4.3.2
         version: 4.3.2(typescript@5.5.3)(vite@5.2.0(@types/node@22.7.5)(terser@5.31.2))
+    optionalDependencies:
+      '@rollup/rollup-linux-x64-gnu':
+        specifier: 4.14.2
+        version: 4.14.2
 
 packages:
 
@@ -2596,6 +2583,15 @@ packages:
   '@tanstack/query-core@5.51.1':
     resolution: {integrity: sha512-fJBMQMpo8/KSsWW5ratJR5+IFr7YNJ3K2kfP9l5XObYHsgfVy1w3FJUWU4FT2fj7+JMaEg33zOcNDBo0LMwHnw==}
 
+  '@tanstack/query-devtools@5.71.5':
+    resolution: {integrity: sha512-Fq1JeAp+I52Md/KnyeFxzG7G0RpdHgeOfDNhSPkZQs/JqqXuAfpUf+wFHDz+vP0GZbSnla2JmcLSQebOkIb1yA==}
+
+  '@tanstack/react-query-devtools@5.71.10':
+    resolution: {integrity: sha512-n0xsIzwNvkIoZCmfHww28jFmnVTVzOt5dHj/py3LNFMJHGnJq9o9ttQESzVt2Hr7as00Aqf8ElVwH6na1o6dnw==}
+    peerDependencies:
+      '@tanstack/react-query': ^5.71.10
+      react: ^18 || ^19
+
   '@tanstack/react-query@5.51.1':
     resolution: {integrity: sha512-s47HKFnQ4HOJAHoIiXcpna/roMMPZJPy6fJ6p4ZNVn8+/onlLBEDd1+xc8OnDuwgvecqkZD7Z2mnSRbcWefrKw==}
     peerDependencies:
@@ -3093,6 +3089,7 @@ packages:
 
   '@walletconnect/sign-client@2.17.0':
     resolution: {integrity: sha512-sErYwvSSHQolNXni47L3Bm10ptJc1s1YoJvJd34s5E9h9+d3rj7PrhbiW9X82deN+Dm5oA8X9tC4xty1yIBrVg==}
+    deprecated: 'Reliability and performance improvements. See: https://github.com/WalletConnect/walletconnect-monorepo/releases'
 
   '@walletconnect/time@1.0.2':
     resolution: {integrity: sha512-uzdd9woDcJ1AaBZRhqy5rNC9laqWGErfc4dxA9a87mPdKOgWMD85mcFo9dIYIts/Jwocfwn07EC6EzclKubk/g==}
@@ -6043,6 +6040,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isstring@4.0.1:
     resolution: {integrity: sha512-0wJxfxH1wgO3GrbuP+dTTk7op+6L41QCXbGINEmD+ny/G/eCqGzxyCsh7159S+mgDDcoarnBw6PC1PS5+wUGgw==}
@@ -10498,7 +10496,7 @@ snapshots:
     dependencies:
       '@ethereumjs/tx': 4.2.0
       '@metamask/superstruct': 3.1.0
-      '@noble/hashes': 1.4.0
+      '@noble/hashes': 1.7.1
       '@scure/base': 1.1.7
       '@types/debug': 4.1.12
       debug: 4.3.5(supports-color@8.1.1)
@@ -11170,6 +11168,14 @@ snapshots:
   '@tanstack/history@1.44.2': {}
 
   '@tanstack/query-core@5.51.1': {}
+
+  '@tanstack/query-devtools@5.71.5': {}
+
+  '@tanstack/react-query-devtools@5.71.10(@tanstack/react-query@5.51.1(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@tanstack/query-devtools': 5.71.5
+      '@tanstack/react-query': 5.51.1(react@18.2.0)
+      react: 18.2.0
 
   '@tanstack/react-query@5.51.1(react@18.2.0)':
     dependencies:

@@ -1,19 +1,16 @@
 import { CustomChain } from "@/types";
-import { Trash2Icon, Star } from "lucide-react";
-import PencilIcon from "../../assets/pencil-icon.svg";
+import { Trash2Icon, Star, PencilIcon } from "lucide-react";
 import ChainAvatar from "../chain-avatar";
 
 interface IListItemProps {
   chain: CustomChain;
   onSelect: (chain: CustomChain) => void;
-  onFeaturedClick: (chain: CustomChain) => void;
   onDeleteClick: (chain: CustomChain) => void;
   onEditClick: (chain: CustomChain) => void;
 }
 export const ListItem = ({
   chain,
   onSelect,
-  onFeaturedClick,
   onDeleteClick,
   onEditClick,
 }: IListItemProps) => {
@@ -32,8 +29,7 @@ export const ListItem = ({
       <div className="flex gap-4 items-center z-10">
         {chain.isCustom && (
           <>
-            <img
-              src={PencilIcon}
+            <PencilIcon
               onClick={() => onEditClick(chain)}
               className="w-[18px] fill-[#E4E4E7] group-hover:fill-gray-dark"
             />
@@ -43,10 +39,13 @@ export const ListItem = ({
             />
           </>
         )}
-        <Star
-          onClick={() => onFeaturedClick(chain)}
-          className={`w-[18px] stroke-gray-icon hover:animate-pulse ${chain.featured ? "fill-gray-icon hover:fill-none" : "fill-none hover:fill-gray-icon"}`}
-        />
+        {chain.featured && (
+          <Star
+            className="w-[18px] hover:animate-pulse"
+            color={chain.featured ? "#c2be05" : "#E4E4E7"}
+            fill={chain.featured ? "#ddd906" : "#E4E4E7"}
+          />
+        )}
       </div>
     </ul>
   );

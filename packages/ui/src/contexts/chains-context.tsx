@@ -11,6 +11,8 @@ import { arbitrum, arbitrumSepolia } from "viem/chains";
 type ChainsContextType = {
   chains: CustomChain[];
   setChains: React.Dispatch<React.SetStateAction<CustomChain[]>>;
+  getChainById(chainId: number): CustomChain | undefined;
+  isLoading: boolean;
 };
 
 export const ChainsContext = createContext<ChainsContextType | undefined>(
@@ -19,20 +21,19 @@ export const ChainsContext = createContext<ChainsContextType | undefined>(
 
 export function ChainsProvider({ children }: { children: ReactNode }) {
   const [chains, setChains] = useState<CustomChain[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getAllChains = async () => {
-      // All chains must be registered to wagmi & to the arb sdk
-      const allChains = await CustomChainService.getAllChains();
+      setIsLoading(true);
+      const userChains = await CustomChainService.getUserChains();
 
-      // So we de-duplicate since we use the same table for every user
-      const dedupedChains = allChains.filter(
-        (obj, index, self) =>
-          self.findIndex((o) => o.chainId === obj.chainId) === index
-      );
+      // All chains must be registered to wagmi & to the arb sdk
       const arbNetworks = getArbitrumNetworks();
-      dedupedChains
+      //Registering networks to arbitrum sdk
+      userChains
         .filter((x) => !arbNetworks.some((y) => y.chainId === x.chainId))
+        .filter((x) => x.isOrbit)
         .forEach((chain) => {
           if (
             chain.chainId !== arbitrumSepolia.id &&
@@ -48,16 +49,26 @@ export function ChainsProvider({ children }: { children: ReactNode }) {
           }
         });
 
-      setChains(dedupedChains as unknown as CustomChain[]);
+      // Setting chains which will be consumed to populate Wagmi config
+      setChains(userChains as unknown as CustomChain[]);
+      setIsLoading(false);
     };
     getAllChains();
   }, []);
+
+  const getChainById = (chainId: number): CustomChain | undefined => {
+    const chain = chains.filter((x) => x.chainId === chainId)[0];
+
+    return chain;
+  };
 
   return (
     <ChainsContext.Provider
       value={{
         chains,
         setChains,
+        getChainById,
+        isLoading,
       }}
     >
       {children}

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { SearchInput } from "../sarch-input";
-import { CustomChain } from "@/types";
+import { CustomChain, NetworkFilter } from "@/types";
 import { useAccount } from "wagmi";
-import { FILTERS as CHAIN_FILTERS } from "@/constants";
+import { FILTERS as CHAIN_FILTERS, TESTNET_FILTER } from "@/constants";
 import { useCustomChain } from "@/hooks/use-custom-chain";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import { ListItem } from "./list-item";
@@ -11,27 +11,47 @@ import { AssetFilters } from "./filters";
 import { useModal } from "@/contexts/modal-context";
 import Button from "../button";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
-import { useChains } from "@/hooks/use-chains";
+import { SkeletonList } from "./loading";
+import { TestnetFilterTabs } from "./testnet-filter";
+import { useApiClient } from "@/hooks/use-api-client";
 
 export const ChainSelector = () => {
   const { address } = useAccount();
-  const { customChains, getUserChains, deleteChain, featureChain } =
-    useCustomChain();
+  const {
+    customChains,
+    publicChains,
+    getFilteredUserChains,
+    getFilteredPublicChains,
+    deleteChain,
+    loading,
+  } = useCustomChain();
+  const client = useApiClient();
+
   const { selectedChain, setSelectedChain } = useSelectedChain();
   const [filter, setFilter] = useState<CHAIN_FILTERS>(CHAIN_FILTERS.ALL);
+  const [testnetFilter, setTestnetFilter] = useState<NetworkFilter>(
+    TESTNET_FILTER.ALL
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { openConnectModal } = useConnectModal();
-  const { chains: allPublicChains } = useChains();
 
   const handleFiltersChange = (filter: CHAIN_FILTERS) => {
     setFilter(filter);
   };
 
+  const handleTestnetFilterChange = (testnetFilter: NetworkFilter) => {
+    setTestnetFilter(testnetFilter);
+  };
+
   useEffect(() => {
-    if (address) getUserChains(address, searchTerm, filter);
-  }, [address, searchTerm, filter]);
+    if (address) {
+      getFilteredUserChains(searchTerm, filter, testnetFilter);
+    } else {
+      getFilteredPublicChains(searchTerm, filter, testnetFilter);
+    }
+  }, [address, searchTerm, filter, testnetFilter]);
 
   const handleSelectChain = (chain: CustomChain) => {
     setSelectedChain(chain);
@@ -41,13 +61,8 @@ export const ChainSelector = () => {
   const handleDeleteChain = (chain: CustomChain) => {
     openModal("Delete Chain", `Confirm action delete ${chain.name}`, () => {
       if (!address) return;
-      deleteChain(address, chain.chainId);
+      deleteChain(client, chain.chainId);
     });
-  };
-
-  const handleFeatureChain = (chain: CustomChain) => {
-    if (!address) return;
-    featureChain(address, chain.chainId);
   };
 
   const handleEditChain = (chain: CustomChain) => {
@@ -65,7 +80,14 @@ export const ChainSelector = () => {
           Selected Chain:
           <p className="font-bold sm:ml-3">{selectedChain.name}</p>
         </h1>
-        <div className="mt-8 flex flex-col lg:flex-row justify-between lg:items-center gap-4">
+        <div className="mt-6">
+          <TestnetFilterTabs
+            onChange={handleTestnetFilterChange}
+            value={testnetFilter}
+          />
+        </div>
+
+        <div className="mt-6 flex flex-col lg:flex-row justify-between lg:items-center gap-4">
           <div className="flex-shrink lg:flex-grow">
             <SearchInput onChange={(value) => setSearchTerm(value)} />
           </div>
@@ -74,42 +96,43 @@ export const ChainSelector = () => {
           </div>
         </div>
         <div className="mt-11 min-h-80 max-h-80 overflow-y-scroll flex flex-col gap-6">
-          {address
-            ? customChains
-                .filter(
-                  (chain, index, self) =>
-                    self.findIndex((c) => c.chainId === chain.chainId) === index
-                )
-                .map((chain) => {
-                  return (
-                    <ListItem
-                      key={`listItem_chain_${chain.chainId}`}
-                      chain={chain}
-                      onSelect={handleSelectChain}
-                      onDeleteClick={handleDeleteChain}
-                      onFeaturedClick={handleFeatureChain}
-                      onEditClick={handleEditChain}
-                    />
-                  );
-                })
-            : allPublicChains
-                .filter((chain) => chain.chainType !== "L1")
-                .filter(
-                  (chain, index, self) =>
-                    self.findIndex((c) => c.chainId === chain.chainId) === index
-                )
-                .map((chain) => {
-                  return (
-                    <ListItem
-                      key={`listItem_chain_${chain.chainId}`}
-                      chain={chain}
-                      onSelect={handleSelectChain}
-                      onDeleteClick={() => {}}
-                      onFeaturedClick={() => {}}
-                      onEditClick={() => {}}
-                    />
-                  );
-                })}
+          {loading ? (
+            <SkeletonList count={5} />
+          ) : address ? (
+            customChains
+              .filter(
+                (chain, index, self) =>
+                  self.findIndex((c) => c.chainId === chain.chainId) === index
+              )
+              .map((chain) => {
+                return (
+                  <ListItem
+                    key={`listItem_chain_${chain.chainId}`}
+                    chain={chain}
+                    onSelect={handleSelectChain}
+                    onDeleteClick={handleDeleteChain}
+                    onEditClick={handleEditChain}
+                  />
+                );
+              })
+          ) : (
+            publicChains
+              .filter(
+                (chain, index, self) =>
+                  self.findIndex((c) => c.chainId === chain.chainId) === index
+              )
+              .map((chain) => {
+                return (
+                  <ListItem
+                    key={`listItem_chain_${chain.chainId}`}
+                    chain={chain}
+                    onSelect={handleSelectChain}
+                    onDeleteClick={() => {}}
+                    onEditClick={() => {}}
+                  />
+                );
+              })
+          )}
         </div>
       </div>
       <div className="w-full my-6 flex gap-1">

@@ -7,8 +7,9 @@ import { Step, TransactionState } from "@/constants";
 import { Transaction } from "@/lib/transactions";
 import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
-import CustomChainService from "@/services/custom-chain-service";
 import { useEffect, useState } from "react";
+import { CustomChain } from "@/types";
+import { useChains } from "@/hooks/use-chains";
 
 export default function ConfirmWithdrawal({
   transaction,
@@ -16,12 +17,14 @@ export default function ConfirmWithdrawal({
   fetchingInboxTxTimestamp: isLoading,
   updateTx,
   state,
+  parentChain,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
   fetchingInboxTxTimestamp: boolean;
   updateTx: (tx: Transaction) => Promise<void>;
   state: TransactionState;
+  parentChain?: CustomChain;
 }) {
   const [parentTxUrl, setParentTxUrl] = useState("");
   const { signer, pushChildTxToParent } = useArbitrumBridge({
@@ -29,6 +32,7 @@ export default function ConfirmWithdrawal({
     childChainId: transaction.childChainId,
   });
   const { ACTIVE, DONE } = useStepStatus(Step.CONFIRM_WITHDRAWAL, state);
+  const { getChainById } = useChains();
 
   const confirmTx = useMutation({
     mutationFn: pushChildTxToParent,
@@ -61,17 +65,20 @@ export default function ConfirmWithdrawal({
             ...updatedTx,
             delayedInboxTimestamp: Date.now(),
           });
+          const parentChain = getChainById(transaction.parentChainId);
+          const txUrl = `${parentChain?.explorer?.default.url}/tx/${inboxTx.hash}`;
+          setParentTxUrl(txUrl);
         },
       }
     );
   }
 
   useEffect(() => {
-    CustomChainService.getChainById(transaction.parentChainId).then((x) => {
-      const txUrl = `${x?.explorer?.default.url}/tx/${transaction.delayedInboxHash}`;
-      setParentTxUrl(txUrl);
-    });
-  }, []);
+    const parentChain = getChainById(transaction.parentChainId);
+    const txUrl = `${parentChain?.explorer?.default.url}/tx/${transaction.delayedInboxHash}`;
+    setParentTxUrl(txUrl);
+  }, [getChainById, transaction]);
+
   return (
     <StatusStep
       done={DONE}
@@ -79,7 +86,7 @@ export default function ConfirmWithdrawal({
       running={isRunning}
       number={2}
       title="Confirm Withdraw"
-      description="Send the Arbitrum withdraw transaction through the delayed inbox"
+      description={`Send the ${parentChain?.name} withdraw transaction through the delayed inbox`}
       className="pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 flex items-start flex-col md:flex-row md:items-center"
     >
       {ACTIVE && (

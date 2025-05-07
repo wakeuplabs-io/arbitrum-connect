@@ -1,7 +1,5 @@
-import EthIcon from "@/assets/ethereum-icon.svg";
 import { LEARN_MORE_URI } from "@/constants";
 import { useAlertContext } from "@/contexts/alert/alert-context";
-import { useWeb3ClientContext } from "@/contexts/web3-client-context";
 import { useEthPrice } from "@/hooks/use-eth-price";
 import useArbitrumBridge, { ClaimStatus } from "@/hooks/use-arbitrum-bridge";
 import {
@@ -20,6 +18,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
+import { useWeb3Client } from "@/contexts/web3-client-context";
+import ChainAvatar from "@/components/chain-avatar";
 
 interface SearchParams {
   amount: string;
@@ -45,11 +45,11 @@ export const Route = createFileRoute("/withdraw")({
 function WithdrawScreen() {
   const navigate = useNavigate();
   const { address } = useAccount();
-  const { parentProvider, childProvider } = useWeb3ClientContext();
   const { amount: amountInWei } = Route.useSearch();
   const { ethPrice } = useEthPrice();
-
-  const { selectedParentChain, selectedChain } = useSelectedChain();
+  const { selectedChain, selectedParentChain } = useSelectedChain();
+  const { provider: childProvider } = useWeb3Client(selectedChain);
+  const { provider: parentProvider } = useWeb3Client(selectedParentChain);
 
   const [approvedAproxFees, setApprovedAproxFees] = useState<boolean>(false);
   const [approvedSequencerMaySpeedUp, setApprovedSequencerMaySpeedUp] =
@@ -64,20 +64,23 @@ function WithdrawScreen() {
   const { setError } = useAlertContext();
   const { data: withdrawPrice, isFetching: withdrawPriceFetching } = useQuery({
     queryKey: ["withdrawPrice"],
-    queryFn: () => getMockedL2WithdrawPrice(childProvider),
+    queryFn: () => getMockedL2WithdrawPrice(childProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
   const { data: confirmPrice, isFetching: confirmPriceFetching } = useQuery({
     queryKey: ["confirmPrice"],
-    queryFn: () => getMockedSendL1MsgPrice(parentProvider),
+    queryFn: () => getMockedSendL1MsgPrice(parentProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
   const { data: claimPrice, isFetching: claimPriceFetching } = useQuery({
     queryKey: ["claimPrice"],
-    queryFn: () => getMockedL1ClaimTxGasLimit(parentProvider),
+    queryFn: () => getMockedL1ClaimTxGasLimit(parentProvider!),
     refetchOnWindowFocus: true,
+    enabled: !!parentProvider,
     initialData: BigNumber.from(0),
   });
 
@@ -133,13 +136,19 @@ function WithdrawScreen() {
       {/* amount */}
       <div className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-2xl md:p-6 p-4">
         <div className="flex items-center gap-3">
-          <img src={EthIcon} alt="ethereum icon" />
+          <ChainAvatar
+            src={selectedChain.logoURI}
+            alt={selectedChain.name}
+            size={44}
+          />
           <div className="flex items-end space-x-2">
             <div
               data-test-id="withdraw-amount"
               className="text-2xl md:text-4xl font-bold"
             >{`${formatEther(amountInWei).slice(0, 15)}`}</div>
-            <div className="ml-0.5 font-bold">ETH</div>
+            <div className="ml-0.5 font-bold">
+              {selectedChain.nativeCurrency.symbol}
+            </div>
           </div>
         </div>
         <div className="text-neutral-400">~ ${amountUSD} USD</div>
@@ -148,9 +157,14 @@ function WithdrawScreen() {
       {/* summary */}
       <div className="flex grow justify-between items-center flex-col bg-neutral-50 border border-neutral-200 rounded-2xl p-4 md:p-6 gap-6">
         <div className="text-sm rounded-2xl p-4 bg-primary-100">
-          You are about to withdraw funds from Arbitrum to Ethereum. This
-          process requires 2 transactions and gas fees in ETH. Any doubts?{" "}
-          <a href={LEARN_MORE_URI} className="link" target="_blank">
+          {`You are about to withdraw funds from ${selectedChain.name} to ${selectedParentChain.name}. This `}
+          {`process requires 2 transactions and gas fees in ${selectedParentChain.nativeCurrency.symbol}. Any doubts? `}
+          <a
+            href={LEARN_MORE_URI}
+            className="link"
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn More
           </a>
         </div>
@@ -170,7 +184,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(withdrawPrice)?.slice(0, 10) ?? "-"} ETH
+                  {formatEther(withdrawPrice)?.slice(0, 10) ?? "-"}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${withdrawUSD}
                   </span>
@@ -195,7 +210,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(confirmPrice)?.slice(0, 10) ?? "-"} ETH
+                  {formatEther(confirmPrice)?.slice(0, 10) ?? "-"}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${confirmUSD}
                   </span>
@@ -220,7 +236,7 @@ function WithdrawScreen() {
             <span className="text-xs">4</span>
           </div>
           <div className="flex flex-col md:flex-row md:justify-between w-full">
-            <p className="text-left">Claim funds on Ethereum</p>
+            <p className="text-left">{`Claim funds on ${selectedParentChain.name}`}</p>
 
             <div className="flex items-center flex-row just gap-3">
               {claimPriceFetching ? (
@@ -231,7 +247,8 @@ function WithdrawScreen() {
                 />
               ) : (
                 <span className="text-sm flex flex-row items-center gap-3">
-                  {formatEther(claimPrice)?.slice(0, 10)} ETH
+                  {formatEther(claimPrice)?.slice(0, 10)}{" "}
+                  {selectedParentChain.nativeCurrency.symbol}
                   <span className="text-neutral-400 text-sm">
                     ~ ${claimUSD}
                   </span>
@@ -253,8 +270,8 @@ function WithdrawScreen() {
             onChange={() => setApprovedTime((v) => !v)}
           />
           <label className="text-sm">
-            I understand the entire process will take approximately 24 hours
-            before I can claim my funds on Ethereum.
+            {`I understand the entire process will take approximately 24 hours
+            before I can claim my funds on ${selectedParentChain.name}.`}
           </label>
         </div>
         <div className="flex gap-4 md:gap-6">

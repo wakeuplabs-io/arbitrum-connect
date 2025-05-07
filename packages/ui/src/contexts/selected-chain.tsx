@@ -1,13 +1,6 @@
 import { createContext, useState, ReactNode, useEffect } from "react";
 import { CustomChain } from "@/types";
-import {
-  customArbitrum,
-  customArbitrumSepolia,
-  customMainnet,
-  customSepolia,
-  defaultCustomChild,
-  defaultCustomMainnet,
-} from "@/lib/wagmi-config";
+import { defaultCustomChild, defaultCustomMainnet } from "@/lib/wagmi-config";
 import {
   getArbitrumNetworks,
   registerCustomArbitrumNetwork,
@@ -15,9 +8,9 @@ import {
 import CustomChainService from "@/services/custom-chain-service";
 import { arbitrum, arbitrumSepolia } from "viem/chains";
 import { useAccount } from "wagmi";
+import { useChains } from "@/hooks/use-chains";
 import { FILTERS } from "@/constants";
 import { Address } from "viem";
-import { useChains } from "@/hooks/use-chains";
 
 type SelectedChainContextType = {
   loading: boolean;
@@ -40,66 +33,46 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
     useState<CustomChain>(defaultCustomMainnet);
   const { address } = useAccount();
   const [customChains, setCustomChains] = useState<CustomChain[]>([]);
-  const { chains } = useChains();
-
-  const initializeCustomChains = async (address: Address) => {
-    const userChains = await CustomChainService.getUserChains(
-      address,
-      "",
-      FILTERS.ALL
-    );
-    if (!userChains.some((x) => x.chainId === customArbitrum.chainId)) {
-      const defaultChain = { ...customArbitrum, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customMainnet.chainId)) {
-      const defaultChain = { ...customMainnet, user: address };
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customSepolia.chainId)) {
-      const defaultChain = { ...customSepolia, user: address };
-      await CustomChainService.addChain(defaultChain);
-    }
-    if (!userChains.some((x) => x.chainId === customArbitrumSepolia.chainId)) {
-      const defaultChain = { ...customArbitrumSepolia, user: address };
-      userChains.push({ ...defaultChain, user: address } as any);
-      await CustomChainService.addChain(defaultChain);
-    }
-
-    if (!userChains.some((x) => x.chainId === selectedChain.chainId))
-      setSelectedChain(defaultCustomChild);
-
-    setCustomChains(userChains as CustomChain[]);
-  };
+  const { getChainById, isLoading: chainsLoading, chains } = useChains();
 
   useEffect(() => {
     if (!address) return;
-    initializeCustomChains(address);
-  }, [address]);
+
+    const lastAddress = localStorage.getItem("last-wallet-address") as Address;
+
+    if (address !== lastAddress) {
+      localStorage.setItem("last-wallet-address", address);
+      window.location.reload();
+    }
+
+  }, [address, selectedChain.chainId]);
 
   useEffect(() => {
-    const getParent = async () => {
-      if (!selectedChain) return;
+    const filteredUserChains = chains.filter((x) =>
+      CustomChainService.filterChain(x, FILTERS.ALL, "")
+    );
+    setCustomChains(filteredUserChains);
+  }, [chains]);
 
+  useEffect(() => {
+    const getParent = () => {
+      if (!selectedChain) return;
       setLoading(true);
-      let parentChain = await CustomChainService.getChainById(
-        selectedChain.parentChainId
-      );
-      if (!parentChain)
-        parentChain = chains.filter(
-          (x) => x.chainId === selectedChain.parentChainId
-        )[0] as any;
+      if (chainsLoading) return;
+
+      const parentChain = getChainById(selectedChain.parentChainId);
+
       if (!parentChain) return;
 
-      setSelectedParentChain(parentChain as any);
+      setSelectedParentChain(parentChain);
       setLoading(false);
     };
     getParent();
-  }, [selectedChain?.parentChainId]);
+  }, [selectedChain, chainsLoading, getChainById]);
 
   useEffect(() => {
     if (
+      !chainsLoading &&
       selectedChain &&
       selectedChain.chainId !== arbitrumSepolia.id &&
       selectedChain.chainId !== arbitrum.id &&
@@ -113,7 +86,9 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
         throwIfAlreadyRegistered: false,
       });
     }
-  }, [selectedChain?.chainId]);
+  }, [selectedChain, chainsLoading]);
+
+  if (chainsLoading) return;
 
   return (
     <SelectedChainContext.Provider

@@ -9,12 +9,15 @@ import ConfirmWithdrawal from "./steps/confirmWithdrawal";
 import ClaimStep from "./steps/claim";
 import ForceStep from "./steps/force";
 import { useTransactionStatus } from "@/hooks/use-transaction-status";
+import { useGetTransactionChains } from "@/hooks/queries/useGetTransactionChains";
+import { Chain } from "wagmi/chains";
 
 export function TransactionStatus({ tx }: { tx: Transaction }) {
   const [triggered, setTriggered] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const isVisible = useOnScreen(ref);
   const { setError } = useAlertContext();
+  const { childChain, parentChain } = useGetTransactionChains(tx);
 
   const {
     transaction,
@@ -24,7 +27,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
     fetchingL2ToL1Msg,
     l2ToL1Msg,
     canClaim,
-  } = useTransaction({ tx: tx, enabled: triggered });
+  } = useTransaction({ tx: tx, enabled: triggered, childChain, parentChain });
 
   const transactionState = useTransactionStatus(transaction);
   useEffect(() => {
@@ -41,13 +44,17 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
       >
         {triggered && (
           <>
-            <InitiateWithdrawal transaction={transaction} />
+            <InitiateWithdrawal
+              transaction={transaction}
+              childChain={childChain}
+            />
             <ConfirmWithdrawal
               transaction={transaction}
               onError={(e) => setError(e.message)}
               fetchingInboxTxTimestamp={fetchingInboxTxTimestamp}
               updateTx={updateTx}
               state={transactionState}
+              parentChain={parentChain}
             />
             <ForceStep
               transaction={transaction}
@@ -56,6 +63,7 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
               fetchingClaimStatus={fetchingClaimStatus}
               fetchingL2ToL1Msg={fetchingL2ToL1Msg}
               state={transactionState}
+              parentChain={parentChain}
             />
             <ClaimStep
               transaction={transaction}
@@ -67,6 +75,8 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
               state={transactionState}
               fetchingL2ToL1Msg={fetchingL2ToL1Msg}
               canClaim={canClaim}
+              parentChain={parentChain as Chain}
+              childChain={childChain}
             />
           </>
         )}
@@ -75,7 +85,12 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
       <div className="bg-gray-200 mt-4 px-4 py-3 text-center">
         <div className="text-sm">
           Have questions about this process?
-          <a className="link" href={LEARN_MORE_URI} target="_blank">
+          <a
+            className="link"
+            href={LEARN_MORE_URI}
+            target="_blank"
+            rel="noreferrer"
+          >
             Learn More
           </a>
         </div>

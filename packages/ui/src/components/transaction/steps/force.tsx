@@ -7,6 +7,7 @@ import { StatusStep } from "../status-step";
 import { useStepStatus } from "@/hooks/use-step-status";
 import { Step, TransactionState } from "@/constants";
 import { calculateRemainingHours } from "@/lib/helpers";
+import { CustomChain } from "@/types";
 
 function ForceIncludeButton({
   transaction,
@@ -45,6 +46,7 @@ export default function ForceStep({
   fetchingClaimStatus,
   fetchingL2ToL1Msg,
   state,
+  parentChain,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
@@ -52,6 +54,7 @@ export default function ForceStep({
   fetchingL2ToL1Msg: boolean;
   triggered: boolean;
   state: TransactionState;
+  parentChain?: CustomChain;
 }) {
   const { signer, forceInclude } = useArbitrumBridge({
     parentChainId: transaction.parentChainId,
@@ -84,14 +87,14 @@ export default function ForceStep({
       running={isLoading}
       number={3}
       title="Force transaction"
-      description="If after 24 hours your Arbitrum transaction hasn't been mined, you can push it forward manually with some extra fee in ethereum"
+      description={`If after 24 hours your ${parentChain?.name} transaction hasn't been mined, you can push it forward manually with some extra fee in ${parentChain?.nativeCurrency.symbol}`}
       className="flex flex-col items-start pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 md:flex-row md:items-center"
     >
-      {state === TransactionState.FORCEABLE ? (
+      {!DONE && state === TransactionState.FORCEABLE ? (
         <ForceIncludeButton onForce={onForce} transaction={transaction} />
       ) : null}
 
-      {isWating24 && !isLoading ? (
+      {!DONE && state !== TransactionState.CLAIMABLE && isWating24 && !isLoading ? (
         <>
           <a className="text-sm font-semibold">
             ~ {remainingHours} hours remaining

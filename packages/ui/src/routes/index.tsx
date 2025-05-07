@@ -3,7 +3,7 @@ import WalletIcon from "@/assets/wallet.svg";
 import CustomConnectButton from "@/components/connect-wallet";
 import ErrorMessage from "@/components/error-message";
 import { useEthPrice } from "@/hooks/use-eth-price";
-import useArbitrumBalance from "@/hooks/use-arbitrum-balance";
+import useBalance from "@/hooks/use-balance";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import cn from "classnames";
@@ -14,6 +14,7 @@ import { useAccount } from "wagmi";
 import { useSelectedChain } from "@/hooks/use-selected-chain";
 import ChainItem from "@/components/chain-item";
 import Button from "@/components/button";
+import ChainAvatar from "@/components/chain-avatar";
 
 export const Route = createFileRoute("/")({
   component: HomeScreen,
@@ -27,20 +28,24 @@ interface FormError {
 function HomeScreen() {
   const navigate = useNavigate();
   const { address } = useAccount();
-  const arbBalance = useArbitrumBalance();
   const { openConnectModal } = useConnectModal();
   const [amountEth, setAmountEth] = useState<string>("");
   const [error, setError] = useState<FormError>();
   const { ethPrice } = useEthPrice();
   const { selectedChain, selectedParentChain } = useSelectedChain();
+  const balance = useBalance(selectedChain);
   function handleSubmit() {
+    if (amountEth === "") {
+      triggerError({ ...error, amount: true });
+      return;
+    }
     const amount = parseUnits(amountEth, 18);
     if (amount.lte("0")) {
       triggerError({ ...error, amount: true });
       return;
     }
 
-    if (amount.gt(parseUnits(arbBalance, 18))) {
+    if (amount.gt(parseUnits(balance, 18))) {
       triggerError({ ...error, balance: true });
       return;
     }
@@ -100,7 +105,17 @@ function HomeScreen() {
           <hr className="w-full pb-6" />
           <div className="flex justify-between items-center w-full">
             <div className="flex items-center gap-4">
-              <img src={EthereumIcon} alt="ethereum icon" />
+              <ChainAvatar
+                src={
+                  selectedChain.nativeCurrency.symbol !== "ETH"
+                    ? selectedChain.logoURI
+                    : EthereumIcon
+                }
+                alt={
+                  selectedChain.nativeToken ? selectedChain.name : "Ethereum"
+                }
+                size={44}
+              />
               <div className="flex flex-col text-left">
                 <div
                   className={cn(
@@ -108,7 +123,7 @@ function HomeScreen() {
                     { "text-red-600": error?.balance }
                   )}
                 >
-                  ETH
+                  {selectedChain.nativeCurrency.symbol}
                 </div>
                 <span
                   className={cn("text-neutral-500 duration-200 ease-in-out", {
@@ -116,7 +131,7 @@ function HomeScreen() {
                   })}
                   id="balance"
                 >
-                  Balance {arbBalance.slice(0, 10)}
+                  Balance {balance.slice(0, 10)}
                 </span>
               </div>
             </div>
@@ -124,7 +139,7 @@ function HomeScreen() {
               <button
                 type="button"
                 className="btn btn-neutral rounded-3xl px-5 font-normal"
-                onClick={() => setAmountEth(arbBalance)}
+                onClick={() => setAmountEth(balance)}
               >
                 Max
               </button>
@@ -168,10 +183,10 @@ function HomeScreen() {
             } else handleSubmit();
           }}
           type="submit"
-          disabled={!address || !arbBalance}
+          disabled={!address || !balance}
         >
           {address
-            ? arbBalance
+            ? balance
               ? "Continue"
               : "Loading balance..."
             : "Connect your wallet to withdraw"}
