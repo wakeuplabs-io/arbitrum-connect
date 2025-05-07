@@ -81,7 +81,7 @@ Resources:
             CustomOriginConfig:
               OriginProtocolPolicy: http-only
         ViewerCertificate:
-          AcmCertificateArn: !Sub "arn:aws:acm:${AWS::Region}:447655722442:certificate/${CertificateId}"
+          AcmCertificateArn: !Sub "arn:aws:acm:us-east-1:447655722442:certificate/${CertificateId}"
           SslSupportMethod: sni-only
           MinimumProtocolVersion: TLSv1.2_2021
         DefaultCacheBehavior:
@@ -94,7 +94,7 @@ Resources:
             - HEAD
             - GET
           Compress: true
-          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 #CacheOptimizedPolicy
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
           ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
         CacheBehaviors:
           - PathPattern: index.html
@@ -107,7 +107,7 @@ Resources:
               - HEAD
               - GET
             Compress: true
-            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad #CacheDisabledPolicy
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
             ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
           - PathPattern: /static/js/*.js
             TargetOriginId: !Sub "${StackName}S3Origin"
@@ -119,7 +119,7 @@ Resources:
               - HEAD
               - GET
             Compress: true
-            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 #CacheOptimizedPolicy
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
             ResponseHeadersPolicyId: !Ref SecurityHeadersPolicy
         CustomErrorResponses:
           - ErrorCode: 404
