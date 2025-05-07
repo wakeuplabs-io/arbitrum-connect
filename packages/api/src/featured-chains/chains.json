@@ -217,7 +217,7 @@
       "confirmPeriodBlocks": 20,
       "explorer": {
         "default": {
-          "url": "https://nova.arbiscan.io"
+          "url": "https://sepolia.arbiscan.io"
         }
       },
       "featured": true
