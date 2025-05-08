@@ -85,7 +85,9 @@ export const api = {
       }));
     },
     getAllUserChains: async () => {
-      const userAddress = localStorage.getItem("last-wallet-address") as Address
+      const userAddress = localStorage.getItem(
+        "last-wallet-address"
+      ) as Address;
 
       const res = await client.api.chains.chains.list.user.$get({
         query: { userAddress },
@@ -122,7 +124,10 @@ export const api = {
         chainId: parseInt(data.chainId, 10),
       } as CustomChain;
     },
-    create: async (clientWithAuth: AuthenticatedApiClient, chain: CustomChain) => {
+    create: async (
+      clientWithAuth: AuthenticatedApiClient,
+      chain: CustomChain
+    ) => {
       const res = await clientWithAuth.api.chains.chains.create.$post({
         json: {
           ...chain,
@@ -130,7 +135,7 @@ export const api = {
           logoURI: chain.logoURI ?? null,
           chainId: chain.chainId.toString(),
           tokenBridge: chain.tokenBridge,
-        }
+        },
       });
 
       if (!res.ok) {
@@ -141,7 +146,10 @@ export const api = {
 
       return data;
     },
-    edit: async (clientWithAuth: AuthenticatedApiClient, chain: CustomChain) => {
+    edit: async (
+      clientWithAuth: AuthenticatedApiClient,
+      chain: CustomChain
+    ) => {
       const res = await clientWithAuth.api.chains.chains.update.$put({
         json: {
           ...chain,
@@ -149,7 +157,7 @@ export const api = {
           chainId: chain.chainId.toString(),
           logoURI: chain.logoURI ?? null,
           tokenBridge: chain.tokenBridge,
-        }
+        },
       });
 
       if (!res.ok) {
@@ -163,12 +171,13 @@ export const api = {
         chainId: parseInt(data.chainId),
       };
     },
-    setFeatured: async (clientWithAuth: AuthenticatedApiClient,
+    setFeatured: async (
+      clientWithAuth: AuthenticatedApiClient,
       chainId: number,
       featured: boolean
     ) => {
       const res = await clientWithAuth.api.chains.chains["set-featured"].$put({
-        json: { chainId: chainId.toString(), featured }
+        json: { chainId: chainId.toString(), featured },
       });
 
       if (!res.ok) {
