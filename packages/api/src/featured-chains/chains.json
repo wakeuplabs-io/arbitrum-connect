@@ -223,69 +223,6 @@
       "featured": true
     },
     {
-      "name": "Arbitrum Nova",
-      "chainId": 42170,
-      "parentChainId": 1,
-      "nativeCurrency": {
-        "name": "Ether",
-        "symbol": "ETH",
-        "decimals": 18
-      },
-      "rpcUrls": {
-        "default": {
-          "http": ["https://nova.arbitrum.io/rpc"]
-        }
-      },
-      "blockExplorers": {
-        "default": {
-          "name": "Arbiscan",
-          "url": "https://nova.arbiscan.io",
-          "apiUrl": "https://api-nova.arbiscan.io/api"
-        }
-      },
-      "contracts": {
-        "multicall3": {
-          "address": "0xca11bde05977b3631167028862be2a173976ca11",
-          "blockCreated": 1746963
-        }
-      },
-      "testnet": false,
-      "logoURI": "/arbitrum-nova-icon.svg",
-      "isTestnet": false,
-      "isCustom": false,
-      "isOrbit": true,
-      "ethBridge": {
-        "bridge": "0xC1Ebd02f738644983b6C4B2d440b8e77DdE276Bd",
-        "inbox": "0xc4448b71118c9071Bcb9734A0EAc55D18A153949",
-        "outbox": "0xD4B80C3D7240325D18E645B49e6535A3Bf95cc58",
-        "rollup": "0xFb209827c58283535b744575e11953DCC4bEAD88",
-        "sequencerInbox": "0x211E1c4c7f1bF5351Ac850Ed10FD68CFfCF6c21b"
-      },
-      "tokenBridge": {
-        "parentCustomGateway": "0xba2F7B6eAe1F9d174199C5E4867b563E0eaC40F3",
-        "parentErc20Gateway": "0x902b3E5f8F19571859F4AB1003B960a5dF693aFF",
-        "parentGatewayRouter": "0xcE18836b233C83325Cc8848CA4487e94C6288264",
-        "parentMultiCall": "0xded9AD2E65F3c4315745dD915Dbe0A4Df61b2320",
-        "parentProxyAdmin": "0xDBFC2FfB44A5D841aB42b0882711ed6e5A9244b0",
-        "parentWeth": "0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9",
-        "parentWethGateway": "0xA8aD8d7e13cbf556eE75CB0324c13535d8100e1E",
-        "childCustomGateway": "0x8Ca1e1AC0f260BC4dA7Dd60aCA6CA66208E642C5",
-        "childErc20Gateway": "0x6e244cD02BBB8a6dbd7F626f05B2ef82151Ab502",
-        "childGatewayRouter": "0x9fDD1C4E4AA24EEc1d913FABea925594a20d43C7",
-        "childMultiCall": "0xA115146782b7143fAdB3065D86eACB54c169d092",
-        "childProxyAdmin": "0x715D99480b77A8d9D603638e593a539E21345FdF",
-        "childWeth": "0x980B62Da83eFf3D4576C647993b0c1D7faf17c73",
-        "childWethGateway": "0xCFB1f08A4852699a979909e22c30263ca249556D"
-      },
-      "confirmPeriodBlocks": 45818,
-      "explorer": {
-        "default": {
-          "url": "https://nova.arbiscan.io"
-        }
-      },
-      "featured": false
-    },
-    {
       "name": "Base",
       "chainId": 8453,
       "parentChainId": 1,
