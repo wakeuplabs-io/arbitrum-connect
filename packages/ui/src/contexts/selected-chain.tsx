@@ -44,7 +44,6 @@ export function SelectedChainProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("last-wallet-address", address);
       window.location.reload();
     }
-
   }, [address, selectedChain.chainId]);
 
   useEffect(() => {

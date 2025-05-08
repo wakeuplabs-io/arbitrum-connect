@@ -24,10 +24,9 @@ export function useSignedFetch() {
 
 export function createSignedFetch(
   signMessage: (payload: string) => Promise<string>,
-  baseFetch: HonoFetch = (fetch as unknown) as HonoFetch
+  baseFetch: HonoFetch = fetch as unknown as HonoFetch
 ): HonoFetch {
   return async (input, init = {}, env?, executionCtx?) => {
-
     let url: string;
     if (typeof input === "string") {
       url = input;
@@ -60,5 +59,3 @@ export function createSignedFetch(
     return baseFetch(input, { ...init, headers }, env, executionCtx);
   };
 }
-
-
