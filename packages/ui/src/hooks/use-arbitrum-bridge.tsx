@@ -96,6 +96,7 @@ export default function useArbitrumBridge(props: {
       data: calldatal2,
       to: ARB_SYS_ADDRESS,
       value: BigInt(amountInWei),
+      gasLimit: 1000000,
     };
   }
 
