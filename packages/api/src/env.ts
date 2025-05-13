@@ -24,7 +24,7 @@ const EnvSchema = z.object({
     "trace",
     "silent",
   ]),
-  CORS_ORIGINS: z.string().default("http://localhost:3000"),
+  CORS_ORIGINS: z.string().default("*"),
   DATABASE_URL: z.string(),
 });
 
