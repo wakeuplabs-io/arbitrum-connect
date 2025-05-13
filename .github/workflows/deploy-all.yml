@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - fix/add-wakeuplabs-io-dns
     paths:
       - "packages/**"
       - ".github/workflows/deploy-all.yml"
