@@ -18,6 +18,15 @@ Parameters:
   CertificateId:
     Description: The ID of the existing certificate related to the domain name
     Type: String
+  Environment:
+    Description: The environment to deploy
+    Type: String
+    AllowedValues:
+      - staging
+      - production
+  
+Conditions:
+  IsProduction: !Equals [ !Ref Environment, "production" ]
 
 Resources:
   SecurityHeadersPolicy:
@@ -132,13 +141,27 @@ Resources:
         Enabled: true
         PriceClass: PriceClass_All
         Aliases:
-          - !Sub ${S3Bucket}
+          !If
+            - IsProduction
+            - [ !Sub ${S3Bucket}, arbitrumconnect.wakeuplabs.io ]
+            - [ !Sub ${S3Bucket} ]
 
   WebsiteAliasRecord:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: !Sub ${HostedZoneId}
       Name: !Sub ${S3Bucket}
+      Type: CNAME
+      TTL: "86400"
+      ResourceRecords:
+        - !GetAtt CloudFrontDistribution.DomainName
+
+  ArbitrumConnectAliasRecord:
+    Condition: IsProduction
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: Z066946538TDE861ZMKEW
+      Name: arbitrumconnect.wakeuplabs.io
       Type: CNAME
       TTL: "86400"
       ResourceRecords:

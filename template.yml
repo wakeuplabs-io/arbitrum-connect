@@ -19,6 +19,12 @@ Parameters:
   CertificateId:
     Description: The ID of the existing certificate related to the domain name
     Type: String
+  Environment:
+    Description: The environment to deploy
+    Type: String
+    AllowedValues:
+      - staging
+      - production
 
 Resources:
   UI:
@@ -31,6 +37,7 @@ Resources:
         Subdomain: !Ref Subdomain
         HostedZoneId: !Ref HostedZoneId
         CertificateId: !Ref CertificateId
+        Environment: !Ref Environment
 
 Outputs:
   UIUrl:
