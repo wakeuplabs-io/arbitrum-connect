@@ -30,6 +30,13 @@ export function TransactionStatus({ tx }: { tx: Transaction }) {
   } = useTransaction({ tx: tx, enabled: triggered, childChain, parentChain });
 
   const transactionState = useTransactionStatus(transaction);
+
+  // if (transaction.bridgeHash === "0x141367db35e84c1dba5479d1c711346d3c5292f45971b36a9e00b61d6be30469") {
+    console.log("claimStatus", transaction.claimStatus);
+    console.log("transaction", transaction);
+  // }
+
+
   useEffect(() => {
     if (!triggered && isVisible) {
       setTriggered(true);

@@ -9,7 +9,7 @@ export function useTransactionStatus(
   if (withdrawCompleted) {
     return TransactionState.COMPLETED;
   }
-  if (transaction.claimStatus === ClaimStatus.CLAIMABLE && !withdrawCompleted)
+  if ([ClaimStatus.CLAIMABLE, ClaimStatus.FORCE_INCLUDE_SKIPPABLE].includes(transaction.claimStatus) && !withdrawCompleted)
     return TransactionState.CLAIMABLE;
   if (
     !!transaction.delayedInboxTimestamp &&

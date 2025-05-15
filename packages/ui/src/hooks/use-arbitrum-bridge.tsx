@@ -13,10 +13,12 @@ import { ethers } from "ethers";
 import { Address } from "viem";
 import { useAccount, useSwitchChain } from "wagmi";
 import { useEthersSigner } from "./use-ethers-signer";
+
 export enum ClaimStatus {
   PENDING = "PENDING",
   CLAIMABLE = "CLAIMABLE",
   CLAIMED = "CLAIMED",
+  FORCE_INCLUDE_SKIPPABLE = "FORCE_INCLUDE_SKIPPABLE",
 }
 
 export default function useArbitrumBridge(props: {
@@ -162,22 +164,29 @@ export default function useArbitrumBridge(props: {
       );
     }
 
-    if (!l2ToL1Msg) return ClaimStatus.PENDING;
+    console.log("DEBUG: l2ToL1Msg2", l2ToL1Msg);
+
+    let l2ToL1Status: ChildToParentMessageStatus | null = null;
+
+    try {
+      l2ToL1Status = await l2ToL1Msg.status(childProvider);
+    } catch (error) {
+      console.error("DEBUG: l2ToL1Status error", error);
+      l2ToL1Status = null;
+    }
+
+    if (l2ToL1Status === null) {
+      return ClaimStatus.FORCE_INCLUDE_SKIPPABLE;
+    }
 
     // Check if already executed
-    if (
-      (await l2ToL1Msg.status(childProvider)) ==
-      ChildToParentMessageStatus.EXECUTED
-    ) {
+    if (l2ToL1Status === ChildToParentMessageStatus.EXECUTED) {
       return ClaimStatus.CLAIMED;
     }
     // block number of the first block where the message can be executed or null if it already can be executed or has been executed
     const block = await l2ToL1Msg.getFirstExecutableBlock(childProvider);
-    if (block === null) {
-      return ClaimStatus.CLAIMABLE;
-    } else {
-      return ClaimStatus.PENDING;
-    }
+
+    return block === null ? ClaimStatus.CLAIMABLE : ClaimStatus.PENDING;
   }
 
   async function claimFunds(props: {
