@@ -235,7 +235,7 @@ export const ChainForm = ({
               <Input
                 disabled={editing}
                 name="chainId"
-                type="number"
+                type="tel"
                 label="Chain id"
                 placeholder="Chain ID"
                 register={register}
@@ -326,7 +326,7 @@ export const ChainForm = ({
             <div className="mb-6">
               <Input
                 name="nativeCurrencyDecimals"
-                type="number"
+                type="tel"
                 label="Native Currency Decimals"
                 placeholder="Native Currency Decimals"
                 register={register}
@@ -375,7 +375,7 @@ export const ChainForm = ({
                 name="parentChainId"
                 label="Parent chain id"
                 placeholder="Parent chain id"
-                type="number"
+                type="tel"
                 register={register}
                 error={errors.name?.message}
               />
