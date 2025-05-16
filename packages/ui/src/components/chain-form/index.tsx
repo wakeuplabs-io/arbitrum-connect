@@ -59,7 +59,6 @@ const schema = z.object({
   // Separated NetworkConfig fields
   nativeCurrencyName: z.string().min(1, { message: "Required" }),
   nativeCurrencySymbol: z.string().min(1, { message: "Required" }),
-  nativeCurrencyDecimals: z.coerce.number().min(1),
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
 
@@ -118,7 +117,6 @@ export const ChainForm = ({
         explorerUrl: chain.explorer.default.url,
         nativeCurrencyName: chain.nativeCurrency.name,
         nativeCurrencySymbol: chain.nativeCurrency.symbol,
-        nativeCurrencyDecimals: chain.nativeCurrency.decimals,
         publicRpcUrl: chain.rpcUrls.default.http[0],
         logoURI: chain.logoURI,
         isTestnet: chain.isTestnet,
@@ -136,6 +134,7 @@ export const ChainForm = ({
       ...data,
       logoURI: data.logoURI || "",
       user: address,
+      nativeCurrencyDecimals: 18,
       tokenBridge: JSON.parse(data.tokenBridge),
     };
 
@@ -325,16 +324,6 @@ export const ChainForm = ({
                 placeholder="Native Currency Symbol"
                 register={register}
                 error={errors.nativeCurrencySymbol?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
-                name="nativeCurrencyDecimals"
-                type="tel"
-                label="Native Currency Decimals"
-                placeholder="Native Currency Decimals"
-                register={register}
-                error={errors.nativeCurrencyDecimals?.message}
               />
             </div>
             <div className="mb-6">
