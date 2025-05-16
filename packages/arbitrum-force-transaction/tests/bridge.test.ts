@@ -29,7 +29,7 @@ describe("bridge", () => {
         l2Signer = new ethers.Wallet(fromPrivateKey, l2Provider)
     })
 
-    xdescribe("assembleWithdrawal", () => {
+    describe("assembleWithdrawal", () => {
         it("assembleWithdrawal should create a withdrawal transaction", async () => {
             // arrange
             const tx = await bridge.assembleWithdraw(fromAddress, BigNumber.from(1))

@@ -47,26 +47,14 @@ const schema = z.object({
   tokenBridge: z
     .string()
     .min(2, { message: "Token bridge config is required" })
-    .transform((val, ctx) => {
+    .refine((val) => {
       try {
         const parsed = JSON.parse(val);
-        const result = tokenBridgeObjectSchema.safeParse(parsed);
-        if (!result.success) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Invalid tokenBridge structure",
-          });
-          return z.NEVER;
-        }
-        return result.data;
+        return tokenBridgeObjectSchema.safeParse(parsed).success;
       } catch {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Invalid JSON format",
-        });
-        return z.NEVER;
+        return false;
       }
-    }),
+    }, { message: "Invalid tokenBridge structure" }),
 
   // Separated NetworkConfig fields
   nativeCurrencyName: z.string().min(1, { message: "Required" }),
@@ -74,7 +62,6 @@ const schema = z.object({
   nativeCurrencyDecimals: z.preprocess((val) => Number(val), z.number().min(1)),
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
-  localRpcUrl: z.string().url().min(1),
 
   logoURI: z
     .string()
@@ -93,6 +80,8 @@ const schema = z.object({
   isTestnet: z.boolean(),
   parentChainId: z.preprocess((val) => Number(val), z.number().min(1)),
 });
+
+type ChainFormData = z.infer<typeof schema>;
 
 export const ChainForm = ({
   chain,
@@ -116,45 +105,52 @@ export const ChainForm = ({
     setError,
     clearErrors,
     formState: { errors, isSubmitting },
-  } = useForm({
+  } = useForm<ChainFormData>({
     resolver: zodResolver(schema),
-    values: {
-      chainId: chain?.chainId,
-      name: chain?.name,
-      bridge: chain?.ethBridge?.bridge,
-      inbox: chain?.ethBridge?.inbox,
-      sequencerInbox: chain?.ethBridge?.sequencerInbox,
-      outbox: chain?.ethBridge?.outbox,
-      rollup: chain?.ethBridge?.rollup,
-      explorerUrl: chain?.explorer?.default?.url,
-      nativeCurrencyName: chain?.nativeCurrency?.name,
-      nativeCurrencySymbol: chain?.nativeCurrency?.symbol,
-      nativeCurrencyDecimals: chain?.nativeCurrency?.decimals,
-      publicRpcUrl: chain?.rpcUrls?.default?.http?.[0],
-      localRpcUrl: chain?.rpcUrls?.default?.http?.[0],
-      logoURI: chain?.logoURI,
-      isTestnet: chain?.isTestnet,
-      tokenBridge: chain?.tokenBridge
-        ? JSON.stringify(chain.tokenBridge, null, 2)
-        : "",
-      parentChainId: chain?.parentChainId,
-    },
+    defaultValues: chain ? {
+        chainId: chain.chainId,
+        name: chain.name,
+        bridge: chain.ethBridge.bridge as `0x${string}`,
+        inbox: chain.ethBridge.inbox as `0x${string}`,
+        sequencerInbox: chain.ethBridge.sequencerInbox as `0x${string}`,
+        outbox: chain.ethBridge.outbox as `0x${string}`,
+        rollup: chain.ethBridge.rollup as `0x${string}`,
+        explorerUrl: chain.explorer.default.url,
+        nativeCurrencyName: chain.nativeCurrency.name,
+        nativeCurrencySymbol: chain.nativeCurrency.symbol,
+        nativeCurrencyDecimals: chain.nativeCurrency.decimals,
+        publicRpcUrl: chain.rpcUrls.default.http[0],
+        logoURI: chain.logoURI,
+        isTestnet: chain.isTestnet,
+        tokenBridge: chain.tokenBridge ? JSON.stringify(chain.tokenBridge, null, 2) : "",
+        parentChainId: chain.parentChainId,
+    } : undefined,
   });
 
   const chainId = useWatch({ control, name: "chainId" });
 
-  const onSubmit = async (data: any) => {
-    const payload: CustomChainPayload = {
+  const onSubmit = async (data: ChainFormData) => {
+    if (!address) return;
+
+    const payload: ChainFormData & CustomChainPayload = {
       ...data,
+      logoURI: data.logoURI || "",
       user: address,
+      tokenBridge: JSON.parse(data.tokenBridge),
     };
 
-    if (address) {
-      if (editing) setSelectedChain(await editChain(client, payload));
-      else setSelectedChain(await createChain(client, payload));
+    let savedChain: CustomChain;
 
-      navigate({ to: "/" });
+    if (editing) {
+      savedChain = await editChain(client, payload);
     }
+    else {
+      savedChain = await createChain(client, payload);
+    };
+
+    setSelectedChain(savedChain)
+
+    navigate({ to: "/" });
   };
 
   useEffect(() => {
@@ -223,6 +219,14 @@ export const ChainForm = ({
         >
           {address ? "Continue" : "Connect your wallet to get started"}
         </Button>
+      )}
+
+      {Object.keys(errors).length > 0 && (
+        <div className="mt-8 w-full flex flex-col gap-4">
+          {Object.keys(errors).map((key) => (
+            <p key={key} className="text-sm text-red-500">{`${key}: ${errors[key as keyof ChainFormData]?.message}`}</p>
+          ))}
+        </div>
       )}
 
       {address && (
@@ -345,16 +349,6 @@ export const ChainForm = ({
             </div>
             <div className="mb-6">
               <Input
-                name="localRpcUrl"
-                label="Local RPC URL"
-                placeholder="Local RPC URL"
-                register={register}
-                type="url"
-                error={errors.localRpcUrl?.message}
-              />
-            </div>
-            <div className="mb-6">
-              <Input
                 name="logoURI"
                 label="Logo URI"
                 placeholder="Logo URI"
@@ -377,7 +371,7 @@ export const ChainForm = ({
                 placeholder="Parent chain id"
                 type="tel"
                 register={register}
-                error={errors.name?.message}
+                error={errors.parentChainId?.message}
               />
             </div>
             <div className="mb-6 flex flex-col sm:flex-row w-full gap-4">

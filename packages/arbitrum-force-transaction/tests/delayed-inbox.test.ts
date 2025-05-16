@@ -4,7 +4,7 @@ import { hardhatMineBlocks } from "./utils/hardhat-mine";
 import { resetHardhatForkEth } from "./utils/hardhat-reset";
 import { config } from "./utils/config";
 
-xdescribe("Arbitrum delayed inbox", () => {
+describe("Arbitrum delayed inbox", () => {
     let delayedInbox: ArbitrumDelayedInbox;
     let l1Provider: providers.Provider;
     let l2Provider: providers.Provider;
