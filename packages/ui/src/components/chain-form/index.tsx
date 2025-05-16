@@ -237,12 +237,18 @@ export const ChainForm = ({
             <div className="mb-6">
               <Input
                 disabled={editing}
-                name="chainId"
                 type="tel"
                 label="Chain id"
                 placeholder="Chain ID"
-                register={register}
                 error={errors.chainId?.message}
+                pattern="[0-9]*"
+                inputMode="numeric"
+                defaultValue={chain?.chainId}
+                {...register("chainId", {
+                  onChange: (e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                  }
+                })}
               />
             </div>
             <div className="mb-6">
@@ -355,12 +361,18 @@ export const ChainForm = ({
             </div>
             <div className="mb-6">
               <Input
-                name="parentChainId"
                 label="Parent chain id"
                 placeholder="Parent chain id"
                 type="tel"
-                register={register}
                 error={errors.parentChainId?.message}
+                pattern="[0-9]*"
+                inputMode="numeric"
+                defaultValue={chain?.parentChainId}
+                {...register("parentChainId", {
+                  onChange: (e) => {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                  }
+                })}
               />
             </div>
             <div className="mb-6 flex flex-col sm:flex-row w-full gap-4">
