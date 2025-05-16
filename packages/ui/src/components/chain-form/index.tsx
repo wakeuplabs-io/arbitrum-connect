@@ -34,7 +34,7 @@ const tokenBridgeObjectSchema: z.ZodType<TokenBridge> = z.object({
 });
 
 const schema = z.object({
-  chainId: z.preprocess((val) => Number(val), z.number().min(1)),
+  chainId: z.coerce.number().min(1),
   name: z.string().min(1, { message: "Required" }),
 
   // EthBridge fields
@@ -59,7 +59,7 @@ const schema = z.object({
   // Separated NetworkConfig fields
   nativeCurrencyName: z.string().min(1, { message: "Required" }),
   nativeCurrencySymbol: z.string().min(1, { message: "Required" }),
-  nativeCurrencyDecimals: z.preprocess((val) => Number(val), z.number().min(1)),
+  nativeCurrencyDecimals: z.coerce.number().min(1),
   explorerUrl: z.string().url().min(1),
   publicRpcUrl: z.string().url().min(1),
 
@@ -78,7 +78,7 @@ const schema = z.object({
     )
     .optional(),
   isTestnet: z.boolean(),
-  parentChainId: z.preprocess((val) => Number(val), z.number().min(1)),
+  parentChainId: z.coerce.number().min(1),
 });
 
 type ChainFormData = z.infer<typeof schema>;
