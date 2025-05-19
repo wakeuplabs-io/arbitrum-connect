@@ -46,7 +46,7 @@ export default function ForceStep({
   fetchingClaimStatus,
   fetchingL2ToL1Msg,
   state,
-  parentChain,
+  // parentChain,
 }: {
   transaction: Transaction;
   onError: (error: Error) => void;
@@ -87,7 +87,8 @@ export default function ForceStep({
       running={isLoading}
       number={3}
       title="Force transaction"
-      description={`If after 24 hours your ${parentChain?.name} transaction hasn't been mined, you can push it forward manually with some extra fee in ${parentChain?.nativeCurrency.symbol}`}
+      // description={`If after 24 hours your ${parentChain?.name} transaction hasn't been mined, you can push it forward manually with some extra fee in ${parentChain?.nativeCurrency.symbol}`}
+      description={`The maximum wait time to claim is 24 hours. However, if the transaction does not require being force included, it may become available sooner.`}
       className="flex flex-col items-start pt-2 space-y-2 md:space-y-0 md:space-x-2 mb-4 md:flex-row md:items-center"
     >
       {!DONE && state === TransactionState.FORCEABLE ? (
