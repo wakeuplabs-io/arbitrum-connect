@@ -8,7 +8,7 @@ Built by [WakeUp Labs](https://www.wakeuplabs.io/), this dApp simplifies the sta
 
 You can try the live version of Arbitrum Connect (production environment supporting both mainnet and testnet):
 
-**Production App:** [Arbitrum Connect](https://staging-arbitrum-connect-alt.wakeuplabs.link/)
+**Production App:** [Arbitrum Connect](https://arbitrumconnect.xyz/)
 
 This app is meant to guide you through a complete and safe withdrawal from child chain (e.g., Arbitrum) to parent chain (e.g., Ethereum) — and step in with support if things go wrong.
 
